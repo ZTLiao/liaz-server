@@ -24,3 +24,6 @@ cache/
 # Go workspace file
 go.work
 go.work.sum
+
+# Order file
+.DS_Store
