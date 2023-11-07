@@ -1,14 +1,10 @@
 package main
 
 import (
-	"core/application"
+	_ "admin/router"
 	"core/cmd"
 	"core/logger"
 )
-
-func init() {
-	application.GetApp().SetName("liaz-admin")
-}
 
 func main() {
 	cmd.Execute()

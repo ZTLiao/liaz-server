@@ -4,6 +4,7 @@ import (
 	"core/application"
 	"core/config"
 	"core/utils"
+	"core/web"
 	"errors"
 	"fmt"
 	"os"
@@ -42,15 +43,30 @@ func init() {
 }
 
 func run() {
+	setup()
+	start()
+}
+
+func setup() {
 	fmt.Printf("The profile active is %s\n", env)
 	application.GetApp().SetEnv(env)
 	config.Setup()
+}
+
+func start() {
+	var server = config.SystemConfig.Server
+	if server == nil {
+		return
+	}
 	fmt.Println("Start server...")
 	var engine = application.GetApp().GetEngine()
-	var port = strconv.Itoa(config.SystemConfig.Server.Port)
-	fmt.Printf("The server port is %s\n", port)
+	//初始化
+	web.InitRouter(engine)
+	//端口
+	var port = strconv.Itoa(server.Port)
 	var serverAddr = utils.COLON + port
 	engine.Run(serverAddr)
+	fmt.Printf("The server port is %s\n", port)
 }
 
 func Execute() {
