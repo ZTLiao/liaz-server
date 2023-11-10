@@ -3,7 +3,9 @@ package application
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"github.com/xormplus/xorm"
 )
 
 type Application struct {
@@ -11,7 +13,9 @@ type Application struct {
 	name          string
 	iConfigClient config_client.IConfigClient
 	logger        *logrus.Logger
-	engine        *gin.Engine
+	ginEngine     *gin.Engine
+	xormEngine    *xorm.Engine
+	redisClient   *redis.Client
 }
 
 func (e *Application) SetEnv(env string) {
@@ -54,14 +58,34 @@ func (e *Application) GetLogger() *logrus.Logger {
 	return e.logger
 }
 
-func (e *Application) SetEngine(engine *gin.Engine) {
-	if e.engine == nil {
-		e.engine = engine
+func (e *Application) SetGinEngine(engine *gin.Engine) {
+	if e.ginEngine == nil {
+		e.ginEngine = engine
 	}
 }
 
-func (e *Application) GetEngine() *gin.Engine {
-	return e.engine
+func (e *Application) GetGinEngine() *gin.Engine {
+	return e.ginEngine
+}
+
+func (e *Application) SetXormEngine(engine *xorm.Engine) {
+	if e.xormEngine == nil {
+		e.xormEngine = engine
+	}
+}
+
+func (e *Application) GetXormEngine() *xorm.Engine {
+	return e.xormEngine
+}
+
+func (e *Application) SetRedisClient(client *redis.Client) {
+	if e.redisClient == nil {
+		e.redisClient = client
+	}
+}
+
+func (e *Application) GetRedisClient() *redis.Client {
+	return e.redisClient
 }
 
 var application = new(Application)

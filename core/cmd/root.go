@@ -59,7 +59,7 @@ func start() {
 		return
 	}
 	fmt.Println("Start server...")
-	var engine = application.GetApp().GetEngine()
+	var engine = application.GetApp().GetGinEngine()
 	//初始化
 	web.InitRouter(engine)
 	//端口

@@ -28,7 +28,7 @@ var (
 			Password:           "nacos",
 			ServerAddr:         "127.0.0.1:8848",
 			Namespace:          "5f49cd28-4eb2-4b0b-a467-bab25f4c9535",
-			SharedDataIds:      "application.yaml",
+			SharedDataIds:      "application.yaml,database.yaml",
 			RefreshableDataIds: "application.yaml",
 		},
 		TEST: {
@@ -36,7 +36,7 @@ var (
 			Password:           "nacos",
 			ServerAddr:         "127.0.0.1:8848",
 			Namespace:          "5f49cd28-4eb2-4b0b-a467-bab25f4c9535",
-			SharedDataIds:      "application.yaml",
+			SharedDataIds:      "application.yaml,database.yaml",
 			RefreshableDataIds: "application.yaml",
 		},
 		PROD: {
@@ -44,7 +44,7 @@ var (
 			Password:           "nacos",
 			ServerAddr:         "127.0.0.1:8848",
 			Namespace:          "5f49cd28-4eb2-4b0b-a467-bab25f4c9535",
-			SharedDataIds:      "application.yaml",
+			SharedDataIds:      "application.yaml,database.yaml",
 			RefreshableDataIds: "application.yaml",
 		},
 	}
@@ -91,13 +91,13 @@ func (e *Nacos) Init() {
 	iConfigClient = iClient
 	application.GetApp().SetIConfigClient(iClient)
 	//获取配置
-	e.getConfig()
+	e.config()
 	//设置监听事件
-	e.listenConfig()
+	e.listen()
 }
 
 // 获取配置
-func (e *Nacos) getConfig() {
+func (e *Nacos) config() {
 	var configYml string
 	sharedDataIdArray := strings.Split(e.SharedDataIds, utils.COMMA)
 	for i := 0; i < len(sharedDataIdArray); i++ {
@@ -124,11 +124,11 @@ func (e *Nacos) getConfig() {
 	}
 	configYml += fmt.Sprintf("%s\n", content)
 	//刷新全局配置
-	e.refreshConfig(configYml)
+	e.refresh(configYml)
 }
 
 // 设置监听事件
-func (e *Nacos) listenConfig() {
+func (e *Nacos) listen() {
 	refreshableDataIdArray := strings.Split(e.RefreshableDataIds, utils.COMMA)
 	for i := 0; i < len(refreshableDataIdArray); i++ {
 		dataId := refreshableDataIdArray[i]
@@ -138,7 +138,7 @@ func (e *Nacos) listenConfig() {
 				Group:  "DEFAULT_GROUP",
 				OnChange: func(namespace, group, dataId, data string) {
 					fmt.Printf("Listening config group : %s, dataId : %s, data : %s\n", group, dataId, data)
-					e.refreshConfig(data)
+					e.refresh(data)
 				},
 			},
 		)
@@ -149,7 +149,7 @@ func (e *Nacos) listenConfig() {
 }
 
 // 刷新全局配置
-func (e *Nacos) refreshConfig(configYml string) {
+func (e *Nacos) refresh(configYml string) {
 	if err := yaml.Unmarshal([]byte(configYml), &SystemConfig); err != nil {
 		fmt.Println(err.Error())
 	}

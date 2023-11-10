@@ -1,7 +1,8 @@
 package utils
 
 const (
-	EMPTY string = ""
-	COLON string = ":"
-	COMMA string = ","
+	EMPTY     string = ""
+	COLON     string = ":"
+	COMMA     string = ","
+	UNDERLINE string = "_"
 )

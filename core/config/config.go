@@ -3,9 +3,12 @@ package config
 import "core/application"
 
 type Config struct {
-	Nacos  *Nacos  `mapstructure:""`
-	Logger *Logger `yaml:"logger"`
-	Server *Server `yaml:"server"`
+	Nacos    *Nacos    `mapstructure:""`
+	Logger   *Logger   `yaml:"logger"`
+	Server   *Server   `yaml:"server"`
+	Dasebase *Database `yaml:"database"`
+	Redis    *Redis    `yaml:"redis"`
+	Security *Security `yaml:"security"`
 }
 
 var SystemConfig = new(Config)
@@ -26,6 +29,10 @@ func Setup() {
 	SystemConfig.Nacos.Init()
 	//日志
 	SystemConfig.Logger.Init()
+	//数据库
+	SystemConfig.Dasebase.Init()
+	//缓存
+	SystemConfig.Redis.Init()
 	//http
 	SystemConfig.Server.Init()
 }

@@ -4,16 +4,6 @@ import (
 	"core/application"
 )
 
-type ILogger interface {
-	Trace(string, ...interface{})
-	Debug(string, ...interface{})
-	Info(string, ...interface{})
-	Warn(string, ...interface{})
-	Error(string, ...interface{})
-	Fatal(string, ...interface{})
-	Panic(string, ...interface{})
-}
-
 func Trace(format string, args ...interface{}) {
 	var logger = application.GetApp().GetLogger()
 	logger.Tracef(format, args...)

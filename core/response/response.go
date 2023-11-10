@@ -6,10 +6,10 @@ import (
 )
 
 type Response struct {
-	Code      int         `json:"code"`
-	Message   string      `json:"message"`
-	Data      interface{} `json:"data,omitempty"`
-	Timestamp int64       `json:"timestamp"`
+	Code      int         `json:"code"`           // 响应编码
+	Message   string      `json:"message"`        // 响应信息
+	Data      interface{} `json:"data,omitempty"` // 响应体
+	Timestamp int64       `json:"timestamp"`      // 当前时间戳
 }
 
 // constructor
@@ -28,9 +28,11 @@ func Success() *Response {
 }
 
 // fail
-func Fail() *Response {
+func Fail(message string) *Response {
 	var code = http.StatusInternalServerError
-	var message = http.StatusText(code)
+	if len(message) == 0 {
+		message = http.StatusText(code)
+	}
 	return New(code, message, nil)
 }
 

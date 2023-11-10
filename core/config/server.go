@@ -14,6 +14,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nacos-group/nacos-sdk-go/v2/inner/uuid"
 	"github.com/sirupsen/logrus"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -30,32 +32,10 @@ func (e *Server) Init() {
 	if env == PROD {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	engine.Use(RequestIdHandler()).Use(LoggerHandler()).Use(ErrorHandler())
-	application.GetApp().SetEngine(engine)
-}
-
-// 异常处理
-func ErrorHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			if r := recover(); r != nil {
-				debug.PrintStack()
-				err := fmt.Sprintf("%s", r)
-				c.JSON(http.StatusOK, response.ReturnError(http.StatusInternalServerError, err))
-			}
-		}()
-		c.Next()
-		if len(c.Errors) > 0 {
-			err := c.Errors[0].Err
-			var code int = http.StatusInternalServerError
-			var message string = err.Error()
-			if apiError, ok := err.(*errors.ApiError); ok {
-				code = apiError.Code
-				message = apiError.Message
-			}
-			c.JSON(http.StatusOK, response.ReturnError(code, message))
-		}
-	}
+	var routerGroup = engine.RouterGroup
+	routerGroup.Use(RequestIdHandler()).Use(LoggerHandler()).Use(ErrorHandler())
+	routerGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler()))
+	application.GetApp().SetGinEngine(engine)
 }
 
 // 请求ID拦截器
@@ -110,6 +90,32 @@ func LoggerHandler() gin.HandlerFunc {
 			entry.Warn()
 		} else {
 			entry.Info()
+		}
+	}
+}
+
+// 异常处理
+func ErrorHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				debug.PrintStack()
+				err := fmt.Sprintf("%s", r)
+				c.JSON(http.StatusOK, response.ReturnError(http.StatusInternalServerError, err))
+			}
+		}()
+		c.Next()
+		if len(c.Errors) > 0 {
+			err := c.Errors[0].Err
+			var code int = http.StatusInternalServerError
+			var message string = err.Error()
+			if apiError, ok := err.(*errors.ApiError); ok {
+				if apiError.Code != 0 {
+					code = apiError.Code
+				}
+				message = apiError.Message
+			}
+			c.JSON(http.StatusOK, response.ReturnError(code, message))
 		}
 	}
 }
