@@ -34,9 +34,10 @@ func (e *AccessTokenCache) Del(adminId int64) {
 
 func (e *AccessTokenCache) TTL(adminId int64) int64 {
 	duration, _ := redis.TTL(e.redisKey(adminId))
-	return duration.Milliseconds()
+	return int64(duration.Milliseconds())
 }
 
 func (e *AccessTokenCache) IsExist(adminId int64) bool {
-	return e.TTL(adminId) != -2
+	num, _ := redis.Exists(e.redisKey(adminId))
+	return num > 0
 }

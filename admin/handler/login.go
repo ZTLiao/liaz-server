@@ -27,7 +27,7 @@ func (e *LoginHandler) Login(wc *web.WebContext) interface{} {
 	var username = wc.Context.PostForm("username")
 	var password = wc.Context.PostForm("password")
 	wc.Info("username : %s, password : %s", username, password)
-	adminUser := new(storage.AdminUserStorage).GetLoginUser(username, password)
+	adminUser := new(storage.AdminUserDb).GetLoginUser(username, password)
 	if adminUser == nil {
 		return response.Fail(constant.LOGIN_ERROR)
 	}
@@ -43,6 +43,8 @@ func (e *LoginHandler) Login(wc *web.WebContext) interface{} {
 		accessTokenCache.Set(adminId, accessToken)
 		new(storage.AdminUserCache).Set(accessToken, adminUser)
 	}
+	//记录
+	new(AdminLoginRecordHandler).AddRecord(adminId, wc.Context.ClientIP(), wc.Context.Request.Header.Get(constant.USER_AGENT))
 	return response.ReturnOK(&resp.AccessTokenResp{
 		AccessToken: accessToken,
 		ExpireAt:    accessTokenCache.TTL(adminId),

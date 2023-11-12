@@ -63,3 +63,8 @@ func TTL(key string) (time.Duration, error) {
 	client := application.GetApp().GetRedisClient()
 	return client.TTL(context.TODO(), key).Result()
 }
+
+func Exists(key ...string) (int64, error) {
+	client := application.GetApp().GetRedisClient()
+	return client.Exists(context.TODO(), key...).Result()
+}

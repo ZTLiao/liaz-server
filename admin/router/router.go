@@ -6,6 +6,7 @@ import (
 	"core/application"
 	"core/config"
 	"core/constant"
+	"core/request"
 	"core/response"
 	"core/web"
 	"net/http"
@@ -26,6 +27,10 @@ func init() {
 		{
 			new(controller.LoginController).Router(r)
 			new(controller.AdminUserController).Router(r)
+			new(controller.LogoutController).Router(r)
+			new(controller.AdminMenuController).Router(r)
+			new(controller.AdminRoleController).Router(r)
+			new(controller.AdminRoleMenuController).Router(r)
 		}
 	})
 }
@@ -43,13 +48,20 @@ func AdminSecurityHandler() gin.HandlerFunc {
 		var accessToken = c.Request.Header.Get(constant.AUTHORIZATION)
 		if len(accessToken) == 0 {
 			c.JSON(http.StatusUnauthorized, response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED))
+			c.Abort()
 			return
 		}
 		var adminUser = new(storage.AdminUserCache).Get(accessToken)
 		if adminUser == nil {
 			c.JSON(http.StatusUnauthorized, response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED))
+			c.Abort()
 			return
 		}
+		headers := c.Request.Header
+		formParams, _ := request.GetPostFormParams(c)
+		queryParams := request.GetQueryParams(c)
+		bodyParams := request.GetBodyParams(c)
+		new(storage.AdminLogDb).AddLog(adminUser.AdminId, c.Request.RequestURI, headers, queryParams, formParams, bodyParams)
 		c.Next()
 	}
 }

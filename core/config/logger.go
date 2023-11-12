@@ -24,12 +24,15 @@ func (e *Logger) Init() {
 		switch e.Type {
 		case "json":
 			log.SetFormatter(&logrus.JSONFormatter{
-				TimestampFormat: utils.DEFAULT_DATETIME_PATTERN,
+				TimestampFormat: utils.NORM_DATETIME_MS_PATTERN,
 			})
 		case "text":
+			log.SetFormatter(&logrus.TextFormatter{
+				TimestampFormat: utils.NORM_DATETIME_MS_PATTERN,
+			})
 		default:
 			log.SetFormatter(&logrus.TextFormatter{
-				TimestampFormat: utils.DEFAULT_DATETIME_PATTERN,
+				TimestampFormat: utils.NORM_DATETIME_MS_PATTERN,
 			})
 		}
 		if e.Stdout == "file" {

@@ -2,10 +2,10 @@ package application
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-xorm/xorm"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
-	"github.com/xormplus/xorm"
 )
 
 type Application struct {

@@ -30,7 +30,11 @@ func (e *AdminUserCache) Get(accessToken string) *model.AdminUser {
 	if len(val) == 0 {
 		return nil
 	}
-	var adminUser = new(model.AdminUser)
-	json.Unmarshal([]byte(val), adminUser)
-	return adminUser
+	var adminUser model.AdminUser
+	json.Unmarshal([]byte(val), &adminUser)
+	return &adminUser
+}
+
+func (e *AdminUserCache) Del(accessToken string) {
+	redis.Del(e.redisKey(accessToken))
 }

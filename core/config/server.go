@@ -1,14 +1,17 @@
 package config
 
 import (
+	"bytes"
 	"core/application"
 	"core/constant"
 	"core/errors"
+	"core/request"
 	"core/response"
 	"core/utils"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -29,12 +32,13 @@ func (e *Server) Init() {
 	var env = application.GetApp().GetEnv()
 	var engine = gin.New()
 	engine.SetTrustedProxies([]string{"127.0.0.1"})
+	var routerGroup = engine.RouterGroup
+	routerGroup.Use(ErrorHandler()).Use(RequestIdHandler()).Use(LoggerHandler())
 	if env == PROD {
 		gin.SetMode(gin.ReleaseMode)
+	} else {
+		routerGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler()))
 	}
-	var routerGroup = engine.RouterGroup
-	routerGroup.Use(RequestIdHandler()).Use(LoggerHandler()).Use(ErrorHandler())
-	routerGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler()))
 	application.GetApp().SetGinEngine(engine)
 }
 
@@ -58,39 +62,38 @@ func LoggerHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := application.GetApp().GetLogger()
 		requestId := c.Request.Header.Get(constant.X_REQUEST_ID)
-		startTime := time.Now()
-		c.Next()
-		spendTime := time.Since(startTime).Milliseconds()
-		//API调用耗时
-		ST := fmt.Sprintf("%d ms", spendTime)
-		//状态码
-		statusCode := c.Writer.Status()
 		//请求客户端的IP
 		clientIP := c.ClientIP()
 		//请求方法
 		method := c.Request.Method
 		//请求URL
 		path := c.Request.RequestURI
+		startTime := time.Now()
+		//日志体
 		entry := logger.WithFields(logrus.Fields{
 			"requestId": requestId,
-			"status":    statusCode,
-			"spendTime": ST,
-			"clientIP":  clientIP,
+			"clientIp":  clientIP,
 			"method":    method,
 			"path":      path,
 		})
+		//封装响应体
+		writerWrapper := &ResponseWriterWrapper{Body: bytes.NewBufferString(utils.EMPTY), ResponseWriter: c.Writer}
+		c.Writer = writerWrapper
+		queryParams := request.GetQueryParams(c)
+		formParams, _ := request.GetPostFormParams(c)
+		bodyParams := request.GetBodyParams(c)
+		entry.Infof("request headers : %s, queryParams : %s, formParams : %s, bodyParams : %s", c.Request.Header, queryParams, formParams, bodyParams)
+		c.Next()
+		spendTime := time.Since(startTime).Milliseconds()
+		//API调用耗时
+		ST := fmt.Sprintf("%d ms", spendTime)
+		//状态码
+		statusCode := c.Writer.Status()
 		//Errors保存了使用当前context的所有中间件/handler所产生的全部错误信息。
 		if len(c.Errors) > 0 {
 			logger.Error(c.Errors.ByType(gin.ErrorTypePrivate).String())
 		}
-		//根据状态码决定打印log的等级
-		if statusCode >= http.StatusInternalServerError {
-			entry.Error()
-		} else if statusCode >= http.StatusBadRequest {
-			entry.Warn()
-		} else {
-			entry.Info()
-		}
+		entry.Infof("response status : %s, spendTime : %s, result : %s", strconv.FormatInt(int64(statusCode), 10), ST, writerWrapper.Body.String())
 	}
 }
 
@@ -102,6 +105,7 @@ func ErrorHandler() gin.HandlerFunc {
 				debug.PrintStack()
 				err := fmt.Sprintf("%s", r)
 				c.JSON(http.StatusOK, response.ReturnError(http.StatusInternalServerError, err))
+				c.Abort()
 			}
 		}()
 		c.Next()
@@ -116,6 +120,22 @@ func ErrorHandler() gin.HandlerFunc {
 				message = apiError.Message
 			}
 			c.JSON(http.StatusOK, response.ReturnError(code, message))
+			c.Abort()
 		}
 	}
+}
+
+type ResponseWriterWrapper struct {
+	gin.ResponseWriter
+	Body *bytes.Buffer // 缓存
+}
+
+func (w ResponseWriterWrapper) Write(b []byte) (int, error) {
+	w.Body.Write(b)
+	return w.ResponseWriter.Write(b)
+}
+
+func (w ResponseWriterWrapper) WriteString(s string) (int, error) {
+	w.Body.WriteString(s)
+	return w.ResponseWriter.WriteString(s)
 }
