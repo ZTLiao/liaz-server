@@ -26,8 +26,8 @@ func (e *AdminMenuDb) GetAdminMemu(adminId int64) []model.AdminMenu {
 			am.created_at,
 			am.updated_at
 		from admin_user_role as aur 
-		inner join admin_role_menu as arm on arm.role_id = aur.role_id
-		inner join admin_menu as am on am.menu_id = arm.menu_id
+		left join admin_role_menu as arm on arm.role_id = aur.role_id
+		left join admin_menu as am on am.menu_id = arm.menu_id
 		where 
 			aur.admin_id = ?
 		group by am.menu_id
