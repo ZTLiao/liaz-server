@@ -14,4 +14,5 @@ func (e *AdminUserController) Router(iWebRoutes web.IWebRoutes) {
 	iWebRoutes.POST("/user", new(handler.AdminUserHandler).SaveAdminUser)
 	iWebRoutes.PUT("/user", new(handler.AdminUserHandler).UpdateAdminUser)
 	iWebRoutes.DELETE("/user/:adminId", new(handler.AdminUserHandler).DelAdminUser)
+	iWebRoutes.PUT("/user/thaw", new(handler.AdminUserHandler).ThawAdminUser)
 }

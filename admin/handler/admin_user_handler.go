@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"admin/model"
 	"admin/resp"
 	"admin/storage"
 	"core/constant"
+	"core/errors"
 	"core/response"
 	"core/web"
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -78,7 +81,36 @@ func (e *AdminUserHandler) UpdateAdminUser(wc *web.WebContext) interface{} {
 }
 
 func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
-
+	var params map[string]any
+	if err := wc.Context.ShouldBindJSON(&params); err != nil {
+		wc.Context.Error(&errors.ApiError{
+			Message: err.Error(),
+		})
+		return
+	}
+	var adminIdStr = fmt.Sprint(params["adminId"])
+	var name = fmt.Sprint(params["name"])
+	var username = fmt.Sprint(params["username"])
+	var password = fmt.Sprint(params["password"])
+	var phone = fmt.Sprint(params["phone"])
+	var avatar = fmt.Sprint(params["avatar"])
+	var email = fmt.Sprint(params["email"])
+	var introduction = fmt.Sprint(params["introduction"])
+	var statusStr = fmt.Sprint(params["status"])
+	var adminUser = new(model.AdminUser)
+	if len(adminIdStr) > 0 {
+		adminUser.AdminId, _ = strconv.ParseInt(adminIdStr, 10, 64)
+	}
+	adminUser.Name = name
+	adminUser.Username = username
+	adminUser.Password = password
+	adminUser.Phone = phone
+	adminUser.Avatar = avatar
+	adminUser.Email = email
+	adminUser.Introduction = introduction
+	status, _ := strconv.ParseInt(statusStr, 10, 64)
+	adminUser.Status = int8(status)
+	new(storage.AdminUserDb).SaveOrUpdateAdminUser(adminUser)
 }
 
 // @Summary 修改系统用户
@@ -92,14 +124,33 @@ func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user/:adminId [delete]
 func (e *AdminUserHandler) DelAdminUser(wc *web.WebContext) interface{} {
-	var adminId = wc.Context.Param("adminId")
-	if len(adminId) > 0 {
-		val, _ := strconv.ParseInt(adminId, 10, 64)
-		new(storage.AdminUserDb).DelAdminUser(val)
-		accessToken := new(storage.AccessTokenCache).Get(val)
+	var adminIdStr = wc.Context.Param("adminId")
+	if len(adminIdStr) > 0 {
+		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
+		new(storage.AdminUserDb).DelAdminUser(adminId)
+		accessToken := new(storage.AccessTokenCache).Get(adminId)
 		if len(accessToken) > 0 {
 			new(storage.AdminUserCache).Del(accessToken)
 		}
+	}
+	return response.Success()
+}
+
+// @Summary 解冻系统用户
+// @title Swagger API
+// @Tags 用户管理
+// @description 解冻系统用户接口
+// @Security ApiKeyAuth
+// @BasePath /admin/user/thaw
+// @Param adminId formdata int64 true "用户ID"
+// @Produce json
+// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
+// @Router /admin/user/:adminId [delete]
+func (e *AdminUserHandler) ThawAdminUser(wc *web.WebContext) interface{} {
+	var adminIdStr = wc.Context.PostForm("adminId")
+	if len(adminIdStr) > 0 {
+		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
+		new(storage.AdminUserDb).ThawAdminUser(adminId)
 	}
 	return response.Success()
 }

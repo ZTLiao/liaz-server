@@ -31,6 +31,7 @@ func init() {
 			new(controller.AdminMenuController).Router(r)
 			new(controller.AdminRoleController).Router(r)
 			new(controller.AdminRoleMenuController).Router(r)
+			new(controller.AdminUserRoleController).Router(r)
 		}
 	})
 }

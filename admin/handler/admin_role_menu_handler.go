@@ -77,7 +77,7 @@ func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} 
 // @title Swagger API
 // @Tags 角色管理
 // @description 授权接口
-// @BasePath /admin/login
+// @BasePath /admin/role/menu
 // @Produce json
 // @Param roleId formData string true "角色ID"
 // @Param menuIds formData string true "多个菜单ID"
@@ -87,17 +87,19 @@ func (e *AdminRoleMenuHandler) SaveAdminRoleMenu(wc *web.WebContext) interface{}
 	var roleIdStr = wc.Context.PostForm("roleId")
 	var menuIds = wc.Context.PostForm("menuIds")
 	wc.Info("roleId : %s, menuIds : %s", roleIdStr, menuIds)
-	if len(roleIdStr) == 0 || len(menuIds) == 0 {
+	if len(roleIdStr) == 0 {
 		return response.Success()
 	}
 	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
 	var adminRoleMenuDb = new(storage.AdminRoleMenuDb)
 	adminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
-	var menuIdArray = strings.Split(menuIds, utils.COMMA)
-	for i := 0; i < len(menuIdArray); i++ {
-		var menuId = menuIdArray[i]
-		val, _ := strconv.ParseInt(menuId, 10, 64)
-		adminRoleMenuDb.AddAdminRoleMenu(roleId, val)
+	if len(menuIds) > 0 {
+		var menuIdArray = strings.Split(menuIds, utils.COMMA)
+		for i := 0; i < len(menuIdArray); i++ {
+			var menuIdStr = menuIdArray[i]
+			menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
+			adminRoleMenuDb.AddAdminRoleMenu(roleId, menuId)
+		}
 	}
 	return response.Success()
 }

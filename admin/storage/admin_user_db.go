@@ -48,3 +48,10 @@ func (e *AdminUserDb) DelAdminUser(adminId int64) {
 	var engine = application.GetApp().GetXormEngine()
 	engine.ID(adminId).Delete(&model.AdminUser{})
 }
+
+func (e *AdminUserDb) ThawAdminUser(adminId int64) {
+	var engine = application.GetApp().GetXormEngine()
+	engine.ID(adminId).Update(&model.AdminUser{
+		Status: 1,
+	})
+}
