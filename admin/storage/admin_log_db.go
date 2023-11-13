@@ -24,6 +24,6 @@ func (e *AdminLogDb) AddLog(adminId int64, uri string, headers map[string][]stri
 	}
 	paramsJson, _ := json.Marshal(params)
 	adminLog.Params = string(paramsJson)
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	engine.Insert(adminLog)
 }

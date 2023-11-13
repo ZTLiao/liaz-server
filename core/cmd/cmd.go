@@ -16,10 +16,10 @@ import (
 var (
 	env     string
 	rootCmd = &cobra.Command{
-		Use:          application.GetApp().GetName(),
-		Short:        application.GetApp().GetName(),
+		Use:          application.GetName(),
+		Short:        application.GetName(),
 		SilenceUsage: true,
-		Long:         application.GetApp().GetName(),
+		Long:         application.GetName(),
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("requires at least one arg")
@@ -30,7 +30,7 @@ var (
 	StartCmd = &cobra.Command{
 		Use:     "start",
 		Short:   "Start application",
-		Example: application.GetApp().GetName() + " start -e dev",
+		Example: application.GetName() + " start -e dev",
 		Run: func(cmd *cobra.Command, args []string) {
 			run()
 		},
@@ -49,7 +49,7 @@ func run() {
 
 func setup() {
 	fmt.Printf("The profile active is %s\n", env)
-	application.GetApp().SetEnv(env)
+	application.SetEnv(env)
 	config.Setup()
 }
 
@@ -59,7 +59,7 @@ func start() {
 		return
 	}
 	fmt.Println("Start server...")
-	var engine = application.GetApp().GetGinEngine()
+	var engine = application.GetGinEngine()
 	//初始化
 	web.InitRouter(engine)
 	//端口

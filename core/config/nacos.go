@@ -89,7 +89,7 @@ func (e *Nacos) Init() {
 		panic(err)
 	}
 	iConfigClient = iClient
-	application.GetApp().SetIConfigClient(iClient)
+	application.SetIConfigClient(iClient)
 	//获取配置
 	e.config()
 	//设置监听事件
@@ -116,7 +116,7 @@ func (e *Nacos) config() {
 	//当前应用的yaml优先级最高
 	content, err := iConfigClient.GetConfig(
 		vo.ConfigParam{
-			DataId: application.GetApp().GetName() + ".yaml",
+			DataId: application.GetName() + ".yaml",
 		},
 	)
 	if err != nil {

@@ -34,5 +34,5 @@ func (e *Redis) Init() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	application.GetApp().SetRedisClient(redisClient)
+	application.SetRedisClient(redisClient)
 }

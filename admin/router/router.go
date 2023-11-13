@@ -16,7 +16,7 @@ import (
 
 func init() {
 	//设置应用名称
-	application.GetApp().SetName("liaz-admin")
+	application.SetName("liaz-admin")
 	//添加路由
 	web.AddRouter(func(wrg *web.WebRouterGroup) {
 		wrg.Use(AdminSecurityHandler())

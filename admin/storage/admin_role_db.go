@@ -10,7 +10,7 @@ type AdminRoleDb struct {
 }
 
 func (e *AdminRoleDb) GetAdminRole() []model.AdminRole {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var adminRoles []model.AdminRole
 	err := engine.OrderBy("created_at asc").Find(&adminRoles)
 	if err != nil {
@@ -20,7 +20,7 @@ func (e *AdminRoleDb) GetAdminRole() []model.AdminRole {
 }
 
 func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var roleId = adminRole.RoleId
 	var name = adminRole.Name
 	if roleId == 0 {
@@ -37,6 +37,6 @@ func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) {
 }
 
 func (e *AdminRoleDb) DelAdminRole(roleId int64) {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	engine.ID(roleId).Delete(&model.AdminRole{})
 }

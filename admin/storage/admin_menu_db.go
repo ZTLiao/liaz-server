@@ -10,7 +10,7 @@ type AdminMenuDb struct {
 }
 
 func (e *AdminMenuDb) GetAdminMemu(adminId int64) []model.AdminMenu {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var adminMenus []model.AdminMenu
 	err := engine.SQL(
 		`
@@ -40,7 +40,7 @@ func (e *AdminMenuDb) GetAdminMemu(adminId int64) []model.AdminMenu {
 }
 
 func (e *AdminMenuDb) GetAdminMenuList() []model.AdminMenu {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var adminMenus []model.AdminMenu
 	err := engine.OrderBy("created_at asc").Find(&adminMenus)
 	if err != nil {
@@ -50,7 +50,7 @@ func (e *AdminMenuDb) GetAdminMenuList() []model.AdminMenu {
 }
 
 func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var menuId = adminMenu.MenuId
 	var name = adminMenu.Name
 	var path = adminMenu.Path
@@ -72,6 +72,6 @@ func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) {
 }
 
 func (e *AdminMenuDb) DelAdminMenu(menuId int64) {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	engine.ID(menuId).Delete(&model.AdminMenu{})
 }

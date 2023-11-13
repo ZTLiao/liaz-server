@@ -29,7 +29,7 @@ func (e *Server) Init() {
 	if e == nil {
 		return
 	}
-	var env = application.GetApp().GetEnv()
+	var env = application.GetEnv()
 	var engine = gin.New()
 	engine.SetTrustedProxies([]string{"127.0.0.1"})
 	var routerGroup = engine.RouterGroup
@@ -39,7 +39,7 @@ func (e *Server) Init() {
 	} else {
 		routerGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler()))
 	}
-	application.GetApp().SetGinEngine(engine)
+	application.SetGinEngine(engine)
 }
 
 // 请求ID拦截器
@@ -60,7 +60,7 @@ func RequestIdHandler() gin.HandlerFunc {
 // 日志拦截器
 func LoggerHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		logger := application.GetApp().GetLogger()
+		logger := application.GetLogger()
 		requestId := c.Request.Header.Get(constant.X_REQUEST_ID)
 		//请求客户端的IP
 		clientIP := c.ClientIP()

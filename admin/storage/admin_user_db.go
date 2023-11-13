@@ -12,7 +12,7 @@ type AdminUserDb struct {
 
 // 获取登录用户信息
 func (e *AdminUserDb) GetLoginUser(username string, password string) *model.AdminUser {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var adminUsers []model.AdminUser
 	err := engine.Where("(username = ? or phone = ? or email = ?) and password = ? and status = ?", username, username, username, password, enums.USER_STATUS_OF_ENABLE).Find(&adminUsers)
 	if err != nil {
@@ -25,7 +25,7 @@ func (e *AdminUserDb) GetLoginUser(username string, password string) *model.Admi
 }
 
 func (e *AdminUserDb) GetAdminUserList() []model.AdminUser {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var adminUsers []model.AdminUser
 	err := engine.OrderBy("created_at desc").Find(&adminUsers)
 	if err != nil {
@@ -35,7 +35,7 @@ func (e *AdminUserDb) GetAdminUserList() []model.AdminUser {
 }
 
 func (e *AdminUserDb) SaveOrUpdateAdminUser(adminUser *model.AdminUser) {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	var adminId = adminUser.AdminId
 	if adminId == 0 {
 		engine.Insert(adminUser)
@@ -45,12 +45,12 @@ func (e *AdminUserDb) SaveOrUpdateAdminUser(adminUser *model.AdminUser) {
 }
 
 func (e *AdminUserDb) DelAdminUser(adminId int64) {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	engine.ID(adminId).Delete(&model.AdminUser{})
 }
 
 func (e *AdminUserDb) ThawAdminUser(adminId int64) {
-	var engine = application.GetApp().GetXormEngine()
+	var engine = application.GetXormEngine()
 	engine.ID(adminId).Update(&model.AdminUser{
 		Status: 1,
 	})

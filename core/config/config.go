@@ -15,7 +15,7 @@ var SystemConfig = new(Config)
 
 // 设置参数
 func Setup() {
-	var env = application.GetApp().GetEnv()
+	var env = application.GetEnv()
 	//nacos配置
 	var profile = profiles[env]
 	SystemConfig.Nacos = new(Nacos)

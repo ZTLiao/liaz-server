@@ -43,7 +43,7 @@ func (e *WebRouterGroup) buildHandlersChain(handlers []WebHandlerFunc) []gin.Han
 }
 
 func (e *WebRouterGroup) Use(handlers ...gin.HandlerFunc) IWebRoutes {
-	var engine = application.GetApp().GetGinEngine()
+	var engine = application.GetGinEngine()
 	engine.RouterGroup.Use(handlers...)
 	return e
 }

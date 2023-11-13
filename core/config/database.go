@@ -36,5 +36,5 @@ func (e *Database) Init() {
 	engine.SetMaxOpenConns(e.MaxOpenConns)
 	//是否打印SQL
 	engine.ShowSQL(e.ShowSQL)
-	application.GetApp().SetXormEngine(engine)
+	application.SetXormEngine(engine)
 }

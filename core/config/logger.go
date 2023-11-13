@@ -68,5 +68,5 @@ func (e *Logger) Init() {
 			log.SetLevel(logrus.FatalLevel)
 		}
 	}
-	application.GetApp().SetLogger(log)
+	application.SetLogger(log)
 }
