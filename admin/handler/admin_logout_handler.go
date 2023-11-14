@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type LogoutHandler struct {
+type AdminLogoutHandler struct {
 }
 
 // @Summary 登出
@@ -20,7 +20,7 @@ type LogoutHandler struct {
 // @Produce json
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/logout [post]
-func (e *LogoutHandler) Logout(wc *web.WebContext) interface{} {
+func (e *AdminLogoutHandler) Logout(wc *web.WebContext) interface{} {
 	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
 	var adminUserCache = new(storage.AdminUserCache)
 	var adminUser = adminUserCache.Get(accessToken)

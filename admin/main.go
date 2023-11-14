@@ -13,5 +13,5 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	cmd.Execute()
+	cmd.Execute("liaz-admin")
 }

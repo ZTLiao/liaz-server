@@ -10,7 +10,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/inner/uuid"
 )
 
-type LoginHandler struct {
+type AdminLoginHandler struct {
 }
 
 // @Summary 登录
@@ -23,7 +23,7 @@ type LoginHandler struct {
 // @Param password formData string true "密码"
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/login [post]
-func (e *LoginHandler) Login(wc *web.WebContext) interface{} {
+func (e *AdminLoginHandler) Login(wc *web.WebContext) interface{} {
 	var username = wc.Context.PostForm("username")
 	var password = wc.Context.PostForm("password")
 	wc.Info("username : %s, password : %s", username, password)

@@ -3,7 +3,6 @@ package router
 import (
 	"admin/controller"
 	"admin/storage"
-	"core/application"
 	"core/config"
 	"core/constant"
 	"core/request"
@@ -15,8 +14,6 @@ import (
 )
 
 func init() {
-	//设置应用名称
-	application.SetName("liaz-admin")
 	//添加路由
 	web.AddRouter(func(wrg *web.WebRouterGroup) {
 		wrg.Use(AdminSecurityHandler())
@@ -25,13 +22,14 @@ func init() {
 		})
 		r := wrg.Group("/admin")
 		{
-			new(controller.LoginController).Router(r)
+			new(controller.AdminLoginController).Router(r)
+			new(controller.AdminLogoutController).Router(r)
 			new(controller.AdminUserController).Router(r)
-			new(controller.LogoutController).Router(r)
 			new(controller.AdminMenuController).Router(r)
 			new(controller.AdminRoleController).Router(r)
 			new(controller.AdminRoleMenuController).Router(r)
 			new(controller.AdminUserRoleController).Router(r)
+			new(controller.AdminUploadController).Router(r)
 		}
 	})
 }

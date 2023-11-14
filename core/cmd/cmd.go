@@ -3,7 +3,6 @@ package cmd
 import (
 	"core/application"
 	"core/config"
-	"core/utils"
 	"core/web"
 	"errors"
 	"fmt"
@@ -14,8 +13,8 @@ import (
 )
 
 var (
-	env     string
-	rootCmd = &cobra.Command{
+	env, name string
+	rootCmd   = &cobra.Command{
 		Use:          application.GetName(),
 		Short:        application.GetName(),
 		SilenceUsage: true,
@@ -43,17 +42,20 @@ func init() {
 }
 
 func run() {
-	setup()
-	start()
+	setupConfig()
+	startServer()
 }
 
-func setup() {
+func setupConfig() {
 	fmt.Printf("The profile active is %s\n", env)
 	application.SetEnv(env)
+	if len(name) > 0 {
+		application.SetName(name)
+	}
 	config.Setup()
 }
 
-func start() {
+func startServer() {
 	var server = config.SystemConfig.Server
 	if server == nil {
 		return
@@ -64,12 +66,14 @@ func start() {
 	web.InitRouter(engine)
 	//端口
 	var port = strconv.Itoa(server.Port)
-	var serverAddr = utils.COLON + port
-	engine.Run(serverAddr)
-	fmt.Printf("The server port is %s\n", port)
+	if len(port) > 0 {
+		os.Setenv("PORT", port)
+	}
+	engine.Run()
 }
 
-func Execute() {
+func Execute(applicationName string) {
+	application.SetName(applicationName)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("Execute err : %s\n", err.Error())
 		os.Exit(-1)
