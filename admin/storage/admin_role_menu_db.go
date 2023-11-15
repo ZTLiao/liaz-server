@@ -2,7 +2,6 @@ package storage
 
 import (
 	"admin/model"
-	"context"
 	"core/application"
 	"core/logger"
 )
@@ -10,7 +9,7 @@ import (
 type AdminRoleMenuDb struct {
 }
 
-func (e *AdminRoleMenuDb) AddAdminRoleMenu(ctx context.Context, roleId int64, menuId int64) {
+func (e *AdminRoleMenuDb) AddAdminRoleMenu(roleId int64, menuId int64) {
 	var engine = application.GetXormEngine()
 	var adminRoleMenu = new(model.AdminRoleMenu)
 	count, err := engine.Where("role_id = ? and menu_id = ?", roleId, menuId).Count(adminRoleMenu)
@@ -25,7 +24,7 @@ func (e *AdminRoleMenuDb) AddAdminRoleMenu(ctx context.Context, roleId int64, me
 	engine.Insert(adminRoleMenu)
 }
 
-func (e *AdminRoleMenuDb) DelAdminRoleMenu(ctx context.Context, roleId int64, menuId int64) {
+func (e *AdminRoleMenuDb) DelAdminRoleMenu(roleId int64, menuId int64) {
 	if roleId == 0 && menuId == 0 {
 		return
 	}
@@ -38,7 +37,7 @@ func (e *AdminRoleMenuDb) DelAdminRoleMenu(ctx context.Context, roleId int64, me
 	}
 }
 
-func (e *AdminRoleMenuDb) GetAdminRoleMenu(ctx context.Context, roleId int64) []model.AdminRoleMenu {
+func (e *AdminRoleMenuDb) GetAdminRoleMenu(roleId int64) []model.AdminRoleMenu {
 	var engine = application.GetXormEngine()
 	var adminRoleMenus []model.AdminRoleMenu
 	engine.Where("role_id = ?", roleId).Find(&adminRoleMenus)

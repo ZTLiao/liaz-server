@@ -3,7 +3,6 @@ package router
 import (
 	"admin/controller"
 	"admin/storage"
-	"context"
 	"core/config"
 	"core/constant"
 	"core/request"
@@ -51,7 +50,7 @@ func AdminSecurityHandler() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		var adminUser = new(storage.AdminUserCache).Get(context.Background(), accessToken)
+		var adminUser = new(storage.AdminUserCache).Get(accessToken)
 		if adminUser == nil {
 			c.JSON(http.StatusUnauthorized, response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED))
 			c.Abort()
@@ -61,7 +60,7 @@ func AdminSecurityHandler() gin.HandlerFunc {
 		formParams, _ := request.GetPostFormParams(c)
 		queryParams := request.GetQueryParams(c)
 		bodyParams := request.GetBodyParams(c)
-		new(storage.AdminLogDb).AddLog(context.Background(), adminUser.AdminId, c.Request.RequestURI, headers, queryParams, formParams, bodyParams)
+		new(storage.AdminLogDb).AddLog(adminUser.AdminId, c.Request.RequestURI, headers, queryParams, formParams, bodyParams)
 		c.Next()
 	}
 }

@@ -42,11 +42,11 @@ func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
 // @Router /admin/menu [get]
 func (e *AdminMenuHandler) GetAdminMenu(wc *web.WebContext) interface{} {
 	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = e.AdminUserCache.Get(wc.Background(), accessToken)
+	var adminUser = e.AdminUserCache.Get(accessToken)
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
-	return response.ReturnOK(e.AdminMenuDb.GetAdminMemu(wc.Background(), adminUser.AdminId))
+	return response.ReturnOK(e.AdminMenuDb.GetAdminMemu(adminUser.AdminId))
 }
 
 // @Summary 保存菜单
@@ -110,9 +110,9 @@ func (e *AdminMenuHandler) saveOrUpdateAdminMenu(wc *web.WebContext) {
 	showOrder, _ := strconv.ParseInt(showOrderStr, 10, 32)
 	adminMenu.ShowOrder = int(showOrder)
 	adminMenu.Description = description
-	e.AdminMenuDb.SaveOrUpdateAdminMenu(wc.Background(), adminMenu)
+	e.AdminMenuDb.SaveOrUpdateAdminMenu(adminMenu)
 	wc.Info("menuId : %d", adminMenu.MenuId)
-	e.AdminRoleMenuDb.AddAdminRoleMenu(wc.Background(), constant.SUPER_ADMIN, adminMenu.MenuId)
+	e.AdminRoleMenuDb.AddAdminRoleMenu(constant.SUPER_ADMIN, adminMenu.MenuId)
 }
 
 // @Summary 删除菜单
@@ -129,8 +129,8 @@ func (e *AdminMenuHandler) DelAdminMenu(wc *web.WebContext) interface{} {
 	var menuIdStr = wc.Context.Param("menuId")
 	if len(menuIdStr) > 0 {
 		menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
-		e.AdminMenuDb.DelAdminMenu(wc.Background(), menuId)
-		e.AdminRoleMenuDb.DelAdminRoleMenu(wc.Background(), 0, menuId)
+		e.AdminMenuDb.DelAdminMenu(menuId)
+		e.AdminRoleMenuDb.DelAdminRoleMenu(0, menuId)
 	}
 	return response.Success()
 }

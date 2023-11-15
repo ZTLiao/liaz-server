@@ -31,7 +31,7 @@ func (e *AdminUserRoleHandler) GetAdminUserRole(wc *web.WebContext) interface{} 
 		return response.Success()
 	}
 	adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-	var adminUserRoles = e.AdminUserRoleDb.GetAdminUserRole(wc.Background(), adminId)
+	var adminUserRoles = e.AdminUserRoleDb.GetAdminUserRole(adminId)
 	var adminRoles = e.AdminRoleDb.GetAdminRole(wc.Background())
 	var roles = make([]resp.AdminRoleResp, 0)
 	for i := 0; i < len(adminRoles); i++ {
@@ -70,13 +70,13 @@ func (e *AdminUserRoleHandler) SaveAdminUserRole(wc *web.WebContext) interface{}
 		return response.Success()
 	}
 	adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-	e.AdminUserRoleDb.DelAdminUserRole(wc.Background(), adminId, 0)
+	e.AdminUserRoleDb.DelAdminUserRole(adminId, 0)
 	if len(roleIds) > 0 {
 		var roleIdArray = strings.Split(roleIds, utils.COMMA)
 		for i := 0; i < len(roleIdArray); i++ {
 			var roleIdStr = roleIdArray[i]
 			roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-			e.AdminUserRoleDb.AddAdminUserRole(wc.Background(), adminId, roleId)
+			e.AdminUserRoleDb.AddAdminUserRole(adminId, roleId)
 		}
 	}
 	return response.Success()

@@ -20,7 +20,7 @@ func (e *AdminRoleDb) GetAdminRole(ctx context.Context) []model.AdminRole {
 	return adminRoles
 }
 
-func (e *AdminRoleDb) SaveOrUpdateAdminRole(ctx context.Context, adminRole *model.AdminRole) {
+func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) {
 	var engine = application.GetXormEngine()
 	var roleId = adminRole.RoleId
 	var name = adminRole.Name
@@ -37,7 +37,7 @@ func (e *AdminRoleDb) SaveOrUpdateAdminRole(ctx context.Context, adminRole *mode
 	}
 }
 
-func (e *AdminRoleDb) DelAdminRole(ctx context.Context, roleId int64) {
+func (e *AdminRoleDb) DelAdminRole(roleId int64) {
 	var engine = application.GetXormEngine()
 	engine.ID(roleId).Delete(&model.AdminRole{})
 }

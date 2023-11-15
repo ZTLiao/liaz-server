@@ -73,7 +73,7 @@ func (e *AdminRoleHandler) saveOrUpdateAdminRole(wc *web.WebContext) {
 		adminRole.RoleId, _ = strconv.ParseInt(roleId, 10, 64)
 	}
 	adminRole.Name = name
-	e.AdminRoleDb.SaveOrUpdateAdminRole(wc.Background(), adminRole)
+	e.AdminRoleDb.SaveOrUpdateAdminRole(adminRole)
 }
 
 // @Summary 删除角色
@@ -90,8 +90,8 @@ func (e *AdminRoleHandler) DelAdminRole(wc *web.WebContext) interface{} {
 	var roleIdStr = wc.Context.Param("roleId")
 	if len(roleIdStr) > 0 {
 		roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-		e.AdminRoleDb.DelAdminRole(wc.Background(), roleId)
-		e.AdminRoleMenuDb.DelAdminRoleMenu(wc.Background(), roleId, 0)
+		e.AdminRoleDb.DelAdminRole(roleId)
+		e.AdminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
 	}
 	return response.Success()
 }

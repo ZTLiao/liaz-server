@@ -31,7 +31,7 @@ func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} 
 		return response.Success()
 	}
 	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-	var adminRoleMenus = e.AdminRoleMenuDb.GetAdminRoleMenu(wc.Background(), roleId)
+	var adminRoleMenus = e.AdminRoleMenuDb.GetAdminRoleMenu(roleId)
 	var adminMenus = e.AdminMenuDb.GetAdminMenuList(wc.Background())
 	var menus = make([]resp.AdminMenuResp, 0)
 	var childMap = make(map[int64][]resp.AdminMenuResp, 0)
@@ -93,13 +93,13 @@ func (e *AdminRoleMenuHandler) SaveAdminRoleMenu(wc *web.WebContext) interface{}
 		return response.Success()
 	}
 	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-	e.AdminRoleMenuDb.DelAdminRoleMenu(wc.Background(), roleId, 0)
+	e.AdminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
 	if len(menuIds) > 0 {
 		var menuIdArray = strings.Split(menuIds, utils.COMMA)
 		for i := 0; i < len(menuIdArray); i++ {
 			var menuIdStr = menuIdArray[i]
 			menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
-			e.AdminRoleMenuDb.AddAdminRoleMenu(wc.Background(), roleId, menuId)
+			e.AdminRoleMenuDb.AddAdminRoleMenu(roleId, menuId)
 		}
 	}
 	return response.Success()
