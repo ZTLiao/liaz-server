@@ -2,7 +2,6 @@ package handler
 
 import (
 	"admin/storage"
-	"context"
 	"core/constant"
 	"core/response"
 	"core/web"
@@ -25,11 +24,11 @@ type AdminLogoutHandler struct {
 // @Router /admin/logout [post]
 func (e *AdminLogoutHandler) Logout(wc *web.WebContext) interface{} {
 	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = e.AdminUserCache.Get(context.Background(), accessToken)
+	var adminUser = e.AdminUserCache.Get(wc.Background(), accessToken)
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
-	e.AccessTokenCache.Del(context.Background(), adminUser.AdminId)
-	e.AdminUserCache.Del(context.Background(), accessToken)
+	e.AccessTokenCache.Del(wc.Background(), adminUser.AdminId)
+	e.AdminUserCache.Del(wc.Background(), accessToken)
 	return response.Success()
 }

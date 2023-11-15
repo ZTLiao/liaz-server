@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"core/application"
 	"core/constant"
 
@@ -59,4 +60,8 @@ func (e *WebContext) Panic(format string, args ...interface{}) {
 	logger.WithFields(logrus.Fields{
 		"requestId": e.Context.Request.Header.Get(constant.X_REQUEST_ID),
 	}).Panicf(format, args...)
+}
+
+func (e *WebContext) Background() context.Context {
+	return e.Context.Request.Context()
 }

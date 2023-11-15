@@ -3,7 +3,6 @@ package handler
 import (
 	"admin/model"
 	"admin/storage"
-	"context"
 	"core/errors"
 	"core/response"
 	"core/web"
@@ -26,7 +25,7 @@ type AdminRoleHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role [get]
 func (e *AdminRoleHandler) GetAdminRole(wc *web.WebContext) interface{} {
-	return response.ReturnOK(e.AdminRoleDb.GetAdminRole(context.Background()))
+	return response.ReturnOK(e.AdminRoleDb.GetAdminRole(wc.Background()))
 }
 
 // @Summary 保存角色
@@ -74,7 +73,7 @@ func (e *AdminRoleHandler) saveOrUpdateAdminRole(wc *web.WebContext) {
 		adminRole.RoleId, _ = strconv.ParseInt(roleId, 10, 64)
 	}
 	adminRole.Name = name
-	e.AdminRoleDb.SaveOrUpdateAdminRole(context.Background(), adminRole)
+	e.AdminRoleDb.SaveOrUpdateAdminRole(wc.Background(), adminRole)
 }
 
 // @Summary 删除角色
@@ -91,8 +90,8 @@ func (e *AdminRoleHandler) DelAdminRole(wc *web.WebContext) interface{} {
 	var roleIdStr = wc.Context.Param("roleId")
 	if len(roleIdStr) > 0 {
 		roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-		e.AdminRoleDb.DelAdminRole(context.Background(), roleId)
-		e.AdminRoleMenuDb.DelAdminRoleMenu(context.Background(), roleId, 0)
+		e.AdminRoleDb.DelAdminRole(wc.Background(), roleId)
+		e.AdminRoleMenuDb.DelAdminRoleMenu(wc.Background(), roleId, 0)
 	}
 	return response.Success()
 }

@@ -4,7 +4,6 @@ import (
 	"admin/model"
 	"admin/resp"
 	"admin/storage"
-	"context"
 	"core/constant"
 	"core/errors"
 	"core/response"
@@ -32,13 +31,13 @@ type AdminUserHandler struct {
 // @Router /admin/user/get [get]
 func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
 	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = e.AdminUserCache.Get(context.Background(), accessToken)
+	var adminUser = e.AdminUserCache.Get(wc.Background(), accessToken)
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
 	return response.ReturnOK(&resp.AdminUserResp{
 		AdminUser: *adminUser,
-		LastTime:  e.AdminLoginRecordDb.GetLastTime(context.Background(), adminUser.AdminId),
+		LastTime:  e.AdminLoginRecordDb.GetLastTime(wc.Background(), adminUser.AdminId),
 	})
 }
 
@@ -52,7 +51,7 @@ func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user [get]
 func (e *AdminUserHandler) GetAdminUserList(wc *web.WebContext) interface{} {
-	return response.ReturnOK(e.AdminUserDb.GetAdminUserList(context.Background()))
+	return response.ReturnOK(e.AdminUserDb.GetAdminUserList(wc.Background()))
 }
 
 // @Summary 添加系统用户
@@ -115,7 +114,7 @@ func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
 	adminUser.Introduction = introduction
 	status, _ := strconv.ParseInt(statusStr, 10, 64)
 	adminUser.Status = int8(status)
-	e.AdminUserDb.SaveOrUpdateAdminUser(context.Background(), adminUser)
+	e.AdminUserDb.SaveOrUpdateAdminUser(wc.Background(), adminUser)
 }
 
 // @Summary 修改系统用户
@@ -132,10 +131,10 @@ func (e *AdminUserHandler) DelAdminUser(wc *web.WebContext) interface{} {
 	var adminIdStr = wc.Context.Param("adminId")
 	if len(adminIdStr) > 0 {
 		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-		e.AdminUserDb.DelAdminUser(context.Background(), adminId)
-		accessToken := e.AccessTokenCache.Get(context.Background(), adminId)
+		e.AdminUserDb.DelAdminUser(wc.Background(), adminId)
+		accessToken := e.AccessTokenCache.Get(wc.Background(), adminId)
 		if len(accessToken) > 0 {
-			e.AdminUserCache.Del(context.Background(), accessToken)
+			e.AdminUserCache.Del(wc.Background(), accessToken)
 		}
 	}
 	return response.Success()
@@ -155,10 +154,10 @@ func (e *AdminUserHandler) ThawAdminUser(wc *web.WebContext) interface{} {
 	var adminIdStr = wc.Context.PostForm("adminId")
 	if len(adminIdStr) > 0 {
 		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-		e.AdminUserDb.ThawAdminUser(context.Background(), adminId)
-		accessToken := e.AccessTokenCache.Get(context.Background(), adminId)
+		e.AdminUserDb.ThawAdminUser(wc.Background(), adminId)
+		accessToken := e.AccessTokenCache.Get(wc.Background(), adminId)
 		if len(accessToken) > 0 {
-			e.AdminUserCache.Del(context.Background(), accessToken)
+			e.AdminUserCache.Del(wc.Background(), accessToken)
 		}
 	}
 	return response.Success()
