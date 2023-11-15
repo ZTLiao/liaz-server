@@ -11,6 +11,8 @@ import (
 )
 
 type AdminRoleHandler struct {
+	AdminRoleDb     storage.AdminRoleDb
+	AdminRoleMenuDb storage.AdminRoleMenuDb
 }
 
 // @Summary 获取系统所有角色
@@ -23,7 +25,7 @@ type AdminRoleHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role [get]
 func (e *AdminRoleHandler) GetAdminRole(wc *web.WebContext) interface{} {
-	return response.ReturnOK(new(storage.AdminRoleDb).GetAdminRole())
+	return response.ReturnOK(e.AdminRoleDb.GetAdminRole())
 }
 
 // @Summary 保存角色
@@ -71,7 +73,7 @@ func (e *AdminRoleHandler) saveOrUpdateAdminRole(wc *web.WebContext) {
 		adminRole.RoleId, _ = strconv.ParseInt(roleId, 10, 64)
 	}
 	adminRole.Name = name
-	new(storage.AdminRoleDb).SaveOrUpdateAdminRole(adminRole)
+	e.AdminRoleDb.SaveOrUpdateAdminRole(adminRole)
 }
 
 // @Summary 删除角色
@@ -88,8 +90,8 @@ func (e *AdminRoleHandler) DelAdminRole(wc *web.WebContext) interface{} {
 	var roleId = wc.Context.Param("roleId")
 	if len(roleId) > 0 {
 		val, _ := strconv.ParseInt(roleId, 10, 64)
-		new(storage.AdminRoleDb).DelAdminRole(val)
-		new(storage.AdminRoleMenuDb).DelAdminRoleMenu(val, 0)
+		e.AdminRoleDb.DelAdminRole(val)
+		e.AdminRoleMenuDb.DelAdminRoleMenu(val, 0)
 	}
 	return response.Success()
 }

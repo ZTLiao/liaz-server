@@ -11,6 +11,8 @@ import (
 )
 
 type AdminRoleMenuHandler struct {
+	AdminRoleMenuDb storage.AdminRoleMenuDb
+	AdminMenuDb     storage.AdminMenuDb
 }
 
 // @Summary 获取角色菜单
@@ -29,8 +31,8 @@ func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} 
 		return response.Success()
 	}
 	val, _ := strconv.ParseInt(roleId, 10, 64)
-	var adminRoleMenus = new(storage.AdminRoleMenuDb).GetAdminRoleMenu(val)
-	var adminMenus = new(storage.AdminMenuDb).GetAdminMenuList()
+	var adminRoleMenus = e.AdminRoleMenuDb.GetAdminRoleMenu(val)
+	var adminMenus = e.AdminMenuDb.GetAdminMenuList()
 	var menus = make([]resp.AdminMenuResp, 0)
 	var childMap = make(map[int64][]resp.AdminMenuResp, 0)
 	for i := 0; i < len(adminMenus); i++ {
@@ -91,14 +93,13 @@ func (e *AdminRoleMenuHandler) SaveAdminRoleMenu(wc *web.WebContext) interface{}
 		return response.Success()
 	}
 	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-	var adminRoleMenuDb = new(storage.AdminRoleMenuDb)
-	adminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
+	e.AdminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
 	if len(menuIds) > 0 {
 		var menuIdArray = strings.Split(menuIds, utils.COMMA)
 		for i := 0; i < len(menuIdArray); i++ {
 			var menuIdStr = menuIdArray[i]
 			menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
-			adminRoleMenuDb.AddAdminRoleMenu(roleId, menuId)
+			e.AdminRoleMenuDb.AddAdminRoleMenu(roleId, menuId)
 		}
 	}
 	return response.Success()

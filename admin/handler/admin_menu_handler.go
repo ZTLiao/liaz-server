@@ -13,6 +13,9 @@ import (
 )
 
 type AdminMenuHandler struct {
+	AdminMenuDb     storage.AdminMenuDb
+	AdminRoleMenuDb storage.AdminRoleMenuDb
+	AdminUserCache  storage.AdminUserCache
 }
 
 // @Summary 获取系统所有菜单
@@ -25,7 +28,7 @@ type AdminMenuHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/menu/list [get]
 func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
-	return response.ReturnOK(new(storage.AdminMenuDb).GetAdminMenuList())
+	return response.ReturnOK(e.AdminMenuDb.GetAdminMenuList())
 }
 
 // @Summary 获取当前用户菜单
@@ -39,11 +42,11 @@ func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
 // @Router /admin/menu [get]
 func (e *AdminMenuHandler) GetAdminMenu(wc *web.WebContext) interface{} {
 	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = new(storage.AdminUserCache).Get(accessToken)
+	var adminUser = e.AdminUserCache.Get(accessToken)
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
-	return response.ReturnOK(new(storage.AdminMenuDb).GetAdminMemu(adminUser.AdminId))
+	return response.ReturnOK(e.AdminMenuDb.GetAdminMemu(adminUser.AdminId))
 }
 
 // @Summary 保存菜单
@@ -107,9 +110,9 @@ func (e *AdminMenuHandler) saveOrUpdateAdminMenu(wc *web.WebContext) {
 	showOrder, _ := strconv.ParseInt(showOrderStr, 10, 32)
 	adminMenu.ShowOrder = int(showOrder)
 	adminMenu.Description = description
-	new(storage.AdminMenuDb).SaveOrUpdateAdminMenu(adminMenu)
+	e.AdminMenuDb.SaveOrUpdateAdminMenu(adminMenu)
 	wc.Info("menuId : %d", adminMenu.MenuId)
-	new(storage.AdminRoleMenuDb).AddAdminRoleMenu(constant.SUPER_ADMIN, adminMenu.MenuId)
+	e.AdminRoleMenuDb.AddAdminRoleMenu(constant.SUPER_ADMIN, adminMenu.MenuId)
 }
 
 // @Summary 删除菜单
@@ -126,8 +129,8 @@ func (e *AdminMenuHandler) DelAdminMenu(wc *web.WebContext) interface{} {
 	var menuId = wc.Context.Param("menuId")
 	if len(menuId) > 0 {
 		val, _ := strconv.ParseInt(menuId, 10, 64)
-		new(storage.AdminMenuDb).DelAdminMenu(val)
-		new(storage.AdminRoleMenuDb).DelAdminRoleMenu(0, val)
+		e.AdminMenuDb.DelAdminMenu(val)
+		e.AdminRoleMenuDb.DelAdminRoleMenu(0, val)
 	}
 	return response.Success()
 }

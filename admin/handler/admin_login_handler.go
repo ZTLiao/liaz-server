@@ -11,6 +11,10 @@ import (
 )
 
 type AdminLoginHandler struct {
+	AdminUserDb        storage.AdminUserDb
+	AccessTokenCache   storage.AccessTokenCache
+	AdminUserCache     storage.AdminUserCache
+	AdminLoginRecordDb storage.AdminLoginRecordDb
 }
 
 // @Summary 登录
@@ -27,27 +31,26 @@ func (e *AdminLoginHandler) Login(wc *web.WebContext) interface{} {
 	var username = wc.Context.PostForm("username")
 	var password = wc.Context.PostForm("password")
 	wc.Info("username : %s, password : %s", username, password)
-	adminUser := new(storage.AdminUserDb).GetLoginUser(username, password)
+	adminUser := e.AdminUserDb.GetLoginUser(username, password)
 	if adminUser == nil {
 		return response.Fail(constant.LOGIN_ERROR)
 	}
 	var adminId = adminUser.AdminId
-	var accessTokenCache = new(storage.AccessTokenCache)
 	var accessToken string
-	if accessTokenCache.IsExist(adminId) {
-		accessToken = accessTokenCache.Get(adminId)
+	if e.AccessTokenCache.IsExist(adminId) {
+		accessToken = e.AccessTokenCache.Get(adminId)
 	} else {
 		adminUser.Password = ""
 		var uuid, _ = uuid.NewV4()
 		accessToken = uuid.String()
-		accessTokenCache.Set(adminId, accessToken)
-		new(storage.AdminUserCache).Set(accessToken, adminUser)
+		e.AccessTokenCache.Set(adminId, accessToken)
+		e.AdminUserCache.Set(accessToken, adminUser)
 	}
 	//记录
-	new(AdminLoginRecordHandler).AddRecord(adminId, wc.Context.ClientIP(), wc.Context.Request.Header.Get(constant.USER_AGENT))
+	e.AdminLoginRecordDb.AddRecord(adminId, wc.Context.ClientIP(), wc.Context.Request.Header.Get(constant.USER_AGENT))
 	return response.ReturnOK(&resp.AccessTokenResp{
 		AccessToken: accessToken,
-		ExpireAt:    accessTokenCache.TTL(adminId),
+		ExpireAt:    e.AccessTokenCache.TTL(adminId),
 		AdminId:     adminId,
 	})
 }

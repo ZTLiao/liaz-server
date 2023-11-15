@@ -2,6 +2,7 @@ package controller
 
 import (
 	"admin/handler"
+	"admin/storage"
 	"core/web"
 )
 
@@ -9,5 +10,11 @@ type AdminLoginController struct {
 }
 
 func (e *AdminLoginController) Router(iWebRoutes web.IWebRoutes) {
-	iWebRoutes.POST("/login", new(handler.AdminLoginHandler).Login)
+	var adminLoginHandler = &handler.AdminLoginHandler{
+		AdminUserDb:        storage.AdminUserDb{},
+		AccessTokenCache:   storage.AccessTokenCache{},
+		AdminUserCache:     storage.AdminUserCache{},
+		AdminLoginRecordDb: storage.AdminLoginRecordDb{},
+	}
+	iWebRoutes.POST("/login", adminLoginHandler.Login)
 }

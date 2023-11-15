@@ -14,6 +14,10 @@ import (
 )
 
 type AdminUserHandler struct {
+	AdminUserDb        storage.AdminUserDb
+	AdminLoginRecordDb storage.AdminLoginRecordDb
+	AdminUserCache     storage.AdminUserCache
+	AccessTokenCache   storage.AccessTokenCache
 }
 
 // @Summary 获取当前用户信息
@@ -27,13 +31,13 @@ type AdminUserHandler struct {
 // @Router /admin/user/get [get]
 func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
 	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = new(storage.AdminUserCache).Get(accessToken)
+	var adminUser = e.AdminUserCache.Get(accessToken)
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
 	return response.ReturnOK(&resp.AdminUserResp{
 		AdminUser: *adminUser,
-		LastTime:  new(storage.AdminLoginRecordDb).GetLastTime(adminUser.AdminId),
+		LastTime:  e.AdminLoginRecordDb.GetLastTime(adminUser.AdminId),
 	})
 }
 
@@ -47,7 +51,7 @@ func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user [get]
 func (e *AdminUserHandler) GetAdminUserList(wc *web.WebContext) interface{} {
-	return response.ReturnOK(new(storage.AdminUserDb).GetAdminUserList())
+	return response.ReturnOK(e.AdminUserDb.GetAdminUserList())
 }
 
 // @Summary 添加系统用户
@@ -110,7 +114,7 @@ func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
 	adminUser.Introduction = introduction
 	status, _ := strconv.ParseInt(statusStr, 10, 64)
 	adminUser.Status = int8(status)
-	new(storage.AdminUserDb).SaveOrUpdateAdminUser(adminUser)
+	e.AdminUserDb.SaveOrUpdateAdminUser(adminUser)
 }
 
 // @Summary 修改系统用户
@@ -127,10 +131,10 @@ func (e *AdminUserHandler) DelAdminUser(wc *web.WebContext) interface{} {
 	var adminIdStr = wc.Context.Param("adminId")
 	if len(adminIdStr) > 0 {
 		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-		new(storage.AdminUserDb).DelAdminUser(adminId)
-		accessToken := new(storage.AccessTokenCache).Get(adminId)
+		e.AdminUserDb.DelAdminUser(adminId)
+		accessToken := e.AccessTokenCache.Get(adminId)
 		if len(accessToken) > 0 {
-			new(storage.AdminUserCache).Del(accessToken)
+			e.AdminUserCache.Del(accessToken)
 		}
 	}
 	return response.Success()
@@ -150,7 +154,11 @@ func (e *AdminUserHandler) ThawAdminUser(wc *web.WebContext) interface{} {
 	var adminIdStr = wc.Context.PostForm("adminId")
 	if len(adminIdStr) > 0 {
 		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-		new(storage.AdminUserDb).ThawAdminUser(adminId)
+		e.AdminUserDb.ThawAdminUser(adminId)
+		accessToken := e.AccessTokenCache.Get(adminId)
+		if len(accessToken) > 0 {
+			e.AdminUserCache.Del(accessToken)
+		}
 	}
 	return response.Success()
 }

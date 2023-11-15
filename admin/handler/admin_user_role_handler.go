@@ -11,6 +11,8 @@ import (
 )
 
 type AdminUserRoleHandler struct {
+	AdminUserRoleDb storage.AdminUserRoleDb
+	AdminRoleDb     storage.AdminRoleDb
 }
 
 // @Summary 获取用户角色
@@ -29,8 +31,8 @@ func (e *AdminUserRoleHandler) GetAdminUserRole(wc *web.WebContext) interface{} 
 		return response.Success()
 	}
 	adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-	var adminUserRoles = new(storage.AdminUserRoleDb).GetAdminUserRole(adminId)
-	var adminRoles = new(storage.AdminRoleDb).GetAdminRole()
+	var adminUserRoles = e.AdminUserRoleDb.GetAdminUserRole(adminId)
+	var adminRoles = e.AdminRoleDb.GetAdminRole()
 	var roles = make([]resp.AdminRoleResp, 0)
 	for i := 0; i < len(adminRoles); i++ {
 		var role = adminRoles[i]
@@ -68,14 +70,13 @@ func (e *AdminUserRoleHandler) SaveAdminUserRole(wc *web.WebContext) interface{}
 		return response.Success()
 	}
 	adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-	var adminUserRoleDb = new(storage.AdminUserRoleDb)
-	adminUserRoleDb.DelAdminUserRole(adminId, 0)
+	e.AdminUserRoleDb.DelAdminUserRole(adminId, 0)
 	if len(roleIds) > 0 {
 		var roleIdArray = strings.Split(roleIds, utils.COMMA)
 		for i := 0; i < len(roleIdArray); i++ {
 			var roleIdStr = roleIdArray[i]
 			roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-			adminUserRoleDb.AddAdminUserRole(adminId, roleId)
+			e.AdminUserRoleDb.AddAdminUserRole(adminId, roleId)
 		}
 	}
 	return response.Success()

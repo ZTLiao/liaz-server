@@ -2,6 +2,7 @@ package controller
 
 import (
 	"admin/handler"
+	"admin/storage"
 	"core/web"
 )
 
@@ -9,8 +10,12 @@ type AdminRoleController struct {
 }
 
 func (e *AdminRoleController) Router(iWebRoutes web.IWebRoutes) {
-	iWebRoutes.GET("/role", new(handler.AdminRoleHandler).GetAdminRole)
-	iWebRoutes.POST("/role", new(handler.AdminRoleHandler).SaveAdminRole)
-	iWebRoutes.PUT("/role", new(handler.AdminRoleHandler).UpdateAdminRole)
-	iWebRoutes.DELETE("/role/:roleId", new(handler.AdminRoleHandler).DelAdminRole)
+	var adminRoleHandler = &handler.AdminRoleHandler{
+		AdminRoleDb:     storage.AdminRoleDb{},
+		AdminRoleMenuDb: storage.AdminRoleMenuDb{},
+	}
+	iWebRoutes.GET("/role", adminRoleHandler.GetAdminRole)
+	iWebRoutes.POST("/role", adminRoleHandler.SaveAdminRole)
+	iWebRoutes.PUT("/role", adminRoleHandler.UpdateAdminRole)
+	iWebRoutes.DELETE("/role/:roleId", adminRoleHandler.DelAdminRole)
 }
