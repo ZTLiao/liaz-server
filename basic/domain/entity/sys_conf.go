@@ -13,7 +13,3 @@ type SysConf struct {
 	CreatedAt   types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at"`
 }
-
-func (e *SysConf) TableName() string {
-	return "sys_conf"
-}

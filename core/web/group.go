@@ -24,6 +24,8 @@ type WebRouterGroup struct {
 	iRoutes gin.IRoutes
 }
 
+var _ IWebRoutes = &WebRouterGroup{}
+
 func (e *WebRouterGroup) buildHandlersChain(handlers []WebHandlerFunc) []gin.HandlerFunc {
 	var handlersChain []gin.HandlerFunc
 	handlersChain = make([]gin.HandlerFunc, 0)

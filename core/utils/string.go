@@ -15,6 +15,8 @@ const (
 	COMMA       string = ","
 	UNDERLINE   string = string(C_UNDERLINE)
 	DASHED      string = "-"
+	SLASH       string = "/"
+	DOT         string = "."
 )
 
 // 单词全部转化为大写

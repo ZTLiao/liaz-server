@@ -1,13 +1,12 @@
 package handler
 
 import (
-	"core/file/minio"
-	"core/response"
+	"basic/interfaces"
 	"core/web"
-	"io"
 )
 
 type AdminUploadHandler struct {
+	FileItem interfaces.FileItem
 }
 
 // @Summary 上传文件
@@ -21,21 +20,5 @@ type AdminUploadHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/upload/:bucketName [post]
 func (e *AdminUploadHandler) Upload(wc *web.WebContext) interface{} {
-	var bucketName = wc.Context.Param("bucketName")
-	if len(bucketName) == 0 {
-		return response.Success()
-	}
-	file, header, err := wc.Context.Request.FormFile("file")
-	if err != nil {
-		return response.Fail(err.Error())
-	}
-	defer file.Close()
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return response.Fail(err.Error())
-	}
-	var fileInfo = new(minio.MinioTemplate).PutObject(bucketName, header.Filename, data)
-	return response.ReturnOK(&map[string]string{
-		"path": fileInfo.Name,
-	})
+	return e.FileItem.UploadFile(wc)
 }

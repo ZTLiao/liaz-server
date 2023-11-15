@@ -17,3 +17,8 @@ type FileObjectInfo struct {
 	Expires      time.Time `json:"expires"`
 	ContentType  string    `json:"contentType"`
 }
+
+func NewFileTemplate() *FileTemplate {
+	var fileTemplate FileTemplate = NewMinioTemplate()
+	return &fileTemplate
+}
