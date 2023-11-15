@@ -3,6 +3,7 @@ package handler
 import (
 	"admin/model"
 	"admin/storage"
+	"context"
 	"core/constant"
 	"core/errors"
 	"core/response"
@@ -28,7 +29,7 @@ type AdminMenuHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/menu/list [get]
 func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
-	return response.ReturnOK(e.AdminMenuDb.GetAdminMenuList())
+	return response.ReturnOK(e.AdminMenuDb.GetAdminMenuList(context.Background()))
 }
 
 // @Summary 获取当前用户菜单
@@ -42,11 +43,11 @@ func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
 // @Router /admin/menu [get]
 func (e *AdminMenuHandler) GetAdminMenu(wc *web.WebContext) interface{} {
 	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = e.AdminUserCache.Get(accessToken)
+	var adminUser = e.AdminUserCache.Get(context.Background(), accessToken)
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
-	return response.ReturnOK(e.AdminMenuDb.GetAdminMemu(adminUser.AdminId))
+	return response.ReturnOK(e.AdminMenuDb.GetAdminMemu(context.Background(), adminUser.AdminId))
 }
 
 // @Summary 保存菜单
@@ -110,9 +111,9 @@ func (e *AdminMenuHandler) saveOrUpdateAdminMenu(wc *web.WebContext) {
 	showOrder, _ := strconv.ParseInt(showOrderStr, 10, 32)
 	adminMenu.ShowOrder = int(showOrder)
 	adminMenu.Description = description
-	e.AdminMenuDb.SaveOrUpdateAdminMenu(adminMenu)
+	e.AdminMenuDb.SaveOrUpdateAdminMenu(context.Background(), adminMenu)
 	wc.Info("menuId : %d", adminMenu.MenuId)
-	e.AdminRoleMenuDb.AddAdminRoleMenu(constant.SUPER_ADMIN, adminMenu.MenuId)
+	e.AdminRoleMenuDb.AddAdminRoleMenu(context.Background(), constant.SUPER_ADMIN, adminMenu.MenuId)
 }
 
 // @Summary 删除菜单
@@ -126,11 +127,11 @@ func (e *AdminMenuHandler) saveOrUpdateAdminMenu(wc *web.WebContext) {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/menu/:menuId [delete]
 func (e *AdminMenuHandler) DelAdminMenu(wc *web.WebContext) interface{} {
-	var menuId = wc.Context.Param("menuId")
-	if len(menuId) > 0 {
-		val, _ := strconv.ParseInt(menuId, 10, 64)
-		e.AdminMenuDb.DelAdminMenu(val)
-		e.AdminRoleMenuDb.DelAdminRoleMenu(0, val)
+	var menuIdStr = wc.Context.Param("menuId")
+	if len(menuIdStr) > 0 {
+		menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
+		e.AdminMenuDb.DelAdminMenu(context.Background(), menuId)
+		e.AdminRoleMenuDb.DelAdminRoleMenu(context.Background(), 0, menuId)
 	}
 	return response.Success()
 }

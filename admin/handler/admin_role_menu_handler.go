@@ -3,6 +3,7 @@ package handler
 import (
 	"admin/resp"
 	"admin/storage"
+	"context"
 	"core/response"
 	"core/utils"
 	"core/web"
@@ -26,13 +27,13 @@ type AdminRoleMenuHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role/menu/:roleId [get]
 func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} {
-	var roleId = wc.Context.Param("roleId")
-	if len(roleId) == 0 {
+	var roleIdStr = wc.Context.Param("roleId")
+	if len(roleIdStr) == 0 {
 		return response.Success()
 	}
-	val, _ := strconv.ParseInt(roleId, 10, 64)
-	var adminRoleMenus = e.AdminRoleMenuDb.GetAdminRoleMenu(val)
-	var adminMenus = e.AdminMenuDb.GetAdminMenuList()
+	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
+	var adminRoleMenus = e.AdminRoleMenuDb.GetAdminRoleMenu(context.Background(), roleId)
+	var adminMenus = e.AdminMenuDb.GetAdminMenuList(context.Background())
 	var menus = make([]resp.AdminMenuResp, 0)
 	var childMap = make(map[int64][]resp.AdminMenuResp, 0)
 	for i := 0; i < len(adminMenus); i++ {
@@ -93,13 +94,13 @@ func (e *AdminRoleMenuHandler) SaveAdminRoleMenu(wc *web.WebContext) interface{}
 		return response.Success()
 	}
 	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-	e.AdminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
+	e.AdminRoleMenuDb.DelAdminRoleMenu(context.Background(), roleId, 0)
 	if len(menuIds) > 0 {
 		var menuIdArray = strings.Split(menuIds, utils.COMMA)
 		for i := 0; i < len(menuIdArray); i++ {
 			var menuIdStr = menuIdArray[i]
 			menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
-			e.AdminRoleMenuDb.AddAdminRoleMenu(roleId, menuId)
+			e.AdminRoleMenuDb.AddAdminRoleMenu(context.Background(), roleId, menuId)
 		}
 	}
 	return response.Success()

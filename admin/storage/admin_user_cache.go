@@ -2,6 +2,7 @@ package storage
 
 import (
 	"admin/model"
+	"context"
 	"core/constant"
 	"core/redis"
 	"encoding/json"
@@ -14,7 +15,7 @@ func (e *AdminUserCache) redisKey(accessToken string) string {
 	return redis.GetKey(constant.ADMIN_USER, accessToken)
 }
 
-func (e *AdminUserCache) Set(accessToken string, adminUser *model.AdminUser) {
+func (e *AdminUserCache) Set(ctx context.Context, accessToken string, adminUser *model.AdminUser) {
 	if adminUser == nil {
 		return
 	}
@@ -22,7 +23,7 @@ func (e *AdminUserCache) Set(accessToken string, adminUser *model.AdminUser) {
 	redis.Set(e.redisKey(accessToken), val, constant.TIME_OF_WEEK)
 }
 
-func (e *AdminUserCache) Get(accessToken string) *model.AdminUser {
+func (e *AdminUserCache) Get(ctx context.Context, accessToken string) *model.AdminUser {
 	if len(accessToken) == 0 {
 		return nil
 	}
@@ -35,6 +36,6 @@ func (e *AdminUserCache) Get(accessToken string) *model.AdminUser {
 	return &adminUser
 }
 
-func (e *AdminUserCache) Del(accessToken string) {
+func (e *AdminUserCache) Del(ctx context.Context, accessToken string) {
 	redis.Del(e.redisKey(accessToken))
 }

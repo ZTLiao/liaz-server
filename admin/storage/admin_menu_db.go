@@ -2,6 +2,7 @@ package storage
 
 import (
 	"admin/model"
+	"context"
 	"core/application"
 	"core/logger"
 )
@@ -9,7 +10,7 @@ import (
 type AdminMenuDb struct {
 }
 
-func (e *AdminMenuDb) GetAdminMemu(adminId int64) []model.AdminMenu {
+func (e *AdminMenuDb) GetAdminMemu(ctx context.Context, adminId int64) []model.AdminMenu {
 	var engine = application.GetXormEngine()
 	var adminMenus []model.AdminMenu
 	err := engine.SQL(
@@ -39,7 +40,7 @@ func (e *AdminMenuDb) GetAdminMemu(adminId int64) []model.AdminMenu {
 	return adminMenus
 }
 
-func (e *AdminMenuDb) GetAdminMenuList() []model.AdminMenu {
+func (e *AdminMenuDb) GetAdminMenuList(ctx context.Context) []model.AdminMenu {
 	var engine = application.GetXormEngine()
 	var adminMenus []model.AdminMenu
 	err := engine.OrderBy("created_at asc").Find(&adminMenus)
@@ -49,7 +50,7 @@ func (e *AdminMenuDb) GetAdminMenuList() []model.AdminMenu {
 	return adminMenus
 }
 
-func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) {
+func (e *AdminMenuDb) SaveOrUpdateAdminMenu(ctx context.Context, adminMenu *model.AdminMenu) {
 	var engine = application.GetXormEngine()
 	var menuId = adminMenu.MenuId
 	var name = adminMenu.Name
@@ -71,7 +72,7 @@ func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) {
 	}
 }
 
-func (e *AdminMenuDb) DelAdminMenu(menuId int64) {
+func (e *AdminMenuDb) DelAdminMenu(ctx context.Context, menuId int64) {
 	var engine = application.GetXormEngine()
 	engine.ID(menuId).Delete(&model.AdminMenu{})
 }

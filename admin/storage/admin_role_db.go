@@ -2,6 +2,7 @@ package storage
 
 import (
 	"admin/model"
+	"context"
 	"core/application"
 	"core/logger"
 )
@@ -9,7 +10,7 @@ import (
 type AdminRoleDb struct {
 }
 
-func (e *AdminRoleDb) GetAdminRole() []model.AdminRole {
+func (e *AdminRoleDb) GetAdminRole(ctx context.Context) []model.AdminRole {
 	var engine = application.GetXormEngine()
 	var adminRoles []model.AdminRole
 	err := engine.OrderBy("created_at asc").Find(&adminRoles)
@@ -19,7 +20,7 @@ func (e *AdminRoleDb) GetAdminRole() []model.AdminRole {
 	return adminRoles
 }
 
-func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) {
+func (e *AdminRoleDb) SaveOrUpdateAdminRole(ctx context.Context, adminRole *model.AdminRole) {
 	var engine = application.GetXormEngine()
 	var roleId = adminRole.RoleId
 	var name = adminRole.Name
@@ -36,7 +37,7 @@ func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) {
 	}
 }
 
-func (e *AdminRoleDb) DelAdminRole(roleId int64) {
+func (e *AdminRoleDb) DelAdminRole(ctx context.Context, roleId int64) {
 	var engine = application.GetXormEngine()
 	engine.ID(roleId).Delete(&model.AdminRole{})
 }

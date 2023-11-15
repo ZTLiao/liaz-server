@@ -3,6 +3,7 @@ package handler
 import (
 	"admin/resp"
 	"admin/storage"
+	"context"
 	"core/constant"
 	"core/response"
 	"core/web"
@@ -31,26 +32,26 @@ func (e *AdminLoginHandler) Login(wc *web.WebContext) interface{} {
 	var username = wc.Context.PostForm("username")
 	var password = wc.Context.PostForm("password")
 	wc.Info("username : %s, password : %s", username, password)
-	adminUser := e.AdminUserDb.GetLoginUser(username, password)
+	adminUser := e.AdminUserDb.GetLoginUser(context.Background(), username, password)
 	if adminUser == nil {
 		return response.Fail(constant.LOGIN_ERROR)
 	}
 	var adminId = adminUser.AdminId
 	var accessToken string
-	if e.AccessTokenCache.IsExist(adminId) {
-		accessToken = e.AccessTokenCache.Get(adminId)
+	if e.AccessTokenCache.IsExist(context.Background(), adminId) {
+		accessToken = e.AccessTokenCache.Get(context.Background(), adminId)
 	} else {
 		adminUser.Password = ""
 		var uuid, _ = uuid.NewV4()
 		accessToken = uuid.String()
-		e.AccessTokenCache.Set(adminId, accessToken)
-		e.AdminUserCache.Set(accessToken, adminUser)
+		e.AccessTokenCache.Set(context.Background(), adminId, accessToken)
+		e.AdminUserCache.Set(context.Background(), accessToken, adminUser)
 	}
 	//记录
-	e.AdminLoginRecordDb.AddRecord(adminId, wc.Context.ClientIP(), wc.Context.Request.Header.Get(constant.USER_AGENT))
+	e.AdminLoginRecordDb.AddRecord(context.Background(), adminId, wc.Context.ClientIP(), wc.Context.Request.Header.Get(constant.USER_AGENT))
 	return response.ReturnOK(&resp.AccessTokenResp{
 		AccessToken: accessToken,
-		ExpireAt:    e.AccessTokenCache.TTL(adminId),
+		ExpireAt:    e.AccessTokenCache.TTL(context.Background(), adminId),
 		AdminId:     adminId,
 	})
 }

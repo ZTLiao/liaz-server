@@ -2,6 +2,7 @@ package storage
 
 import (
 	"admin/model"
+	"context"
 	"core/application"
 	"encoding/json"
 )
@@ -9,7 +10,7 @@ import (
 type AdminLogDb struct {
 }
 
-func (e *AdminLogDb) AddLog(adminId int64, uri string, headers map[string][]string, queryParams map[string]any, formParams map[string]any, bodyParams string) {
+func (e *AdminLogDb) AddLog(ctx context.Context, adminId int64, uri string, headers map[string][]string, queryParams map[string]any, formParams map[string]any, bodyParams string) {
 	var adminLog = new(model.AdminLog)
 	adminLog.AdminId = adminId
 	adminLog.Uri = uri

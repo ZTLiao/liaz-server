@@ -3,6 +3,7 @@ package handler
 import (
 	"admin/model"
 	"admin/storage"
+	"context"
 	"core/errors"
 	"core/response"
 	"core/web"
@@ -25,7 +26,7 @@ type AdminRoleHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role [get]
 func (e *AdminRoleHandler) GetAdminRole(wc *web.WebContext) interface{} {
-	return response.ReturnOK(e.AdminRoleDb.GetAdminRole())
+	return response.ReturnOK(e.AdminRoleDb.GetAdminRole(context.Background()))
 }
 
 // @Summary 保存角色
@@ -73,7 +74,7 @@ func (e *AdminRoleHandler) saveOrUpdateAdminRole(wc *web.WebContext) {
 		adminRole.RoleId, _ = strconv.ParseInt(roleId, 10, 64)
 	}
 	adminRole.Name = name
-	e.AdminRoleDb.SaveOrUpdateAdminRole(adminRole)
+	e.AdminRoleDb.SaveOrUpdateAdminRole(context.Background(), adminRole)
 }
 
 // @Summary 删除角色
@@ -87,11 +88,11 @@ func (e *AdminRoleHandler) saveOrUpdateAdminRole(wc *web.WebContext) {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role/:roleId [delete]
 func (e *AdminRoleHandler) DelAdminRole(wc *web.WebContext) interface{} {
-	var roleId = wc.Context.Param("roleId")
-	if len(roleId) > 0 {
-		val, _ := strconv.ParseInt(roleId, 10, 64)
-		e.AdminRoleDb.DelAdminRole(val)
-		e.AdminRoleMenuDb.DelAdminRoleMenu(val, 0)
+	var roleIdStr = wc.Context.Param("roleId")
+	if len(roleIdStr) > 0 {
+		roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
+		e.AdminRoleDb.DelAdminRole(context.Background(), roleId)
+		e.AdminRoleMenuDb.DelAdminRoleMenu(context.Background(), roleId, 0)
 	}
 	return response.Success()
 }

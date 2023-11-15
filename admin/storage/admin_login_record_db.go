@@ -2,6 +2,7 @@ package storage
 
 import (
 	"admin/model"
+	"context"
 	"core/application"
 	"core/logger"
 	"core/types"
@@ -12,7 +13,7 @@ import (
 type AdminLoginRecordDb struct {
 }
 
-func (e *AdminLoginRecordDb) AddRecord(adminId int64, clientIp string, userAgent string) {
+func (e *AdminLoginRecordDb) AddRecord(ctx context.Context, adminId int64, clientIp string, userAgent string) {
 	ua := user_agent.New(userAgent)
 	var record = new(model.AdminLoginRecord)
 	record.AdminId = adminId
@@ -34,7 +35,7 @@ func (e *AdminLoginRecordDb) AddRecord(adminId int64, clientIp string, userAgent
 	}
 }
 
-func (e *AdminLoginRecordDb) GetLastTime(adminId int64) types.Time {
+func (e *AdminLoginRecordDb) GetLastTime(ctx context.Context, adminId int64) types.Time {
 	var engine = application.GetXormEngine()
 	var record = new(model.AdminLoginRecord)
 	has, err := engine.Where("admin_id = ?", adminId).OrderBy("record_id desc").Limit(1, 1).Get(record)

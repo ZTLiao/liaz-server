@@ -2,6 +2,7 @@ package storage
 
 import (
 	"admin/model"
+	"context"
 	"core/application"
 	"core/logger"
 )
@@ -9,7 +10,7 @@ import (
 type AdminUserRoleDb struct {
 }
 
-func (e *AdminUserRoleDb) GetAdminUserRole(adminId int64) []model.AdminUserRole {
+func (e *AdminUserRoleDb) GetAdminUserRole(ctx context.Context, adminId int64) []model.AdminUserRole {
 	var engine = application.GetXormEngine()
 	var adminUserRoles []model.AdminUserRole
 	err := engine.Where("admin_id = ?", adminId).Find(&adminUserRoles)
@@ -19,7 +20,7 @@ func (e *AdminUserRoleDb) GetAdminUserRole(adminId int64) []model.AdminUserRole 
 	return adminUserRoles
 }
 
-func (e *AdminUserRoleDb) DelAdminUserRole(adminId int64, roleId int64) {
+func (e *AdminUserRoleDb) DelAdminUserRole(ctx context.Context, adminId int64, roleId int64) {
 	if adminId == 0 && roleId == 0 {
 		return
 	}
@@ -32,7 +33,7 @@ func (e *AdminUserRoleDb) DelAdminUserRole(adminId int64, roleId int64) {
 	}
 }
 
-func (e *AdminUserRoleDb) AddAdminUserRole(adminId int64, roleId int64) {
+func (e *AdminUserRoleDb) AddAdminUserRole(ctx context.Context, adminId int64, roleId int64) {
 	var engine = application.GetXormEngine()
 	var adminUserRole = new(model.AdminUserRole)
 	count, err := engine.Where("admin_id = ? and role_id = ?", adminId, roleId).Count(adminUserRole)
