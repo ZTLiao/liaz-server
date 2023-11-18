@@ -9,4 +9,5 @@ type SysConfRepoInterface interface {
 	DeleteSysConf(int64) error
 	GetSysConfList() ([]entity.SysConf, error)
 	GetSysConfByKey(string) (*entity.SysConf, error)
+	GetSysConfByKind(int8) ([]entity.SysConf, error)
 }

@@ -47,10 +47,28 @@ func (e *SysConfMemory) HGet(key string) (*entity.SysConf, error) {
 	return &sysConf, nil
 }
 
-func (e *SysConfMemory) HDel(key string) error {
-	return e.redis.HDel(e.RedisKey(), key)
+func (e *SysConfMemory) Del() error {
+	return e.redis.Del(e.RedisKey())
 }
 
 func (e *SysConfMemory) HExists(key string) (bool, error) {
 	return e.redis.HExists(e.RedisKey(), key)
+}
+
+func (e *SysConfMemory) HGetAll() (map[string]entity.SysConf, error) {
+	var sysConfMap map[string]entity.SysConf
+	val, err := e.redis.HGetAll(e.RedisKey())
+	if err != nil {
+		return nil, err
+	}
+	sysConfMap = make(map[string]entity.SysConf, len(val))
+	for k, v := range val {
+		var sysConf entity.SysConf
+		err = json.Unmarshal([]byte(v), &sysConf)
+		if err != nil {
+			return nil, err
+		}
+		sysConfMap[k] = sysConf
+	}
+	return sysConfMap, nil
 }

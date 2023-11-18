@@ -23,7 +23,7 @@ func (e *SysConfReop) SaveSysConf(sysConf *entity.SysConf) (*entity.SysConf, err
 	if err != nil {
 		return nil, err
 	}
-	err = e.sysConfMemory.HDel(sysConf.ConfKey)
+	err = e.sysConfMemory.Del()
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (e *SysConfReop) UpdateSysConf(sysConf *entity.SysConf) (*entity.SysConf, e
 	if err != nil {
 		return nil, err
 	}
-	err = e.sysConfMemory.HDel(sysConf.ConfKey)
+	err = e.sysConfMemory.Del()
 	if err != nil {
 		return nil, err
 	}
@@ -47,15 +47,11 @@ func (e *SysConfReop) UpdateSysConf(sysConf *entity.SysConf) (*entity.SysConf, e
 }
 
 func (e *SysConfReop) DeleteSysConf(confId int64) error {
-	sysConf, err := e.GetSysConf(confId)
+	err := e.sysConfStore.DeleteSysConf(confId)
 	if err != nil {
 		return err
 	}
-	err = e.sysConfStore.DeleteSysConf(confId)
-	if err != nil {
-		return err
-	}
-	err = e.sysConfMemory.HDel(sysConf.ConfKey)
+	err = e.sysConfMemory.Del()
 	if err != nil {
 		return err
 	}
@@ -76,9 +72,45 @@ func (e *SysConfReop) GetSysConfByKey(confKey string) (*entity.SysConf, error) {
 		if err != nil {
 			return nil, err
 		}
-		if sysConf != nil {
-			e.sysConfMemory.HSet(confKey, sysConf)
+		sysConfs, err := e.GetSysConfList()
+		if err != nil {
+			return nil, err
+		}
+		for _, v := range sysConfs {
+			e.sysConfMemory.HSet(v.ConfKey, &v)
 		}
 	}
 	return sysConf, nil
+}
+
+func (e *SysConfReop) GetSysConfByKind(confKind int8) ([]entity.SysConf, error) {
+	sysConfMap, err := e.sysConfMemory.HGetAll()
+	if err != nil {
+		return nil, err
+	}
+	if len(sysConfMap) == 0 {
+		sysConfs, err := e.sysConfStore.GetSysConfByKind(confKind)
+		if err != nil {
+			return nil, err
+		}
+		for _, v := range sysConfs {
+			if len(v.ConfKey) > 0 {
+				e.sysConfMemory.HSet(v.ConfKey, &v)
+
+			}
+		}
+		sysConfMap, err = e.sysConfMemory.HGetAll()
+		if err != nil {
+			return nil, err
+		}
+	}
+	var sysConfs = make([]entity.SysConf, 0)
+	if len(sysConfMap) > 0 {
+		for _, v := range sysConfMap {
+			if (v.ConfKind&confKind) != 0 && len(v.ConfKey) > 0 {
+				sysConfs = append(sysConfs, v)
+			}
+		}
+	}
+	return sysConfs, nil
 }

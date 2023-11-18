@@ -3,6 +3,7 @@ package store
 import (
 	"basic/domain/repository"
 	"basic/infrastructure/persistence/entity"
+	"core/constant"
 
 	"github.com/go-xorm/xorm"
 )
@@ -18,7 +19,7 @@ func NewSysConfStore(db *xorm.Engine) *SysConfStore {
 }
 
 func (e *SysConfStore) SaveSysConf(sysConf *entity.SysConf) (*entity.SysConf, error) {
-	_, err := e.db.Insert(&sysConf)
+	_, err := e.db.Insert(sysConf)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +36,7 @@ func (e *SysConfStore) GetSysConf(confId int64) (*entity.SysConf, error) {
 }
 
 func (e *SysConfStore) UpdateSysConf(sysConf *entity.SysConf) (*entity.SysConf, error) {
-	_, err := e.db.ID(sysConf.ConfId).Update(&sysConf)
+	_, err := e.db.ID(sysConf.ConfId).Update(sysConf)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +63,7 @@ func (e *SysConfStore) GetSysConfList() ([]entity.SysConf, error) {
 
 func (e *SysConfStore) GetSysConfByKey(confKey string) (*entity.SysConf, error) {
 	var sysConfs []entity.SysConf
-	err := e.db.Where("conf_key = ?", confKey).Find(&sysConfs)
+	err := e.db.Where("conf_key = ? and status = ?", confKey, constant.YES).Find(&sysConfs)
 	if err != nil {
 		return nil, err
 	}
@@ -70,4 +71,31 @@ func (e *SysConfStore) GetSysConfByKey(confKey string) (*entity.SysConf, error) 
 		return &sysConfs[0], nil
 	}
 	return nil, nil
+}
+
+func (e *SysConfStore) GetSysConfByKind(confKind int8) ([]entity.SysConf, error) {
+	var sysConfs []entity.SysConf
+	err := e.db.SQL(
+		`
+		select 
+			sc.conf_id,
+			sc.conf_key,
+			sc.conf_name,
+			sc.conf_kind,
+			sc.conf_type,
+			sc.conf_value,
+			sc.description,
+			sc.status,
+			sc.created_at,
+			sc.updated_at
+		from 
+			sys_conf as sc
+		where 
+			sc.status = 1
+			and (sc.conf_kind & ?) != 0
+		`, confKind).Find(&sysConfs)
+	if err != nil {
+		return nil, err
+	}
+	return sysConfs, nil
 }

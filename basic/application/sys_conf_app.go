@@ -18,6 +18,7 @@ type SysConfAppInterface interface {
 	DeleteSysConf(int64) error
 	GetSysConfList() ([]entity.SysConf, error)
 	GetSysConfByKey(confKey string) (*entity.SysConf, error)
+	GetSysConfByKind(int8) ([]entity.SysConf, error)
 }
 
 func (e *sysConfApp) SaveSysConf(sysConf *entity.SysConf) (*entity.SysConf, error) {
@@ -42,4 +43,8 @@ func (e *sysConfApp) GetSysConfList() ([]entity.SysConf, error) {
 
 func (e *sysConfApp) GetSysConfByKey(confKey string) (*entity.SysConf, error) {
 	return e.sysConfRepo.GetSysConfByKey(confKey)
+}
+
+func (e *sysConfApp) GetSysConfByKind(confKind int8) ([]entity.SysConf, error) {
+	return e.sysConfRepo.GetSysConfByKind(confKind)
 }
