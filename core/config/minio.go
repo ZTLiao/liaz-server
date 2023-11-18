@@ -1,7 +1,7 @@
 package config
 
 import (
-	"core/application"
+	"core/system"
 	"core/utils"
 	"fmt"
 
@@ -27,5 +27,5 @@ func (e *Minio) Init() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	application.SetMinioClient(client)
+	system.SetMinioClient(client)
 }

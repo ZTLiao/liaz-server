@@ -3,6 +3,7 @@ package controller
 import (
 	"admin/handler"
 	"admin/storage"
+	"core/system"
 	"core/web"
 )
 
@@ -10,9 +11,10 @@ type AdminRoleController struct {
 }
 
 func (e *AdminRoleController) Router(iWebRoutes web.IWebRoutes) {
+	db := system.GetXormEngine()
 	var adminRoleHandler = &handler.AdminRoleHandler{
-		AdminRoleDb:     storage.AdminRoleDb{},
-		AdminRoleMenuDb: storage.AdminRoleMenuDb{},
+		AdminRoleDb:     storage.NewAdminRoleDb(db),
+		AdminRoleMenuDb: storage.NewAdminRoleMenuDb(db),
 	}
 	iWebRoutes.GET("/role", adminRoleHandler.GetAdminRole)
 	iWebRoutes.POST("/role", adminRoleHandler.SaveAdminRole)

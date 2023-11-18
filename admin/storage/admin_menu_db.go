@@ -2,18 +2,21 @@ package storage
 
 import (
 	"admin/model"
-	"context"
-	"core/application"
-	"core/logger"
+
+	"github.com/go-xorm/xorm"
 )
 
 type AdminMenuDb struct {
+	db *xorm.Engine
 }
 
-func (e *AdminMenuDb) GetAdminMemu(adminId int64) []model.AdminMenu {
-	var engine = application.GetXormEngine()
+func NewAdminMenuDb(db *xorm.Engine) *AdminMenuDb {
+	return &AdminMenuDb{db}
+}
+
+func (e *AdminMenuDb) GetAdminMemu(adminId int64) ([]model.AdminMenu, error) {
 	var adminMenus []model.AdminMenu
-	err := engine.SQL(
+	err := e.db.SQL(
 		`
 		select 
 			am.menu_id,
@@ -35,44 +38,52 @@ func (e *AdminMenuDb) GetAdminMemu(adminId int64) []model.AdminMenu {
 		order by am.parent_id, am.show_order
 		`, adminId).Find(&adminMenus)
 	if err != nil {
-		logger.Error(err.Error())
+		return nil, err
 	}
-	return adminMenus
+	return adminMenus, nil
 }
 
-func (e *AdminMenuDb) GetAdminMenuList(ctx context.Context) []model.AdminMenu {
-	var engine = application.GetXormEngine()
+func (e *AdminMenuDb) GetAdminMenuList() ([]model.AdminMenu, error) {
 	var adminMenus []model.AdminMenu
-	err := engine.OrderBy("created_at asc").Find(&adminMenus)
+	err := e.db.OrderBy("created_at asc").Find(&adminMenus)
 	if err != nil {
-		logger.Error(err.Error())
+		return nil, err
 	}
-	return adminMenus
+	return adminMenus, nil
 }
 
-func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) {
-	var engine = application.GetXormEngine()
-	var menuId = adminMenu.MenuId
-	var name = adminMenu.Name
-	var path = adminMenu.Path
+func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) error {
+	menuId := adminMenu.MenuId
+	name := adminMenu.Name
+	path := adminMenu.Path
 	if menuId == 0 {
-		count, err := engine.Where("name = ? and path = ?", name, path).Count(adminMenu)
+		count, err := e.db.Where("name = ? and path = ?", name, path).Count(adminMenu)
 		if err != nil {
-			logger.Error(err.Error())
+			return err
 		}
 		if count == 0 {
-			engine.Insert(adminMenu)
+			_, err := e.db.Insert(adminMenu)
+			if err != nil {
+				return err
+			}
 		}
 	} else {
-		engine.ID(menuId).Update(adminMenu)
+		_, err := e.db.ID(menuId).Update(adminMenu)
+		if err != nil {
+			return err
+		}
 	}
-	_, err := engine.Where("name = ? and path = ?", name, path).Get(adminMenu)
+	_, err := e.db.Where("name = ? and path = ?", name, path).Get(adminMenu)
 	if err != nil {
-		logger.Error(err.Error())
+		return err
 	}
+	return nil
 }
 
-func (e *AdminMenuDb) DelAdminMenu(menuId int64) {
-	var engine = application.GetXormEngine()
-	engine.ID(menuId).Delete(&model.AdminMenu{})
+func (e *AdminMenuDb) DelAdminMenu(menuId int64) error {
+	_, err := e.db.ID(menuId).Delete(&model.AdminMenu{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

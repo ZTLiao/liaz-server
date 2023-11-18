@@ -11,8 +11,8 @@ import (
 )
 
 type AdminRoleMenuHandler struct {
-	AdminRoleMenuDb storage.AdminRoleMenuDb
-	AdminMenuDb     storage.AdminMenuDb
+	AdminRoleMenuDb *storage.AdminRoleMenuDb
+	AdminMenuDb     *storage.AdminMenuDb
 }
 
 // @Summary 获取角色菜单
@@ -26,20 +26,29 @@ type AdminRoleMenuHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role/menu/:roleId [get]
 func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} {
-	var roleIdStr = wc.Context.Param("roleId")
+	roleIdStr := wc.Param("roleId")
 	if len(roleIdStr) == 0 {
 		return response.Success()
 	}
-	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
-	var adminRoleMenus = e.AdminRoleMenuDb.GetAdminRoleMenu(roleId)
-	var adminMenus = e.AdminMenuDb.GetAdminMenuList(wc.Background())
+	roleId, err := strconv.ParseInt(roleIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	adminRoleMenus, err := e.AdminRoleMenuDb.GetAdminRoleMenu(roleId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	adminMenus, err := e.AdminMenuDb.GetAdminMenuList()
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	var menus = make([]resp.AdminMenuResp, 0)
 	var childMap = make(map[int64][]resp.AdminMenuResp, 0)
 	for i := 0; i < len(adminMenus); i++ {
-		var adminMenu = adminMenus[i]
-		var menuId = adminMenu.MenuId
-		var parentId = adminMenu.ParentId
-		var checked bool = false
+		adminMenu := adminMenus[i]
+		menuId := adminMenu.MenuId
+		parentId := adminMenu.ParentId
+		var checked bool
 		for _, v := range adminRoleMenus {
 			if v.MenuId == menuId {
 				checked = true
@@ -55,7 +64,7 @@ func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} 
 		if parentId == 0 {
 			menus = append(menus, menu)
 		} else {
-			var childs = childMap[parentId]
+			childs := childMap[parentId]
 			if len(childs) == 0 {
 				childs = make([]resp.AdminMenuResp, 0)
 			}
@@ -63,9 +72,9 @@ func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} 
 		}
 	}
 	for i := 0; i < len(menus); i++ {
-		var menu = &menus[i]
-		var menuId = menu.MenuId
-		var childs []resp.AdminMenuResp = childMap[menuId]
+		menu := &menus[i]
+		menuId := menu.MenuId
+		childs := childMap[menuId]
 		if len(childs) == 0 {
 			continue
 		}
@@ -86,19 +95,25 @@ func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} 
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role/menu [post]
 func (e *AdminRoleMenuHandler) SaveAdminRoleMenu(wc *web.WebContext) interface{} {
-	var roleIdStr = wc.Context.PostForm("roleId")
-	var menuIds = wc.Context.PostForm("menuIds")
+	roleIdStr := wc.PostForm("roleId")
+	menuIds := wc.PostForm("menuIds")
 	wc.Info("roleId : %s, menuIds : %s", roleIdStr, menuIds)
 	if len(roleIdStr) == 0 {
 		return response.Success()
 	}
-	roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
+	roleId, err := strconv.ParseInt(roleIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	e.AdminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
 	if len(menuIds) > 0 {
-		var menuIdArray = strings.Split(menuIds, utils.COMMA)
+		menuIdArray := strings.Split(menuIds, utils.COMMA)
 		for i := 0; i < len(menuIdArray); i++ {
-			var menuIdStr = menuIdArray[i]
-			menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
+			menuIdStr := menuIdArray[i]
+			menuId, err := strconv.ParseInt(menuIdStr, 10, 64)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
 			e.AdminRoleMenuDb.AddAdminRoleMenu(roleId, menuId)
 		}
 	}

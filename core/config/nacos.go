@@ -1,7 +1,7 @@
 package config
 
 import (
-	"core/application"
+	"core/system"
 	"core/utils"
 	"fmt"
 	"strconv"
@@ -62,7 +62,7 @@ type Nacos struct {
 func (e *Nacos) Init() {
 	//nacos地址
 	serverAddrArray := strings.Split(e.ServerAddr, utils.COLON)
-	var ipAddr = serverAddrArray[0]
+	ipAddr := serverAddrArray[0]
 	port, err := strconv.Atoi(serverAddrArray[1])
 	if err != nil {
 		fmt.Println(err.Error())
@@ -89,7 +89,7 @@ func (e *Nacos) Init() {
 		panic(err)
 	}
 	iConfigClient = iClient
-	application.SetIConfigClient(iClient)
+	system.SetIConfigClient(iClient)
 	//获取配置
 	e.config()
 	//设置监听事件
@@ -116,7 +116,7 @@ func (e *Nacos) config() {
 	//当前应用的yaml优先级最高
 	content, err := iConfigClient.GetConfig(
 		vo.ConfigParam{
-			DataId: application.GetName() + ".yaml",
+			DataId: system.GetName() + ".yaml",
 		},
 	)
 	if err != nil {

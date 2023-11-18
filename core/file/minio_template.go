@@ -3,38 +3,36 @@ package file
 import (
 	"bytes"
 	"context"
-	"core/application"
-	"core/logger"
 
 	"github.com/minio/minio-go/v7"
 )
 
 type MinioTemplate struct {
+	minioClient *minio.Client
 }
 
 var _ FileTemplate = &MinioTemplate{}
 
-func NewMinioTemplate() *MinioTemplate {
-	return &MinioTemplate{}
+func NewMinioTemplate(minioClient *minio.Client) *MinioTemplate {
+	return &MinioTemplate{minioClient}
 }
 
-func (e *MinioTemplate) CreateBucket(bucketName string) {
-	var minioClient = application.GetMinioClient()
-	ok, err := minioClient.BucketExists(context.Background(), bucketName)
+func (e *MinioTemplate) CreateBucket(bucketName string) error {
+	ok, err := e.minioClient.BucketExists(context.Background(), bucketName)
 	if err != nil {
-		logger.Error(err.Error())
-		return
+		return err
 	}
 	if !ok {
-		minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+		err := e.minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func (e *MinioTemplate) ListObjects(bucketName string) []FileObjectInfo {
-	var minioClient = application.GetMinioClient()
-	var opt = minio.ListObjectsOptions{}
-	opt.Set("Content-Type", "image/jpeg")
-	var objectInfos = minioClient.ListObjects(context.Background(), bucketName, opt)
+	objectInfos := e.minioClient.ListObjects(context.Background(), bucketName, minio.ListObjectsOptions{})
 	var fileInfos = make([]FileObjectInfo, 0)
 	for objectInfo := range objectInfos {
 		fileInfos = append(fileInfos, FileObjectInfo{
@@ -48,18 +46,16 @@ func (e *MinioTemplate) ListObjects(bucketName string) []FileObjectInfo {
 	return fileInfos
 }
 
-func (e *MinioTemplate) PutObject(bucketName string, objectName string, data []byte) *FileObjectInfo {
+func (e *MinioTemplate) PutObject(bucketName string, objectName string, data []byte) (*FileObjectInfo, error) {
 	e.CreateBucket(bucketName)
-	var minioClient = application.GetMinioClient()
-	uploadInfo, err := minioClient.PutObject(context.Background(), bucketName, objectName, bytes.NewBuffer(data), int64(len(data)), minio.PutObjectOptions{})
+	uploadInfo, err := e.minioClient.PutObject(context.Background(), bucketName, objectName, bytes.NewBuffer(data), int64(len(data)), minio.PutObjectOptions{})
 	if err != nil {
-		logger.Error(err.Error())
-		return nil
+		return nil, err
 	}
 	return &FileObjectInfo{
 		Name:         uploadInfo.Key,
 		Size:         uploadInfo.Size,
 		LastModified: uploadInfo.LastModified,
 		Expires:      uploadInfo.Expiration,
-	}
+	}, nil
 }

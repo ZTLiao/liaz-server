@@ -10,6 +10,11 @@ type FileItem struct {
 	Path       string     `json:"path" xorm:"path"`
 	UnqiueId   string     `json:"unqiueId" xorm:"unqiue_id"`
 	Suffix     string     `json:"suffix" xorm:"suffix"`
+	FileType   string     `json:"fileType" xorm:"file_type"`
 	CreatedAt  types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt  types.Time `json:"updatedAt" xorm:"updated_at"`
+}
+
+func (e *FileItem) TableName() string {
+	return "file_item"
 }

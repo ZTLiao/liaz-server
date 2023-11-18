@@ -4,6 +4,7 @@ import (
 	"admin/resp"
 	"admin/storage"
 	"core/constant"
+	"core/logger"
 	"core/response"
 	"core/web"
 
@@ -11,10 +12,10 @@ import (
 )
 
 type AdminLoginHandler struct {
-	AdminUserDb        storage.AdminUserDb
-	AccessTokenCache   storage.AccessTokenCache
-	AdminUserCache     storage.AdminUserCache
-	AdminLoginRecordDb storage.AdminLoginRecordDb
+	AdminUserDb        *storage.AdminUserDb
+	AccessTokenCache   *storage.AccessTokenCache
+	AdminUserCache     *storage.AdminUserCache
+	AdminLoginRecordDb *storage.AdminLoginRecordDb
 }
 
 // @Summary 登录
@@ -28,29 +29,46 @@ type AdminLoginHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/login [post]
 func (e *AdminLoginHandler) Login(wc *web.WebContext) interface{} {
-	var username = wc.Context.PostForm("username")
-	var password = wc.Context.PostForm("password")
+	username := wc.PostForm("username")
+	password := wc.PostForm("password")
 	wc.Info("username : %s, password : %s", username, password)
-	adminUser := e.AdminUserDb.GetLoginUser(username, password)
+	adminUser, err := e.AdminUserDb.GetLoginUser(username, password)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	if adminUser == nil {
 		return response.Fail(constant.LOGIN_ERROR)
 	}
-	var adminId = adminUser.AdminId
+	adminId := adminUser.AdminId
 	var accessToken string
-	if e.AccessTokenCache.IsExist(adminId) {
-		accessToken = e.AccessTokenCache.Get(adminId)
+	ok, err := e.AccessTokenCache.IsExist(adminId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if ok {
+		accessToken, err = e.AccessTokenCache.Get(adminId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 	} else {
 		adminUser.Password = ""
-		var uuid, _ = uuid.NewV4()
+		uuid, err := uuid.NewV4()
+		if err != nil {
+			logger.Error(err.Error())
+		}
 		accessToken = uuid.String()
 		e.AccessTokenCache.Set(adminId, accessToken)
 		e.AdminUserCache.Set(accessToken, adminUser)
 	}
 	//记录
-	e.AdminLoginRecordDb.AddRecord(adminId, wc.Context.ClientIP(), wc.Context.Request.Header.Get(constant.USER_AGENT))
+	e.AdminLoginRecordDb.AddRecord(adminId, wc.ClientIP(), wc.GetHeader(constant.USER_AGENT))
+	expireAt, err := e.AccessTokenCache.TTL(adminId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	return response.ReturnOK(&resp.AccessTokenResp{
 		AccessToken: accessToken,
-		ExpireAt:    e.AccessTokenCache.TTL(adminId),
+		ExpireAt:    expireAt,
 		AdminId:     adminId,
 	})
 }

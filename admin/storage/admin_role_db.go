@@ -2,42 +2,54 @@ package storage
 
 import (
 	"admin/model"
-	"context"
-	"core/application"
-	"core/logger"
+
+	"github.com/go-xorm/xorm"
 )
 
 type AdminRoleDb struct {
+	db *xorm.Engine
 }
 
-func (e *AdminRoleDb) GetAdminRole(ctx context.Context) []model.AdminRole {
-	var engine = application.GetXormEngine()
+func NewAdminRoleDb(db *xorm.Engine) *AdminRoleDb {
+	return &AdminRoleDb{db}
+}
+
+func (e *AdminRoleDb) GetAdminRole() ([]model.AdminRole, error) {
 	var adminRoles []model.AdminRole
-	err := engine.OrderBy("created_at asc").Find(&adminRoles)
+	err := e.db.OrderBy("created_at asc").Find(&adminRoles)
 	if err != nil {
-		logger.Error(err.Error())
+		return nil, err
 	}
-	return adminRoles
+	return adminRoles, nil
 }
 
-func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) {
-	var engine = application.GetXormEngine()
-	var roleId = adminRole.RoleId
-	var name = adminRole.Name
+func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) error {
+	roleId := adminRole.RoleId
+	name := adminRole.Name
 	if roleId == 0 {
-		count, err := engine.Where("name = ?", name).Count(adminRole)
+		count, err := e.db.Where("name = ?", name).Count(adminRole)
 		if err != nil {
-			logger.Error(err.Error())
+			return err
 		}
 		if count == 0 {
-			engine.Insert(adminRole)
+			_, err := e.db.Insert(adminRole)
+			if err != nil {
+				return err
+			}
 		}
 	} else {
-		engine.ID(roleId).Update(adminRole)
+		_, err := e.db.ID(roleId).Update(adminRole)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (e *AdminRoleDb) DelAdminRole(roleId int64) {
-	var engine = application.GetXormEngine()
-	engine.ID(roleId).Delete(&model.AdminRole{})
+func (e *AdminRoleDb) DelAdminRole(roleId int64) error {
+	_, err := e.db.ID(roleId).Delete(&model.AdminRole{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

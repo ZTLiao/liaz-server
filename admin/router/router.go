@@ -36,30 +36,39 @@ func init() {
 
 func AdminSecurityHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var requestUri = c.Request.RequestURI
-		var excludes = config.SystemConfig.Security.Excludes
+		requestUri := c.Request.RequestURI
+		excludes := config.SystemConfig.Security.Excludes
 		for _, v := range excludes {
 			if requestUri == v {
 				c.Next()
 				return
 			}
 		}
-		var accessToken = c.Request.Header.Get(constant.AUTHORIZATION)
+		accessToken := c.Request.Header.Get(constant.AUTHORIZATION)
 		if len(accessToken) == 0 {
 			c.JSON(http.StatusUnauthorized, response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED))
 			c.Abort()
 			return
 		}
-		var adminUser = new(storage.AdminUserCache).Get(accessToken)
+		adminUser, err := new(storage.AdminUserCache).Get(accessToken)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
 		if adminUser == nil {
 			c.JSON(http.StatusUnauthorized, response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED))
 			c.Abort()
 			return
 		}
 		headers := c.Request.Header
-		formParams, _ := request.GetPostFormParams(c)
+		formParams, err := request.GetPostFormParams(c)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
 		queryParams := request.GetQueryParams(c)
-		bodyParams := request.GetBodyParams(c)
+		bodyParams, err := request.GetBodyParams(c)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
 		new(storage.AdminLogDb).AddLog(adminUser.AdminId, c.Request.RequestURI, headers, queryParams, formParams, bodyParams)
 		c.Next()
 	}

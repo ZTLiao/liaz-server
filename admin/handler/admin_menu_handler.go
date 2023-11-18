@@ -4,7 +4,7 @@ import (
 	"admin/model"
 	"admin/storage"
 	"core/constant"
-	"core/errors"
+	"core/logger"
 	"core/response"
 	"core/web"
 	"fmt"
@@ -13,9 +13,9 @@ import (
 )
 
 type AdminMenuHandler struct {
-	AdminMenuDb     storage.AdminMenuDb
-	AdminRoleMenuDb storage.AdminRoleMenuDb
-	AdminUserCache  storage.AdminUserCache
+	AdminMenuDb     *storage.AdminMenuDb
+	AdminRoleMenuDb *storage.AdminRoleMenuDb
+	AdminUserCache  *storage.AdminUserCache
 }
 
 // @Summary 获取系统所有菜单
@@ -28,7 +28,11 @@ type AdminMenuHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/menu/list [get]
 func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
-	return response.ReturnOK(e.AdminMenuDb.GetAdminMenuList(wc.Background()))
+	adminMenus, err := e.AdminMenuDb.GetAdminMenuList()
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(adminMenus)
 }
 
 // @Summary 获取当前用户菜单
@@ -41,12 +45,19 @@ func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/menu [get]
 func (e *AdminMenuHandler) GetAdminMenu(wc *web.WebContext) interface{} {
-	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = e.AdminUserCache.Get(accessToken)
+	accessToken := wc.GetHeader(constant.AUTHORIZATION)
+	adminUser, err := e.AdminUserCache.Get(accessToken)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
-	return response.ReturnOK(e.AdminMenuDb.GetAdminMemu(adminUser.AdminId))
+	adminMenu, err := e.AdminMenuDb.GetAdminMemu(adminUser.AdminId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(adminMenu)
 }
 
 // @Summary 保存菜单
@@ -81,33 +92,44 @@ func (e *AdminMenuHandler) UpdateAdminMenu(wc *web.WebContext) interface{} {
 
 func (e *AdminMenuHandler) saveOrUpdateAdminMenu(wc *web.WebContext) {
 	var params map[string]any
-	if err := wc.Context.ShouldBindJSON(&params); err != nil {
-		wc.Context.Error(&errors.ApiError{
-			Message: err.Error(),
-		})
-		return
+	if err := wc.ShouldBindJSON(&params); err != nil {
+		wc.AbortWithError(err)
 	}
-	var menuId = fmt.Sprint(params["menuId"])
-	var parentId = fmt.Sprint(params["parentId"])
-	var name = fmt.Sprint(params["name"])
-	var path = fmt.Sprint(params["path"])
-	var icon = fmt.Sprint(params["icon"])
-	var statusStr = fmt.Sprint(params["status"])
-	var showOrderStr = fmt.Sprint(params["showOrder"])
-	var description = fmt.Sprint(params["description"])
+	menuIdStr := fmt.Sprint(params["menuId"])
+	parentIdStr := fmt.Sprint(params["parentId"])
+	name := fmt.Sprint(params["name"])
+	path := fmt.Sprint(params["path"])
+	icon := fmt.Sprint(params["icon"])
+	statusStr := fmt.Sprint(params["status"])
+	showOrderStr := fmt.Sprint(params["showOrder"])
+	description := fmt.Sprint(params["description"])
 	var adminMenu = new(model.AdminMenu)
-	if len(menuId) > 0 {
-		adminMenu.MenuId, _ = strconv.ParseInt(menuId, 10, 64)
+	if len(menuIdStr) > 0 {
+		menuId, err := strconv.ParseInt(menuIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		adminMenu.MenuId = menuId
 	}
-	if len(parentId) > 0 {
-		adminMenu.ParentId, _ = strconv.ParseInt(parentId, 10, 64)
+	if len(parentIdStr) > 0 {
+		parentId, err := strconv.ParseInt(parentIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		adminMenu.ParentId = parentId
 	}
 	adminMenu.Name = name
 	adminMenu.Path = path
 	adminMenu.Icon = icon
-	status, _ := strconv.ParseInt(statusStr, 10, 64)
+	status, err := strconv.ParseInt(statusStr, 10, 8)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	adminMenu.Status = int8(status)
-	showOrder, _ := strconv.ParseInt(showOrderStr, 10, 32)
+	showOrder, err := strconv.ParseInt(showOrderStr, 10, 32)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	adminMenu.ShowOrder = int(showOrder)
 	adminMenu.Description = description
 	e.AdminMenuDb.SaveOrUpdateAdminMenu(adminMenu)
@@ -126,9 +148,12 @@ func (e *AdminMenuHandler) saveOrUpdateAdminMenu(wc *web.WebContext) {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/menu/:menuId [delete]
 func (e *AdminMenuHandler) DelAdminMenu(wc *web.WebContext) interface{} {
-	var menuIdStr = wc.Context.Param("menuId")
+	menuIdStr := wc.Param("menuId")
 	if len(menuIdStr) > 0 {
-		menuId, _ := strconv.ParseInt(menuIdStr, 10, 64)
+		menuId, err := strconv.ParseInt(menuIdStr, 10, 64)
+		if err != nil {
+			logger.Error(err.Error())
+		}
 		e.AdminMenuDb.DelAdminMenu(menuId)
 		e.AdminRoleMenuDb.DelAdminRoleMenu(0, menuId)
 	}

@@ -2,44 +2,60 @@ package storage
 
 import (
 	"admin/model"
-	"core/application"
-	"core/logger"
+
+	"github.com/go-xorm/xorm"
 )
 
 type AdminRoleMenuDb struct {
+	db *xorm.Engine
 }
 
-func (e *AdminRoleMenuDb) AddAdminRoleMenu(roleId int64, menuId int64) {
-	var engine = application.GetXormEngine()
+func NewAdminRoleMenuDb(db *xorm.Engine) *AdminRoleMenuDb {
+	return &AdminRoleMenuDb{db}
+}
+
+func (e *AdminRoleMenuDb) AddAdminRoleMenu(roleId int64, menuId int64) error {
 	var adminRoleMenu = new(model.AdminRoleMenu)
-	count, err := engine.Where("role_id = ? and menu_id = ?", roleId, menuId).Count(adminRoleMenu)
+	count, err := e.db.Where("role_id = ? and menu_id = ?", roleId, menuId).Count(adminRoleMenu)
 	if err != nil {
-		logger.Error(err.Error())
+		return err
 	}
 	if count > 0 {
-		return
+		return nil
 	}
 	adminRoleMenu.RoleId = roleId
 	adminRoleMenu.MenuId = menuId
-	engine.Insert(adminRoleMenu)
+	_, err = e.db.Insert(adminRoleMenu)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (e *AdminRoleMenuDb) DelAdminRoleMenu(roleId int64, menuId int64) {
+func (e *AdminRoleMenuDb) DelAdminRoleMenu(roleId int64, menuId int64) error {
 	if roleId == 0 && menuId == 0 {
-		return
+		return nil
 	}
-	var engine = application.GetXormEngine()
 	if roleId != 0 {
-		engine.Where("role_id = ?", roleId).Delete(&model.AdminRoleMenu{})
+		_, err := e.db.Where("role_id = ?", roleId).Delete(&model.AdminRoleMenu{})
+		if err != nil {
+			return err
+		}
 	}
 	if menuId != 0 {
-		engine.Where("menu_id = ?", menuId).Delete(&model.AdminRoleMenu{})
+		_, err := e.db.Where("menu_id = ?", menuId).Delete(&model.AdminRoleMenu{})
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (e *AdminRoleMenuDb) GetAdminRoleMenu(roleId int64) []model.AdminRoleMenu {
-	var engine = application.GetXormEngine()
+func (e *AdminRoleMenuDb) GetAdminRoleMenu(roleId int64) ([]model.AdminRoleMenu, error) {
 	var adminRoleMenus []model.AdminRoleMenu
-	engine.Where("role_id = ?", roleId).Find(&adminRoleMenus)
-	return adminRoleMenus
+	err := e.db.Where("role_id = ?", roleId).Find(&adminRoleMenus)
+	if err != nil {
+		return nil, err
+	}
+	return adminRoleMenus, nil
 }

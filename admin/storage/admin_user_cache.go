@@ -8,33 +8,55 @@ import (
 )
 
 type AdminUserCache struct {
+	redis *redis.RedisUtil
 }
 
-func (e *AdminUserCache) redisKey(accessToken string) string {
-	return redis.GetKey(constant.ADMIN_USER, accessToken)
+func NewAdminUserCache(redis *redis.RedisUtil) *AdminUserCache {
+	return &AdminUserCache{redis}
 }
 
-func (e *AdminUserCache) Set(accessToken string, adminUser *model.AdminUser) {
+func (e *AdminUserCache) RedisKey(accessToken string) string {
+	return e.redis.GetKey(constant.ADMIN_USER, accessToken)
+}
+
+func (e *AdminUserCache) Set(accessToken string, adminUser *model.AdminUser) error {
 	if adminUser == nil {
-		return
+		return nil
 	}
-	val, _ := json.Marshal(adminUser)
-	redis.Set(e.redisKey(accessToken), val, constant.TIME_OF_WEEK)
+	val, err := json.Marshal(adminUser)
+	if err != nil {
+		return err
+	}
+	err = e.redis.Set(e.RedisKey(accessToken), val, constant.TIME_OF_WEEK)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (e *AdminUserCache) Get(accessToken string) *model.AdminUser {
+func (e *AdminUserCache) Get(accessToken string) (*model.AdminUser, error) {
 	if len(accessToken) == 0 {
-		return nil
+		return nil, nil
 	}
-	val, _ := redis.Get(e.redisKey(accessToken))
+	val, err := e.redis.Get(e.RedisKey(accessToken))
+	if err != nil {
+		return nil, err
+	}
 	if len(val) == 0 {
-		return nil
+		return nil, nil
 	}
 	var adminUser model.AdminUser
-	json.Unmarshal([]byte(val), &adminUser)
-	return &adminUser
+	err = json.Unmarshal([]byte(val), &adminUser)
+	if err != nil {
+		return nil, err
+	}
+	return &adminUser, nil
 }
 
-func (e *AdminUserCache) Del(accessToken string) {
-	redis.Del(e.redisKey(accessToken))
+func (e *AdminUserCache) Del(accessToken string) error {
+	err := e.redis.Del(e.RedisKey(accessToken))
+	if err != nil {
+		return err
+	}
+	return nil
 }

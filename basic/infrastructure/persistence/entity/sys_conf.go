@@ -10,6 +10,11 @@ type SysConf struct {
 	ConfType    int8       `json:"confType" xorm:"conf_type"`
 	ConfValue   string     `json:"confValue" xorm:"conf_value"`
 	Description string     `json:"description" xorm:"description"`
+	Status      int8       `json:"status" xorm:"status"`
 	CreatedAt   types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at"`
+}
+
+func (e *SysConf) TableName() string {
+	return "sys_conf"
 }

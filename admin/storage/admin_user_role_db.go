@@ -2,47 +2,60 @@ package storage
 
 import (
 	"admin/model"
-	"core/application"
-	"core/logger"
+
+	"github.com/go-xorm/xorm"
 )
 
 type AdminUserRoleDb struct {
+	db *xorm.Engine
 }
 
-func (e *AdminUserRoleDb) GetAdminUserRole(adminId int64) []model.AdminUserRole {
-	var engine = application.GetXormEngine()
+func NewAdminUserRoleDb(db *xorm.Engine) *AdminUserRoleDb {
+	return &AdminUserRoleDb{db}
+}
+
+func (e *AdminUserRoleDb) GetAdminUserRole(adminId int64) ([]model.AdminUserRole, error) {
 	var adminUserRoles []model.AdminUserRole
-	err := engine.Where("admin_id = ?", adminId).Find(&adminUserRoles)
+	err := e.db.Where("admin_id = ?", adminId).Find(&adminUserRoles)
 	if err != nil {
-		logger.Error(err.Error())
+		return nil, err
 	}
-	return adminUserRoles
+	return adminUserRoles, err
 }
 
-func (e *AdminUserRoleDb) DelAdminUserRole(adminId int64, roleId int64) {
+func (e *AdminUserRoleDb) DelAdminUserRole(adminId int64, roleId int64) error {
 	if adminId == 0 && roleId == 0 {
-		return
+		return nil
 	}
-	var engine = application.GetXormEngine()
 	if adminId != 0 {
-		engine.Where("admin_id = ?", adminId).Delete(&model.AdminUserRole{})
+		_, err := e.db.Where("admin_id = ?", adminId).Delete(&model.AdminUserRole{})
+		if err != nil {
+			return err
+		}
 	}
 	if roleId != 0 {
-		engine.Where("role_id = ?", roleId).Delete(&model.AdminUserRole{})
+		_, err := e.db.Where("role_id = ?", roleId).Delete(&model.AdminUserRole{})
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (e *AdminUserRoleDb) AddAdminUserRole(adminId int64, roleId int64) {
-	var engine = application.GetXormEngine()
+func (e *AdminUserRoleDb) AddAdminUserRole(adminId int64, roleId int64) error {
 	var adminUserRole = new(model.AdminUserRole)
-	count, err := engine.Where("admin_id = ? and role_id = ?", adminId, roleId).Count(adminUserRole)
+	count, err := e.db.Where("admin_id = ? and role_id = ?", adminId, roleId).Count(adminUserRole)
 	if err != nil {
-		logger.Error(err.Error())
+		return err
 	}
 	if count > 0 {
-		return
+		return nil
 	}
 	adminUserRole.AdminId = adminId
 	adminUserRole.RoleId = roleId
-	engine.Insert(adminUserRole)
+	_, err = e.db.Insert(adminUserRole)
+	if err != nil {
+		return err
+	}
+	return nil
 }

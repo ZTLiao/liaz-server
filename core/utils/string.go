@@ -47,7 +47,6 @@ func ToUnderlineCase(s string) string {
 			if unicode.IsUpper(r) {
 				output = append(output, rune(C_UNDERLINE))
 			}
-
 			output = append(output, unicode.ToLower(r))
 		}
 	}

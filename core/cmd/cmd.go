@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"core/application"
 	"core/config"
+	"core/system"
 	"core/web"
 	"errors"
 	"fmt"
@@ -15,10 +15,10 @@ import (
 var (
 	env, name string
 	rootCmd   = &cobra.Command{
-		Use:          application.GetName(),
-		Short:        application.GetName(),
+		Use:          system.GetName(),
+		Short:        system.GetName(),
 		SilenceUsage: true,
-		Long:         application.GetName(),
+		Long:         system.GetName(),
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("requires at least one arg")
@@ -29,7 +29,7 @@ var (
 	StartCmd = &cobra.Command{
 		Use:     "start",
 		Short:   "Start application",
-		Example: application.GetName() + " start -e dev",
+		Example: system.GetName() + " start -e dev",
 		Run: func(cmd *cobra.Command, args []string) {
 			run()
 		},
@@ -48,24 +48,24 @@ func run() {
 
 func setupConfig() {
 	fmt.Printf("The profile active is %s\n", env)
-	application.SetEnv(env)
+	system.SetEnv(env)
 	if len(name) > 0 {
-		application.SetName(name)
+		system.SetName(name)
 	}
 	config.Setup()
 }
 
 func startServer() {
-	var server = config.SystemConfig.Server
+	server := config.SystemConfig.Server
 	if server == nil {
 		return
 	}
 	fmt.Println("Start server...")
-	var engine = application.GetGinEngine()
+	engine := system.GetGinEngine()
 	//初始化
 	web.InitRouter(engine)
 	//端口
-	var port = strconv.Itoa(server.Port)
+	port := strconv.Itoa(server.Port)
 	if len(port) > 0 {
 		os.Setenv("PORT", port)
 	}
@@ -73,7 +73,7 @@ func startServer() {
 }
 
 func Execute(applicationName string) {
-	application.SetName(applicationName)
+	system.SetName(applicationName)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("Execute err : %s\n", err.Error())
 		os.Exit(-1)

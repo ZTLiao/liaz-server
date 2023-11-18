@@ -2,12 +2,14 @@ package file
 
 import (
 	"time"
+
+	"github.com/minio/minio-go/v7"
 )
 
 type FileTemplate interface {
-	CreateBucket(bucketName string)
-	ListObjects(bucketName string) []FileObjectInfo
-	PutObject(bucketName string, objectName string, data []byte) *FileObjectInfo
+	CreateBucket(string) error
+	ListObjects(string) []FileObjectInfo
+	PutObject(string, string, []byte) (*FileObjectInfo, error)
 }
 
 type FileObjectInfo struct {
@@ -18,7 +20,7 @@ type FileObjectInfo struct {
 	ContentType  string    `json:"contentType"`
 }
 
-func NewFileTemplate() *FileTemplate {
-	var fileTemplate FileTemplate = NewMinioTemplate()
-	return &fileTemplate
+func NewFileTemplate(client interface{}) FileTemplate {
+	var fileTemplate FileTemplate = NewMinioTemplate(client.(*minio.Client))
+	return fileTemplate
 }

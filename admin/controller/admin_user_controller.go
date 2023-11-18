@@ -3,6 +3,8 @@ package controller
 import (
 	"admin/handler"
 	"admin/storage"
+	"core/redis"
+	"core/system"
 	"core/web"
 )
 
@@ -10,11 +12,13 @@ type AdminUserController struct {
 }
 
 func (e *AdminUserController) Router(iWebRoutes web.IWebRoutes) {
+	db := system.GetXormEngine()
+	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var adminUserHandler = &handler.AdminUserHandler{
-		AdminUserDb:        storage.AdminUserDb{},
-		AdminLoginRecordDb: storage.AdminLoginRecordDb{},
-		AdminUserCache:     storage.AdminUserCache{},
-		AccessTokenCache:   storage.AccessTokenCache{},
+		AdminUserDb:        storage.NewAdminUserDb(db),
+		AdminLoginRecordDb: storage.NewAdminLoginRecordDb(db),
+		AdminUserCache:     storage.NewAdminUserCache(redis),
+		AccessTokenCache:   storage.NewAccessTokenCache(redis),
 	}
 	iWebRoutes.GET("/user/get", adminUserHandler.GetAdminUser)
 	iWebRoutes.GET("/user", adminUserHandler.GetAdminUserList)

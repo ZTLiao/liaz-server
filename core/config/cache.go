@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	"core/application"
+	"core/system"
 	"fmt"
 
 	"github.com/redis/go-redis/v9"
@@ -34,5 +34,5 @@ func (e *Redis) Init() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	application.SetRedisClient(redisClient)
+	system.SetRedisClient(redisClient)
 }

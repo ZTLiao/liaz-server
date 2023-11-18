@@ -1,6 +1,6 @@
 package config
 
-import "core/application"
+import "core/system"
 
 type Config struct {
 	Nacos    *Nacos    `mapstructure:""`
@@ -16,9 +16,9 @@ var SystemConfig = new(Config)
 
 // 设置参数
 func Setup() {
-	var env = application.GetEnv()
+	env := system.GetEnv()
 	//nacos配置
-	var profile = profiles[env]
+	profile := profiles[env]
 	SystemConfig.Nacos = new(Nacos)
 	SystemConfig.Nacos.Username = profile.Username
 	SystemConfig.Nacos.Password = profile.Password

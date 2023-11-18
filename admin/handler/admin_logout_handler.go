@@ -9,8 +9,8 @@ import (
 )
 
 type AdminLogoutHandler struct {
-	AdminUserCache   storage.AdminUserCache
-	AccessTokenCache storage.AccessTokenCache
+	AdminUserCache   *storage.AdminUserCache
+	AccessTokenCache *storage.AccessTokenCache
 }
 
 // @Summary 登出
@@ -23,8 +23,11 @@ type AdminLogoutHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/logout [post]
 func (e *AdminLogoutHandler) Logout(wc *web.WebContext) interface{} {
-	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = e.AdminUserCache.Get(accessToken)
+	accessToken := wc.GetHeader(constant.AUTHORIZATION)
+	adminUser, err := e.AdminUserCache.Get(accessToken)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}

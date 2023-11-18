@@ -1,7 +1,7 @@
 package config
 
 import (
-	"core/application"
+	"core/system"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -36,5 +36,5 @@ func (e *Database) Init() {
 	engine.SetMaxOpenConns(e.MaxOpenConns)
 	//是否打印SQL
 	engine.ShowSQL(e.ShowSQL)
-	application.SetXormEngine(engine)
+	system.SetXormEngine(engine)
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type AdminUploadHandler struct {
-	FileItem interfaces.FileItem
+	FileItemHandler *interfaces.FileItemHandler
 }
 
 // @Summary 上传文件
@@ -20,5 +20,5 @@ type AdminUploadHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/upload/:bucketName [post]
 func (e *AdminUploadHandler) Upload(wc *web.WebContext) interface{} {
-	return e.FileItem.UploadFile(wc)
+	return e.FileItemHandler.UploadFile(wc)
 }

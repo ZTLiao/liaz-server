@@ -2,28 +2,49 @@ package storage
 
 import (
 	"admin/model"
-	"core/application"
 	"encoding/json"
+
+	"github.com/go-xorm/xorm"
 )
 
 type AdminLogDb struct {
+	db *xorm.Engine
 }
 
-func (e *AdminLogDb) AddLog(adminId int64, uri string, headers map[string][]string, queryParams map[string]any, formParams map[string]any, bodyParams string) {
+func NewAdminLogDb(db *xorm.Engine) *AdminLogDb {
+	return &AdminLogDb{db}
+}
+
+func (e *AdminLogDb) AddLog(adminId int64, uri string, headers map[string][]string, queryParams map[string]any, formParams map[string]any, bodyParams string) error {
 	var adminLog = new(model.AdminLog)
 	adminLog.AdminId = adminId
 	adminLog.Uri = uri
-	headersJson, _ := json.Marshal(headers)
-	queryParamsJson, _ := json.Marshal(queryParams)
-	formParamsJson, _ := json.Marshal(formParams)
+	headersJson, err := json.Marshal(headers)
+	if err != nil {
+		return err
+	}
+	queryParamsJson, err := json.Marshal(queryParams)
+	if err != nil {
+		return err
+	}
+	formParamsJson, err := json.Marshal(formParams)
+	if err != nil {
+		return err
+	}
 	var params = &map[string]string{
 		"headers":     string(headersJson),
 		"queryParams": string(queryParamsJson),
 		"formParams":  string(formParamsJson),
 		"bodyParams":  bodyParams,
 	}
-	paramsJson, _ := json.Marshal(params)
+	paramsJson, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
 	adminLog.Params = string(paramsJson)
-	var engine = application.GetXormEngine()
-	engine.Insert(adminLog)
+	_, err = e.db.Insert(adminLog)
+	if err != nil {
+		return err
+	}
+	return nil
 }

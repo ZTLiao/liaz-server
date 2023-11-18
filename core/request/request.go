@@ -35,11 +35,14 @@ func GetPostFormParams(c *gin.Context) (map[string]any, error) {
 	return postMap, nil
 }
 
-func GetBodyParams(c *gin.Context) string {
-	reqBytes, _ := c.GetRawData()
+func GetBodyParams(c *gin.Context) (string, error) {
+	reqBytes, err := c.GetRawData()
+	if err != nil {
+		return "", err
+	}
 	// 请求包体写回
 	if len(reqBytes) > 0 {
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(reqBytes))
 	}
-	return string(reqBytes)
+	return string(reqBytes), nil
 }

@@ -11,8 +11,8 @@ import (
 )
 
 type AdminUserRoleHandler struct {
-	AdminUserRoleDb storage.AdminUserRoleDb
-	AdminRoleDb     storage.AdminRoleDb
+	AdminUserRoleDb *storage.AdminUserRoleDb
+	AdminRoleDb     *storage.AdminRoleDb
 }
 
 // @Summary 获取用户角色
@@ -26,17 +26,26 @@ type AdminUserRoleHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user/role/:adminId [get]
 func (e *AdminUserRoleHandler) GetAdminUserRole(wc *web.WebContext) interface{} {
-	var adminIdStr = wc.Context.Param("adminId")
+	adminIdStr := wc.Param("adminId")
 	if len(adminIdStr) == 0 {
 		return response.Success()
 	}
-	adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
-	var adminUserRoles = e.AdminUserRoleDb.GetAdminUserRole(adminId)
-	var adminRoles = e.AdminRoleDb.GetAdminRole(wc.Background())
+	adminId, err := strconv.ParseInt(adminIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	adminUserRoles, err := e.AdminUserRoleDb.GetAdminUserRole(adminId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	adminRoles, err := e.AdminRoleDb.GetAdminRole()
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	var roles = make([]resp.AdminRoleResp, 0)
 	for i := 0; i < len(adminRoles); i++ {
-		var role = adminRoles[i]
-		var checked bool = false
+		role := adminRoles[i]
+		var checked bool
 		for _, v := range adminUserRoles {
 			if role.RoleId == v.RoleId {
 				checked = true
@@ -63,19 +72,25 @@ func (e *AdminUserRoleHandler) GetAdminUserRole(wc *web.WebContext) interface{} 
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user/role [post]
 func (e *AdminUserRoleHandler) SaveAdminUserRole(wc *web.WebContext) interface{} {
-	var adminIdStr = wc.Context.PostForm("adminId")
-	var roleIds = wc.Context.PostForm("roleIds")
+	adminIdStr := wc.PostForm("adminId")
+	roleIds := wc.PostForm("roleIds")
 	wc.Info("adminId : %s, roleIds : %s", adminIdStr, roleIds)
 	if len(adminIdStr) == 0 {
 		return response.Success()
 	}
-	adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
+	adminId, err := strconv.ParseInt(adminIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	e.AdminUserRoleDb.DelAdminUserRole(adminId, 0)
 	if len(roleIds) > 0 {
-		var roleIdArray = strings.Split(roleIds, utils.COMMA)
+		roleIdArray := strings.Split(roleIds, utils.COMMA)
 		for i := 0; i < len(roleIdArray); i++ {
-			var roleIdStr = roleIdArray[i]
-			roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
+			roleIdStr := roleIdArray[i]
+			roleId, err := strconv.ParseInt(roleIdStr, 10, 64)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
 			e.AdminUserRoleDb.AddAdminUserRole(adminId, roleId)
 		}
 	}

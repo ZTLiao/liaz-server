@@ -7,37 +7,51 @@ import (
 )
 
 type AccessTokenCache struct {
+	redis *redis.RedisUtil
 }
 
-func (e *AccessTokenCache) redisKey(adminId int64) string {
-	return redis.GetKey(constant.ACCESS_TOKEN, strconv.FormatInt(adminId, 10))
+func NewAccessTokenCache(redis *redis.RedisUtil) *AccessTokenCache {
+	return &AccessTokenCache{redis}
 }
 
-func (e *AccessTokenCache) Set(adminId int64, accessToken string) {
+func (e *AccessTokenCache) RedisKey(adminId int64) string {
+	return e.redis.GetKey(constant.ACCESS_TOKEN, strconv.FormatInt(adminId, 10))
+}
+
+func (e *AccessTokenCache) Set(adminId int64, accessToken string) error {
 	if len(accessToken) == 0 {
-		return
+		return nil
 	}
-	redis.Set(e.redisKey(adminId), accessToken, constant.TIME_OF_WEEK)
+	return e.redis.Set(e.RedisKey(adminId), accessToken, constant.TIME_OF_WEEK)
 }
 
-func (e *AccessTokenCache) Get(adminId int64) string {
-	data, _ := redis.Get(e.redisKey(adminId))
+func (e *AccessTokenCache) Get(adminId int64) (string, error) {
+	data, err := e.redis.Get(e.RedisKey(adminId))
+	if err != nil {
+		return "", err
+	}
 	if len(data) == 0 {
-		return ""
+		return "", nil
 	}
-	return data
+	return data, nil
 }
 
-func (e *AccessTokenCache) Del(adminId int64) {
-	redis.Del(e.redisKey(adminId))
+func (e *AccessTokenCache) Del(adminId int64) error {
+	return e.redis.Del(e.RedisKey(adminId))
 }
 
-func (e *AccessTokenCache) TTL(adminId int64) int64 {
-	duration, _ := redis.TTL(e.redisKey(adminId))
-	return int64(duration.Milliseconds())
+func (e *AccessTokenCache) TTL(adminId int64) (int64, error) {
+	duration, err := e.redis.TTL(e.RedisKey(adminId))
+	if err != nil {
+		return 0, nil
+	}
+	return int64(duration.Milliseconds()), nil
 }
 
-func (e *AccessTokenCache) IsExist(adminId int64) bool {
-	num, _ := redis.Exists(e.redisKey(adminId))
-	return num > 0
+func (e *AccessTokenCache) IsExist(adminId int64) (bool, error) {
+	num, err := e.redis.Exists(e.RedisKey(adminId))
+	if err != nil {
+		return false, err
+	}
+	return num > 0, nil
 }

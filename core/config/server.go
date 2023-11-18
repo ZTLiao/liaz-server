@@ -2,11 +2,11 @@ package config
 
 import (
 	"bytes"
-	"core/application"
 	"core/constant"
 	"core/errors"
 	"core/request"
 	"core/response"
+	"core/system"
 	"core/utils"
 	"fmt"
 	"net/http"
@@ -29,17 +29,60 @@ func (e *Server) Init() {
 	if e == nil {
 		return
 	}
-	var env = application.GetEnv()
-	var engine = gin.New()
+	env := system.GetEnv()
+	engine := gin.New()
 	engine.SetTrustedProxies([]string{"127.0.0.1"})
-	var routerGroup = engine.RouterGroup
-	routerGroup.Use(ErrorHandler()).Use(RequestIdHandler()).Use(LoggerHandler())
+	routerGroup := engine.RouterGroup
+	routerGroup.Use(ErrorHandler()).Use(CorsHandler()).Use(RequestIdHandler()).Use(LoggerHandler())
 	if env == PROD {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
 		routerGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler()))
 	}
-	application.SetGinEngine(engine)
+	system.SetGinEngine(engine)
+}
+
+// 异常处理
+func ErrorHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				debug.PrintStack()
+				err := fmt.Sprintf("%s", r)
+				c.JSON(http.StatusOK, response.ReturnError(http.StatusInternalServerError, err))
+				c.Abort()
+			}
+		}()
+		c.Next()
+		if len(c.Errors) > 0 {
+			err := c.Errors[0].Err
+			code := http.StatusInternalServerError
+			message := err.Error()
+			if apiError, ok := err.(*errors.ApiError); ok {
+				if apiError.Code != 0 {
+					code = apiError.Code
+				}
+				message = apiError.Message
+			}
+			c.JSON(http.StatusOK, response.ReturnError(code, message))
+			c.Abort()
+		}
+	}
+}
+
+// 跨域
+func CorsHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH, DELETE")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
 }
 
 // 请求ID拦截器
@@ -48,7 +91,10 @@ func RequestIdHandler() gin.HandlerFunc {
 		X_REQUEST_ID := constant.X_REQUEST_ID
 		requestId := c.Request.Header.Get(X_REQUEST_ID)
 		if requestId == utils.EMPTY {
-			uuid, _ := uuid.NewV4()
+			uuid, err := uuid.NewV4()
+			if err != nil {
+				c.AbortWithError(http.StatusInternalServerError, err)
+			}
 			requestId = uuid.String()
 		}
 		c.Set(X_REQUEST_ID, requestId)
@@ -59,8 +105,8 @@ func RequestIdHandler() gin.HandlerFunc {
 
 // 日志拦截器
 func LoggerHandler() gin.HandlerFunc {
+	logger := system.GetLogger()
 	return func(c *gin.Context) {
-		logger := application.GetLogger()
 		requestId := c.Request.Header.Get(constant.X_REQUEST_ID)
 		//请求客户端的IP
 		clientIP := c.ClientIP()
@@ -80,8 +126,14 @@ func LoggerHandler() gin.HandlerFunc {
 		writerWrapper := &ResponseWriterWrapper{Body: bytes.NewBufferString(utils.EMPTY), ResponseWriter: c.Writer}
 		c.Writer = writerWrapper
 		queryParams := request.GetQueryParams(c)
-		formParams, _ := request.GetPostFormParams(c)
-		bodyParams := request.GetBodyParams(c)
+		formParams, err := request.GetPostFormParams(c)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
+		bodyParams, err := request.GetBodyParams(c)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
 		entry.Infof("request headers : %s, queryParams : %s, formParams : %s, bodyParams : %s", c.Request.Header, queryParams, formParams, bodyParams)
 		c.Next()
 		spendTime := time.Since(startTime).Milliseconds()
@@ -94,34 +146,6 @@ func LoggerHandler() gin.HandlerFunc {
 			logger.Error(c.Errors.ByType(gin.ErrorTypePrivate).String())
 		}
 		entry.Infof("response status : %s, spendTime : %s, result : %s", strconv.FormatInt(int64(statusCode), 10), ST, writerWrapper.Body.String())
-	}
-}
-
-// 异常处理
-func ErrorHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			if r := recover(); r != nil {
-				debug.PrintStack()
-				err := fmt.Sprintf("%s", r)
-				c.JSON(http.StatusOK, response.ReturnError(http.StatusInternalServerError, err))
-				c.Abort()
-			}
-		}()
-		c.Next()
-		if len(c.Errors) > 0 {
-			err := c.Errors[0].Err
-			var code int = http.StatusInternalServerError
-			var message string = err.Error()
-			if apiError, ok := err.(*errors.ApiError); ok {
-				if apiError.Code != 0 {
-					code = apiError.Code
-				}
-				message = apiError.Message
-			}
-			c.JSON(http.StatusOK, response.ReturnError(code, message))
-			c.Abort()
-		}
 	}
 }
 

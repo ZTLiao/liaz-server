@@ -5,7 +5,6 @@ import (
 	"admin/resp"
 	"admin/storage"
 	"core/constant"
-	"core/errors"
 	"core/response"
 	"core/web"
 	"fmt"
@@ -14,10 +13,10 @@ import (
 )
 
 type AdminUserHandler struct {
-	AdminUserDb        storage.AdminUserDb
-	AdminLoginRecordDb storage.AdminLoginRecordDb
-	AdminUserCache     storage.AdminUserCache
-	AccessTokenCache   storage.AccessTokenCache
+	AdminUserDb        *storage.AdminUserDb
+	AdminLoginRecordDb *storage.AdminLoginRecordDb
+	AdminUserCache     *storage.AdminUserCache
+	AccessTokenCache   *storage.AccessTokenCache
 }
 
 // @Summary 获取当前用户信息
@@ -30,14 +29,24 @@ type AdminUserHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user/get [get]
 func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
-	var accessToken = wc.Context.Request.Header.Get(constant.AUTHORIZATION)
-	var adminUser = e.AdminUserCache.Get(accessToken)
+	accessToken := wc.GetHeader(constant.AUTHORIZATION)
+	adminUser, err := e.AdminUserCache.Get(accessToken)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	if adminUser == nil {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
+	lastTime, err := e.AdminLoginRecordDb.GetLastTime(adminUser.AdminId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	return response.ReturnOK(&resp.AdminUserResp{
-		AdminUser: *adminUser,
-		LastTime:  e.AdminLoginRecordDb.GetLastTime(adminUser.AdminId),
+		AdminId:  adminUser.AdminId,
+		Name:     adminUser.Name,
+		Username: adminUser.Username,
+		Avatar:   adminUser.Avatar,
+		LastTime: lastTime,
 	})
 }
 
@@ -51,7 +60,11 @@ func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user [get]
 func (e *AdminUserHandler) GetAdminUserList(wc *web.WebContext) interface{} {
-	return response.ReturnOK(e.AdminUserDb.GetAdminUserList(wc.Background()))
+	adminUsers, err := e.AdminUserDb.GetAdminUserList()
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(adminUsers)
 }
 
 // @Summary 添加系统用户
@@ -86,24 +99,25 @@ func (e *AdminUserHandler) UpdateAdminUser(wc *web.WebContext) interface{} {
 
 func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
 	var params map[string]any
-	if err := wc.Context.ShouldBindJSON(&params); err != nil {
-		wc.Context.Error(&errors.ApiError{
-			Message: err.Error(),
-		})
-		return
+	if err := wc.ShouldBindJSON(&params); err != nil {
+		wc.AbortWithError(err)
 	}
-	var adminIdStr = fmt.Sprint(params["adminId"])
-	var name = fmt.Sprint(params["name"])
-	var username = fmt.Sprint(params["username"])
-	var password = fmt.Sprint(params["password"])
-	var phone = fmt.Sprint(params["phone"])
-	var avatar = fmt.Sprint(params["avatar"])
-	var email = fmt.Sprint(params["email"])
-	var introduction = fmt.Sprint(params["introduction"])
-	var statusStr = fmt.Sprint(params["status"])
+	adminIdStr := fmt.Sprint(params["adminId"])
+	name := fmt.Sprint(params["name"])
+	username := fmt.Sprint(params["username"])
+	password := fmt.Sprint(params["password"])
+	phone := fmt.Sprint(params["phone"])
+	avatar := fmt.Sprint(params["avatar"])
+	email := fmt.Sprint(params["email"])
+	introduction := fmt.Sprint(params["introduction"])
+	statusStr := fmt.Sprint(params["status"])
 	var adminUser = new(model.AdminUser)
 	if len(adminIdStr) > 0 {
-		adminUser.AdminId, _ = strconv.ParseInt(adminIdStr, 10, 64)
+		adminId, err := strconv.ParseInt(adminIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		adminUser.AdminId = adminId
 	}
 	adminUser.Name = name
 	adminUser.Username = username
@@ -112,7 +126,10 @@ func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
 	adminUser.Avatar = avatar
 	adminUser.Email = email
 	adminUser.Introduction = introduction
-	status, _ := strconv.ParseInt(statusStr, 10, 64)
+	status, err := strconv.ParseInt(statusStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	adminUser.Status = int8(status)
 	e.AdminUserDb.SaveOrUpdateAdminUser(adminUser)
 }
@@ -128,11 +145,17 @@ func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user/:adminId [delete]
 func (e *AdminUserHandler) DelAdminUser(wc *web.WebContext) interface{} {
-	var adminIdStr = wc.Context.Param("adminId")
+	adminIdStr := wc.Param("adminId")
 	if len(adminIdStr) > 0 {
-		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
+		adminId, err := strconv.ParseInt(adminIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		e.AdminUserDb.DelAdminUser(adminId)
-		accessToken := e.AccessTokenCache.Get(adminId)
+		accessToken, err := e.AccessTokenCache.Get(adminId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		if len(accessToken) > 0 {
 			e.AdminUserCache.Del(accessToken)
 		}
@@ -151,11 +174,17 @@ func (e *AdminUserHandler) DelAdminUser(wc *web.WebContext) interface{} {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/user/:adminId [delete]
 func (e *AdminUserHandler) ThawAdminUser(wc *web.WebContext) interface{} {
-	var adminIdStr = wc.Context.PostForm("adminId")
+	adminIdStr := wc.PostForm("adminId")
 	if len(adminIdStr) > 0 {
-		adminId, _ := strconv.ParseInt(adminIdStr, 10, 64)
+		adminId, err := strconv.ParseInt(adminIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		e.AdminUserDb.ThawAdminUser(adminId)
-		accessToken := e.AccessTokenCache.Get(adminId)
+		accessToken, err := e.AccessTokenCache.Get(adminId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		if len(accessToken) > 0 {
 			e.AdminUserCache.Del(accessToken)
 		}

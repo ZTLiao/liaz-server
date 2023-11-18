@@ -2,17 +2,21 @@ package storage
 
 import (
 	"admin/model"
-	"core/application"
-	"core/logger"
 	"core/types"
 
+	"github.com/go-xorm/xorm"
 	"github.com/mssola/user_agent"
 )
 
 type AdminLoginRecordDb struct {
+	db *xorm.Engine
 }
 
-func (e *AdminLoginRecordDb) AddRecord(adminId int64, clientIp string, userAgent string) {
+func NewAdminLoginRecordDb(db *xorm.Engine) *AdminLoginRecordDb {
+	return &AdminLoginRecordDb{db}
+}
+
+func (e *AdminLoginRecordDb) AddRecord(adminId int64, clientIp string, userAgent string) error {
 	ua := user_agent.New(userAgent)
 	var record = new(model.AdminLoginRecord)
 	record.AdminId = adminId
@@ -28,21 +32,17 @@ func (e *AdminLoginRecordDb) AddRecord(adminId int64, clientIp string, userAgent
 	record.BrowserName = browserName
 	record.BrowserVersion = browserVersion
 	record.ClientIp = clientIp
-	var engine = application.GetXormEngine()
-	if _, err := engine.Insert(record); err != nil {
-		logger.Error(err.Error())
+	if _, err := e.db.Insert(record); err != nil {
+		return err
 	}
+	return nil
 }
 
-func (e *AdminLoginRecordDb) GetLastTime(adminId int64) types.Time {
-	var engine = application.GetXormEngine()
+func (e *AdminLoginRecordDb) GetLastTime(adminId int64) (types.Time, error) {
 	var record = new(model.AdminLoginRecord)
-	has, err := engine.Where("admin_id = ?", adminId).OrderBy("record_id desc").Limit(1, 1).Get(record)
+	_, err := e.db.Where("admin_id = ?", adminId).OrderBy("record_id desc").Limit(1, 1).Get(record)
 	if err != nil {
-		logger.Error(err.Error())
+		return types.Time{}, err
 	}
-	if !has {
-		return types.Time{}
-	}
-	return record.CreatedAt
+	return record.CreatedAt, nil
 }

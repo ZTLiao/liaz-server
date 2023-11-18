@@ -13,8 +13,8 @@ type Response struct {
 }
 
 // constructor
-func New(code int, message string, data interface{}) *Response {
-	response := new(Response)
+func NewResponse(code int, message string, data interface{}) *Response {
+	var response = new(Response)
 	response.Code = code
 	response.Message = message
 	response.Data = data
@@ -29,21 +29,21 @@ func Success() *Response {
 
 // fail
 func Fail(message string) *Response {
-	var code = http.StatusInternalServerError
+	code := http.StatusInternalServerError
 	if len(message) == 0 {
 		message = http.StatusText(code)
 	}
-	return New(code, message, nil)
+	return NewResponse(code, message, nil)
 }
 
 // return ok
 func ReturnOK(data interface{}) *Response {
-	var code = http.StatusOK
-	var message = http.StatusText(code)
-	return New(code, message, data)
+	code := http.StatusOK
+	message := http.StatusText(code)
+	return NewResponse(code, message, data)
 }
 
 // return error
 func ReturnError(code int, message string) *Response {
-	return New(code, message, nil)
+	return NewResponse(code, message, nil)
 }

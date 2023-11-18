@@ -3,7 +3,6 @@ package handler
 import (
 	"admin/model"
 	"admin/storage"
-	"core/errors"
 	"core/response"
 	"core/web"
 	"fmt"
@@ -11,8 +10,8 @@ import (
 )
 
 type AdminRoleHandler struct {
-	AdminRoleDb     storage.AdminRoleDb
-	AdminRoleMenuDb storage.AdminRoleMenuDb
+	AdminRoleDb     *storage.AdminRoleDb
+	AdminRoleMenuDb *storage.AdminRoleMenuDb
 }
 
 // @Summary 获取系统所有角色
@@ -25,7 +24,11 @@ type AdminRoleHandler struct {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role [get]
 func (e *AdminRoleHandler) GetAdminRole(wc *web.WebContext) interface{} {
-	return response.ReturnOK(e.AdminRoleDb.GetAdminRole(wc.Background()))
+	adminRole, err := e.AdminRoleDb.GetAdminRole()
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(adminRole)
 }
 
 // @Summary 保存角色
@@ -60,17 +63,18 @@ func (e *AdminRoleHandler) UpdateAdminRole(wc *web.WebContext) interface{} {
 
 func (e *AdminRoleHandler) saveOrUpdateAdminRole(wc *web.WebContext) {
 	var params map[string]any
-	if err := wc.Context.ShouldBindJSON(&params); err != nil {
-		wc.Context.Error(&errors.ApiError{
-			Message: err.Error(),
-		})
-		return
+	if err := wc.ShouldBindJSON(&params); err != nil {
+		wc.AbortWithError(err)
 	}
-	var roleId = fmt.Sprint(params["roleId"])
-	var name = fmt.Sprint(params["name"])
+	roleIdStr := fmt.Sprint(params["roleId"])
+	name := fmt.Sprint(params["name"])
 	var adminRole = new(model.AdminRole)
-	if len(roleId) > 0 {
-		adminRole.RoleId, _ = strconv.ParseInt(roleId, 10, 64)
+	if len(roleIdStr) > 0 {
+		roleId, err := strconv.ParseInt(roleIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		adminRole.RoleId = roleId
 	}
 	adminRole.Name = name
 	e.AdminRoleDb.SaveOrUpdateAdminRole(adminRole)
@@ -87,9 +91,12 @@ func (e *AdminRoleHandler) saveOrUpdateAdminRole(wc *web.WebContext) {
 // @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
 // @Router /admin/role/:roleId [delete]
 func (e *AdminRoleHandler) DelAdminRole(wc *web.WebContext) interface{} {
-	var roleIdStr = wc.Context.Param("roleId")
+	roleIdStr := wc.Param("roleId")
 	if len(roleIdStr) > 0 {
-		roleId, _ := strconv.ParseInt(roleIdStr, 10, 64)
+		roleId, err := strconv.ParseInt(roleIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		e.AdminRoleDb.DelAdminRole(roleId)
 		e.AdminRoleMenuDb.DelAdminRoleMenu(roleId, 0)
 	}

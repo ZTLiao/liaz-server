@@ -1,7 +1,7 @@
 package config
 
 import (
-	"core/application"
+	"core/system"
 	"core/utils"
 	"fmt"
 	"os"
@@ -68,5 +68,5 @@ func (e *Logger) Init() {
 			log.SetLevel(logrus.FatalLevel)
 		}
 	}
-	application.SetLogger(log)
+	system.SetLogger(log)
 }
