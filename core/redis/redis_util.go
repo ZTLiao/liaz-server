@@ -69,7 +69,7 @@ func (e *RedisUtil) Unlock(key string, lockVal string) error {
 }
 
 func (e *RedisUtil) Get(key string) (string, error) {
-	res, err := e.db.Get(context.Background(), key).Result()
+	res, err := e.db.Get(context.TODO(), key).Result()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -77,7 +77,7 @@ func (e *RedisUtil) Get(key string) (string, error) {
 }
 
 func (e *RedisUtil) Set(key string, val interface{}, expire int) error {
-	err := e.db.Set(context.Background(), key, val, time.Duration(expire)*time.Second).Err()
+	err := e.db.Set(context.TODO(), key, val, time.Duration(expire)*time.Second).Err()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -85,7 +85,7 @@ func (e *RedisUtil) Set(key string, val interface{}, expire int) error {
 }
 
 func (e *RedisUtil) Del(key string) error {
-	err := e.db.Del(context.Background(), key).Err()
+	err := e.db.Del(context.TODO(), key).Err()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -93,7 +93,7 @@ func (e *RedisUtil) Del(key string) error {
 }
 
 func (e *RedisUtil) HSet(hk string, value ...string) (int64, error) {
-	res, err := e.db.HSet(context.Background(), hk, value).Result()
+	res, err := e.db.HSet(context.TODO(), hk, value).Result()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -101,7 +101,7 @@ func (e *RedisUtil) HSet(hk string, value ...string) (int64, error) {
 }
 
 func (e *RedisUtil) HGet(hk, key string) (string, error) {
-	res, err := e.db.HGet(context.Background(), hk, key).Result()
+	res, err := e.db.HGet(context.TODO(), hk, key).Result()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -109,15 +109,23 @@ func (e *RedisUtil) HGet(hk, key string) (string, error) {
 }
 
 func (e *RedisUtil) HDel(hk, key string) error {
-	err := e.db.HDel(context.Background(), hk, key).Err()
+	err := e.db.HDel(context.TODO(), hk, key).Err()
 	if err != nil {
 		logger.Error(err.Error())
 	}
 	return err
 }
 
+func (e *RedisUtil) HGetAll(hk string) (map[string]string, error) {
+	res, err := e.db.HGetAll(context.TODO(), hk).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
 func (e *RedisUtil) HExists(hk, key string) (bool, error) {
-	res, err := e.db.HExists(context.Background(), hk, key).Result()
+	res, err := e.db.HExists(context.TODO(), hk, key).Result()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -125,7 +133,7 @@ func (e *RedisUtil) HExists(hk, key string) (bool, error) {
 }
 
 func (e *RedisUtil) Incr(key string) error {
-	err := e.db.Incr(context.Background(), key).Err()
+	err := e.db.Incr(context.TODO(), key).Err()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -133,7 +141,7 @@ func (e *RedisUtil) Incr(key string) error {
 }
 
 func (e *RedisUtil) Decr(key string) error {
-	err := e.db.Decr(context.Background(), key).Err()
+	err := e.db.Decr(context.TODO(), key).Err()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -141,7 +149,7 @@ func (e *RedisUtil) Decr(key string) error {
 }
 
 func (e *RedisUtil) Expire(key string, dur time.Duration) error {
-	err := e.db.Expire(context.Background(), key, dur).Err()
+	err := e.db.Expire(context.TODO(), key, dur).Err()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -149,7 +157,7 @@ func (e *RedisUtil) Expire(key string, dur time.Duration) error {
 }
 
 func (e *RedisUtil) TTL(key string) (time.Duration, error) {
-	res, err := e.db.TTL(context.Background(), key).Result()
+	res, err := e.db.TTL(context.TODO(), key).Result()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -157,7 +165,7 @@ func (e *RedisUtil) TTL(key string) (time.Duration, error) {
 }
 
 func (e *RedisUtil) Exists(key ...string) (int64, error) {
-	res, err := e.db.Exists(context.Background(), key...).Result()
+	res, err := e.db.Exists(context.TODO(), key...).Result()
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -165,7 +173,7 @@ func (e *RedisUtil) Exists(key ...string) (int64, error) {
 }
 
 func (e *RedisUtil) SetNX(key string, value interface{}, dur time.Duration) (bool, error) {
-	res, err := e.db.SetNX(context.Background(), key, value, dur).Result()
+	res, err := e.db.SetNX(context.TODO(), key, value, dur).Result()
 	if err != nil {
 		logger.Error(err.Error())
 	}

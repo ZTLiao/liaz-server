@@ -5,18 +5,23 @@ import (
 	"admin/storage"
 	"core/config"
 	"core/constant"
+	"core/redis"
 	"core/request"
 	"core/response"
+	"core/system"
 	"core/web"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-xorm/xorm"
 )
 
 func init() {
 	//添加路由
 	web.AddRouter(func(wrg *web.WebRouterGroup) {
-		wrg.Use(AdminSecurityHandler())
+		db := system.GetXormEngine()
+		redis := redis.NewRedisUtil(system.GetRedisClient())
+		wrg.Use(AdminSecurityHandler(db, redis))
 		wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
 			return response.Success()
 		})
@@ -30,11 +35,12 @@ func init() {
 			new(controller.AdminRoleMenuController).Router(r)
 			new(controller.AdminUserRoleController).Router(r)
 			new(controller.AdminUploadController).Router(r)
+			new(controller.AdminSysConfController).Router(r)
 		}
 	})
 }
 
-func AdminSecurityHandler() gin.HandlerFunc {
+func AdminSecurityHandler(db *xorm.Engine, redis *redis.RedisUtil) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestUri := c.Request.RequestURI
 		excludes := config.SystemConfig.Security.Excludes
@@ -50,7 +56,7 @@ func AdminSecurityHandler() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		adminUser, err := new(storage.AdminUserCache).Get(accessToken)
+		adminUser, err := storage.NewAdminUserCache(redis).Get(accessToken)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -69,7 +75,7 @@ func AdminSecurityHandler() gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 		}
-		new(storage.AdminLogDb).AddLog(adminUser.AdminId, c.Request.RequestURI, headers, queryParams, formParams, bodyParams)
+		storage.NewAdminLogDb(db).AddLog(adminUser.AdminId, c.Request.RequestURI, headers, queryParams, formParams, bodyParams)
 		c.Next()
 	}
 }

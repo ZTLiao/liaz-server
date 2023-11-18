@@ -32,7 +32,7 @@ func (e *AdminSysConfHandler) UpdateAdminSysConf(wc *web.WebContext) interface{}
 }
 
 func (e *AdminSysConfHandler) DelAdminSysConf(wc *web.WebContext) interface{} {
-	var confIdStr = wc.Param("confId")
+	confIdStr := wc.Param("confId")
 	if len(confIdStr) > 0 {
 		confId, err := strconv.ParseInt(confIdStr, 10, 64)
 		if err != nil {
@@ -83,9 +83,25 @@ func (e *AdminSysConfHandler) SaveOrUpdateAdminSysConf(wc *web.WebContext) {
 	}
 	sysConf.Status = int8(status)
 	sysConf.Description = description
-	if len(confIdStr) == 0 {
+	if sysConf.ConfId == 0 {
 		e.SysConfApp.SaveSysConf(sysConf)
 	} else {
 		e.SysConfApp.UpdateSysConf(sysConf)
 	}
+}
+
+func (e *AdminSysConfHandler) GetAdminSysConfByKind(wc *web.WebContext) interface{} {
+	confKindStr := wc.Param("confKind")
+	if len(confKindStr) == 0 {
+		return response.Success()
+	}
+	confKind, err := strconv.ParseInt(confKindStr, 10, 8)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	sysConfs, err := e.SysConfApp.GetSysConfByKind(int8(confKind))
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(sysConfs)
 }
