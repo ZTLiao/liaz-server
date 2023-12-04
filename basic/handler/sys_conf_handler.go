@@ -110,3 +110,14 @@ func (e *SysConfHandler) GetSysConfByKind(confKind int8) ([]model.SysConf, error
 	}
 	return sysConfs, nil
 }
+
+func (e *SysConfHandler) GetConfValueByKey(confKey string) (string, error) {
+	sysConf, err := e.GetSysConfByKey(confKey)
+	if err != nil {
+		return "", err
+	}
+	if sysConf == nil {
+		return "", nil
+	}
+	return sysConf.ConfValue, nil
+}

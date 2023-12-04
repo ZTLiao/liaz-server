@@ -18,16 +18,6 @@ type AdminLoginHandler struct {
 	AdminLoginRecordDb *storage.AdminLoginRecordDb
 }
 
-// @Summary 登录
-// @title Swagger API
-// @Tags 授权管理
-// @description 登录接口
-// @BasePath /admin/login
-// @Produce json
-// @Param username formData string true "账号"
-// @Param password formData string true "密码"
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/login [post]
 func (e *AdminLoginHandler) Login(wc *web.WebContext) interface{} {
 	username := wc.PostForm("username")
 	password := wc.PostForm("password")

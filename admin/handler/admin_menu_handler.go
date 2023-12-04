@@ -18,15 +18,6 @@ type AdminMenuHandler struct {
 	AdminUserCache  *storage.AdminUserCache
 }
 
-// @Summary 获取系统所有菜单
-// @title Swagger API
-// @Tags 菜单管理
-// @description 获取系统所有菜单接口
-// @Security ApiKeyAuth
-// @BasePath /admin/menu/list
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/menu/list [get]
 func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
 	adminMenus, err := e.AdminMenuDb.GetAdminMenuList()
 	if err != nil {
@@ -35,15 +26,6 @@ func (e *AdminMenuHandler) GetAdminMenuList(wc *web.WebContext) interface{} {
 	return response.ReturnOK(adminMenus)
 }
 
-// @Summary 获取当前用户菜单
-// @title Swagger API
-// @Tags 首页管理
-// @description 获取当前用户菜单接口
-// @Security ApiKeyAuth
-// @BasePath /admin/menu
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/menu [get]
 func (e *AdminMenuHandler) GetAdminMenu(wc *web.WebContext) interface{} {
 	accessToken := wc.GetHeader(constant.AUTHORIZATION)
 	adminUser, err := e.AdminUserCache.Get(accessToken)
@@ -60,31 +42,11 @@ func (e *AdminMenuHandler) GetAdminMenu(wc *web.WebContext) interface{} {
 	return response.ReturnOK(adminMenu)
 }
 
-// @Summary 保存菜单
-// @title Swagger API
-// @Tags 菜单管理
-// @description 保存菜单接口
-// @Security ApiKeyAuth
-// @BasePath /admin/menu
-// @Param adminMenu body model.AdminMenu true "菜单"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/menu [post]
 func (e *AdminMenuHandler) SaveAdminMenu(wc *web.WebContext) interface{} {
 	e.saveOrUpdateAdminMenu(wc)
 	return response.Success()
 }
 
-// @Summary 修改菜单
-// @title Swagger API
-// @Tags 菜单管理
-// @description 修改菜单接口
-// @Security ApiKeyAuth
-// @BasePath /admin/menu
-// @Param adminMenu body model.AdminMenu true "菜单"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/menu [put]
 func (e *AdminMenuHandler) UpdateAdminMenu(wc *web.WebContext) interface{} {
 	e.saveOrUpdateAdminMenu(wc)
 	return response.Success()
@@ -137,16 +99,6 @@ func (e *AdminMenuHandler) saveOrUpdateAdminMenu(wc *web.WebContext) {
 	e.AdminRoleMenuDb.AddAdminRoleMenu(constant.SUPER_ADMIN, adminMenu.MenuId)
 }
 
-// @Summary 删除菜单
-// @title Swagger API
-// @Tags 菜单管理
-// @description 删除菜单接口
-// @Security ApiKeyAuth
-// @BasePath /admin/menu/:menuId
-// @Param menuId query int64 true "菜单ID"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/menu/:menuId [delete]
 func (e *AdminMenuHandler) DelAdminMenu(wc *web.WebContext) interface{} {
 	menuIdStr := wc.Param("menuId")
 	if len(menuIdStr) > 0 {

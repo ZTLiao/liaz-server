@@ -13,15 +13,6 @@ type AdminLogoutHandler struct {
 	AccessTokenCache *storage.AccessTokenCache
 }
 
-// @Summary 登出
-// @title Swagger API
-// @Tags 授权管理
-// @description 登出接口
-// @Security ApiKeyAuth
-// @BasePath /admin/logout
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/logout [post]
 func (e *AdminLogoutHandler) Logout(wc *web.WebContext) interface{} {
 	accessToken := wc.GetHeader(constant.AUTHORIZATION)
 	adminUser, err := e.AdminUserCache.Get(accessToken)

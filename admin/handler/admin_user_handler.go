@@ -19,15 +19,6 @@ type AdminUserHandler struct {
 	AccessTokenCache   *storage.AccessTokenCache
 }
 
-// @Summary 获取当前用户信息
-// @title Swagger API
-// @Tags 用户管理
-// @description 获取当前用户信息接口
-// @Security ApiKeyAuth
-// @BasePath /admin/user/get
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/user/get [get]
 func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
 	accessToken := wc.GetHeader(constant.AUTHORIZATION)
 	adminUser, err := e.AdminUserCache.Get(accessToken)
@@ -50,15 +41,6 @@ func (e *AdminUserHandler) GetAdminUser(wc *web.WebContext) interface{} {
 	})
 }
 
-// @Summary 获取系统用户列表
-// @title Swagger API
-// @Tags 用户管理
-// @description 获取系统用户列表接口
-// @Security ApiKeyAuth
-// @BasePath /admin/user
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/user [get]
 func (e *AdminUserHandler) GetAdminUserList(wc *web.WebContext) interface{} {
 	adminUsers, err := e.AdminUserDb.GetAdminUserList()
 	if err != nil {
@@ -67,31 +49,11 @@ func (e *AdminUserHandler) GetAdminUserList(wc *web.WebContext) interface{} {
 	return response.ReturnOK(adminUsers)
 }
 
-// @Summary 添加系统用户
-// @title Swagger API
-// @Tags 用户管理
-// @description 添加系统用户接口
-// @Security ApiKeyAuth
-// @BasePath /admin/user
-// @Param adminUser body model.AdminUser true "系统用户"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/user [post]
 func (e *AdminUserHandler) SaveAdminUser(wc *web.WebContext) interface{} {
 	e.saveOrUpdateAdminUser(wc)
 	return response.Success()
 }
 
-// @Summary 修改系统用户
-// @title Swagger API
-// @Tags 用户管理
-// @description 修改系统用户接口
-// @Security ApiKeyAuth
-// @BasePath /admin/user
-// @Param adminUser body model.AdminUser true "系统用户"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/user [put]
 func (e *AdminUserHandler) UpdateAdminUser(wc *web.WebContext) interface{} {
 	e.saveOrUpdateAdminUser(wc)
 	return response.Success()
@@ -134,16 +96,6 @@ func (e *AdminUserHandler) saveOrUpdateAdminUser(wc *web.WebContext) {
 	e.AdminUserDb.SaveOrUpdateAdminUser(adminUser)
 }
 
-// @Summary 修改系统用户
-// @title Swagger API
-// @Tags 用户管理
-// @description 修改系统用户接口
-// @Security ApiKeyAuth
-// @BasePath /admin/user/:adminId
-// @Param adminId query int64 true "用户ID"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/user/:adminId [delete]
 func (e *AdminUserHandler) DelAdminUser(wc *web.WebContext) interface{} {
 	adminIdStr := wc.Param("adminId")
 	if len(adminIdStr) > 0 {
@@ -163,16 +115,6 @@ func (e *AdminUserHandler) DelAdminUser(wc *web.WebContext) interface{} {
 	return response.Success()
 }
 
-// @Summary 解冻系统用户
-// @title Swagger API
-// @Tags 用户管理
-// @description 解冻系统用户接口
-// @Security ApiKeyAuth
-// @BasePath /admin/user/thaw
-// @Param adminId formdata int64 true "用户ID"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/user/:adminId [delete]
 func (e *AdminUserHandler) ThawAdminUser(wc *web.WebContext) interface{} {
 	adminIdStr := wc.PostForm("adminId")
 	if len(adminIdStr) > 0 {

@@ -15,16 +15,6 @@ type AdminRoleMenuHandler struct {
 	AdminMenuDb     *storage.AdminMenuDb
 }
 
-// @Summary 获取角色菜单
-// @title Swagger API
-// @Tags 角色管理
-// @description 获取角色菜单接口
-// @Security ApiKeyAuth
-// @BasePath /admin/role/menu/:roleId
-// @Param roleId query int64 true "角色ID"
-// @Produce json
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/role/menu/:roleId [get]
 func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} {
 	roleIdStr := wc.Param("roleId")
 	if len(roleIdStr) == 0 {
@@ -84,16 +74,6 @@ func (e *AdminRoleMenuHandler) GetAdminRoleMenu(wc *web.WebContext) interface{} 
 	return response.ReturnOK(menus)
 }
 
-// @Summary 授权
-// @title Swagger API
-// @Tags 角色管理
-// @description 授权接口
-// @BasePath /admin/role/menu
-// @Produce json
-// @Param roleId formData string true "角色ID"
-// @Param menuIds formData string true "多个菜单ID"
-// @Success 200 {object} response.Response "{"code":200,"data":{},"message":"OK"}"
-// @Router /admin/role/menu [post]
 func (e *AdminRoleMenuHandler) SaveAdminRoleMenu(wc *web.WebContext) interface{} {
 	roleIdStr := wc.PostForm("roleId")
 	menuIds := wc.PostForm("menuIds")
