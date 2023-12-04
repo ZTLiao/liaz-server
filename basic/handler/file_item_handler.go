@@ -1,8 +1,8 @@
-package interfaces
+package handler
 
 import (
-	"basic/application"
-	"basic/infrastructure/persistence/entity"
+	"basic/model"
+	"basic/storage"
 	"core/constant"
 	"core/file"
 	"core/redis"
@@ -18,13 +18,13 @@ import (
 )
 
 type FileItemHandler struct {
-	fileItemApp  application.FileItemAppInterface
+	fileItemDb   *storage.FileItemDb
 	fileTemplate file.FileTemplate
 }
 
-func NewFileItemHandler(fileItemApp application.FileItemAppInterface, fileTemplate file.FileTemplate) *FileItemHandler {
+func NewFileItemHandler(fileItemDb *storage.FileItemDb, fileTemplate file.FileTemplate) *FileItemHandler {
 	return &FileItemHandler{
-		fileItemApp:  fileItemApp,
+		fileItemDb:   fileItemDb,
 		fileTemplate: fileTemplate,
 	}
 }
@@ -66,7 +66,7 @@ func (e *FileItemHandler) UploadFile(wc *web.WebContext) interface{} {
 		redisLock.Unlock()
 		return response.Fail(constant.UPLOAD_ERROR)
 	}
-	var fileItem = entity.FileItem{}
+	var fileItem = model.FileItem{}
 	fileItem.BucketName = bucketName
 	fileItem.ObjectName = fileName
 	fileItem.Size = header.Size
@@ -74,7 +74,7 @@ func (e *FileItemHandler) UploadFile(wc *web.WebContext) interface{} {
 	fileItem.UnqiueId = timestamp
 	fileItem.Suffix = suffix
 	fileItem.FileType = fileType
-	e.fileItemApp.SaveFileItem(&fileItem)
+	e.fileItemDb.SaveFileItem(&fileItem)
 	redisLock.Unlock()
 	return response.ReturnOK(fileItem)
 }

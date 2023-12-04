@@ -1,24 +1,21 @@
-package store
+package storage
 
 import (
-	"basic/domain/repository"
-	"basic/infrastructure/persistence/entity"
+	"basic/model"
 	"core/constant"
 
 	"github.com/go-xorm/xorm"
 )
 
-type SysConfStore struct {
+type SysConfDb struct {
 	db *xorm.Engine
 }
 
-var _ repository.SysConfRepoInterface = &SysConfStore{}
-
-func NewSysConfStore(db *xorm.Engine) *SysConfStore {
-	return &SysConfStore{db}
+func NewSysConfDb(db *xorm.Engine) *SysConfDb {
+	return &SysConfDb{db}
 }
 
-func (e *SysConfStore) SaveSysConf(sysConf *entity.SysConf) (*entity.SysConf, error) {
+func (e *SysConfDb) SaveSysConf(sysConf *model.SysConf) (*model.SysConf, error) {
 	_, err := e.db.Insert(sysConf)
 	if err != nil {
 		return nil, err
@@ -26,8 +23,8 @@ func (e *SysConfStore) SaveSysConf(sysConf *entity.SysConf) (*entity.SysConf, er
 	return sysConf, nil
 }
 
-func (e *SysConfStore) GetSysConf(confId int64) (*entity.SysConf, error) {
-	var sysConf entity.SysConf
+func (e *SysConfDb) GetSysConf(confId int64) (*model.SysConf, error) {
+	var sysConf model.SysConf
 	_, err := e.db.ID(confId).Get(&sysConf)
 	if err != nil {
 		return nil, err
@@ -35,7 +32,7 @@ func (e *SysConfStore) GetSysConf(confId int64) (*entity.SysConf, error) {
 	return &sysConf, nil
 }
 
-func (e *SysConfStore) UpdateSysConf(sysConf *entity.SysConf) (*entity.SysConf, error) {
+func (e *SysConfDb) UpdateSysConf(sysConf *model.SysConf) (*model.SysConf, error) {
 	_, err := e.db.ID(sysConf.ConfId).Update(sysConf)
 	if err != nil {
 		return nil, err
@@ -43,8 +40,8 @@ func (e *SysConfStore) UpdateSysConf(sysConf *entity.SysConf) (*entity.SysConf, 
 	return sysConf, nil
 }
 
-func (e *SysConfStore) DeleteSysConf(confId int64) error {
-	var sysConf entity.SysConf
+func (e *SysConfDb) DeleteSysConf(confId int64) error {
+	var sysConf model.SysConf
 	_, err := e.db.ID(confId).Delete(&sysConf)
 	if err != nil {
 		return err
@@ -52,8 +49,8 @@ func (e *SysConfStore) DeleteSysConf(confId int64) error {
 	return nil
 }
 
-func (e *SysConfStore) GetSysConfList() ([]entity.SysConf, error) {
-	var sysConfs []entity.SysConf
+func (e *SysConfDb) GetSysConfList() ([]model.SysConf, error) {
+	var sysConfs []model.SysConf
 	err := e.db.OrderBy("created_at asc").Find(&sysConfs)
 	if err != nil {
 		return nil, err
@@ -61,8 +58,8 @@ func (e *SysConfStore) GetSysConfList() ([]entity.SysConf, error) {
 	return sysConfs, nil
 }
 
-func (e *SysConfStore) GetSysConfByKey(confKey string) (*entity.SysConf, error) {
-	var sysConfs []entity.SysConf
+func (e *SysConfDb) GetSysConfByKey(confKey string) (*model.SysConf, error) {
+	var sysConfs []model.SysConf
 	err := e.db.Where("conf_key = ? and status = ?", confKey, constant.YES).Find(&sysConfs)
 	if err != nil {
 		return nil, err
@@ -73,8 +70,8 @@ func (e *SysConfStore) GetSysConfByKey(confKey string) (*entity.SysConf, error) 
 	return nil, nil
 }
 
-func (e *SysConfStore) GetSysConfByKind(confKind int8) ([]entity.SysConf, error) {
-	var sysConfs []entity.SysConf
+func (e *SysConfDb) GetSysConfByKind(confKind int8) ([]model.SysConf, error) {
+	var sysConfs []model.SysConf
 	err := e.db.SQL(
 		`
 		select 

@@ -9,6 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetHeaders(c *gin.Context) map[string]any {
+	header := c.Request.Header
+	var headerMap = make(map[string]any, len(header))
+	for k, v := range header {
+		headerMap[k] = v
+	}
+	return headerMap
+}
+
 func GetQueryParams(c *gin.Context) map[string]any {
 	query := c.Request.URL.Query()
 	var queryMap = make(map[string]any, len(query))

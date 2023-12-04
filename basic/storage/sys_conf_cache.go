@@ -1,25 +1,25 @@
-package memory
+package storage
 
 import (
-	"basic/infrastructure/persistence/entity"
+	"basic/model"
 	"core/constant"
 	"core/redis"
 	"encoding/json"
 )
 
-type SysConfMemory struct {
+type SysConfCache struct {
 	redis *redis.RedisUtil
 }
 
-func NewSysConfMemory(redis *redis.RedisUtil) *SysConfMemory {
-	return &SysConfMemory{redis}
+func NewSysConfCache(redis *redis.RedisUtil) *SysConfCache {
+	return &SysConfCache{redis}
 }
 
-func (e *SysConfMemory) RedisKey() string {
+func (e *SysConfCache) RedisKey() string {
 	return e.redis.GetKey(constant.SYS_CONF)
 }
 
-func (e *SysConfMemory) HSet(key string, sysConf *entity.SysConf) error {
+func (e *SysConfCache) HSet(key string, sysConf *model.SysConf) error {
 	if sysConf == nil {
 		return nil
 	}
@@ -34,12 +34,12 @@ func (e *SysConfMemory) HSet(key string, sysConf *entity.SysConf) error {
 	return nil
 }
 
-func (e *SysConfMemory) HGet(key string) (*entity.SysConf, error) {
+func (e *SysConfCache) HGet(key string) (*model.SysConf, error) {
 	val, err := e.redis.HGet(e.RedisKey(), key)
 	if err != nil {
 		return nil, err
 	}
-	var sysConf entity.SysConf
+	var sysConf model.SysConf
 	err = json.Unmarshal([]byte(val), &sysConf)
 	if err != nil {
 		return nil, err
@@ -47,23 +47,23 @@ func (e *SysConfMemory) HGet(key string) (*entity.SysConf, error) {
 	return &sysConf, nil
 }
 
-func (e *SysConfMemory) Del() error {
+func (e *SysConfCache) Del() error {
 	return e.redis.Del(e.RedisKey())
 }
 
-func (e *SysConfMemory) HExists(key string) (bool, error) {
+func (e *SysConfCache) HExists(key string) (bool, error) {
 	return e.redis.HExists(e.RedisKey(), key)
 }
 
-func (e *SysConfMemory) HGetAll() (map[string]entity.SysConf, error) {
-	var sysConfMap map[string]entity.SysConf
+func (e *SysConfCache) HGetAll() (map[string]model.SysConf, error) {
+	var sysConfMap map[string]model.SysConf
 	val, err := e.redis.HGetAll(e.RedisKey())
 	if err != nil {
 		return nil, err
 	}
-	sysConfMap = make(map[string]entity.SysConf, len(val))
+	sysConfMap = make(map[string]model.SysConf, len(val))
 	for k, v := range val {
-		var sysConf entity.SysConf
+		var sysConf model.SysConf
 		err = json.Unmarshal([]byte(v), &sysConf)
 		if err != nil {
 			return nil, err

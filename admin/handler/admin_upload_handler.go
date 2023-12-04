@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"basic/interfaces"
+	"basic/handler"
 	"core/web"
 )
 
 type AdminUploadHandler struct {
-	FileItemHandler *interfaces.FileItemHandler
+	FileItemHandler *handler.FileItemHandler
 }
 
 // @Summary 上传文件

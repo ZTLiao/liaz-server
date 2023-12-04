@@ -125,6 +125,7 @@ func LoggerHandler() gin.HandlerFunc {
 		//封装响应体
 		writerWrapper := &ResponseWriterWrapper{Body: bytes.NewBufferString(utils.EMPTY), ResponseWriter: c.Writer}
 		c.Writer = writerWrapper
+		headers := request.GetHeaders(c)
 		queryParams := request.GetQueryParams(c)
 		formParams, err := request.GetPostFormParams(c)
 		if err != nil {
@@ -134,7 +135,7 @@ func LoggerHandler() gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 		}
-		entry.Infof("request headers : %s, queryParams : %s, formParams : %s, bodyParams : %s", c.Request.Header, queryParams, formParams, bodyParams)
+		entry.Infof("request headers : %s, queryParams : %s, formParams : %s, bodyParams : %s", printf(headers), printf(queryParams), printf(formParams), bodyParams)
 		c.Next()
 		spendTime := time.Since(startTime).Milliseconds()
 		//API调用耗时
@@ -147,6 +148,22 @@ func LoggerHandler() gin.HandlerFunc {
 		}
 		entry.Infof("response status : %s, spendTime : %s, result : %s", strconv.FormatInt(int64(statusCode), 10), ST, writerWrapper.Body.String())
 	}
+}
+
+// 请求参数格式化日志输出
+func printf(params map[string]any) string {
+	var content string
+	if len(params) == 0 {
+		return content
+	}
+	for k, v := range params {
+		content += k + "=" + fmt.Sprintf("%s", v) + "&"
+	}
+	if len(content) > 0 {
+		rs := []rune(content)
+		content = string(rs[0 : len(content)-1])
+	}
+	return content
 }
 
 type ResponseWriterWrapper struct {

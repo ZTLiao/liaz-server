@@ -15,7 +15,7 @@ func NewAdminLogDb(db *xorm.Engine) *AdminLogDb {
 	return &AdminLogDb{db}
 }
 
-func (e *AdminLogDb) AddLog(adminId int64, uri string, headers map[string][]string, queryParams map[string]any, formParams map[string]any, bodyParams string) error {
+func (e *AdminLogDb) AddLog(adminId int64, uri string, headers map[string]any, queryParams map[string]any, formParams map[string]any, bodyParams string) error {
 	var adminLog = new(model.AdminLog)
 	adminLog.AdminId = adminId
 	adminLog.Uri = uri

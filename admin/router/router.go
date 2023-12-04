@@ -65,7 +65,7 @@ func AdminSecurityHandler(db *xorm.Engine, redis *redis.RedisUtil) gin.HandlerFu
 			c.Abort()
 			return
 		}
-		headers := c.Request.Header
+		headers := request.GetHeaders(c)
 		formParams, err := request.GetPostFormParams(c)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
