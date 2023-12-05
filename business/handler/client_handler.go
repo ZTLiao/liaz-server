@@ -1,15 +1,16 @@
 package handler
 
 import (
-	basic "basic/handler"
+	basicHandler "basic/handler"
 	"business/resp"
 	"core/constant"
 	"core/response"
 	"core/web"
+	"encoding/json"
 )
 
 type ClientHandler struct {
-	SysConfHandler *basic.SysConfHandler
+	SysConfHandler *basicHandler.SysConfHandler
 }
 
 func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
@@ -17,8 +18,17 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
+	var key = new(resp.KeyConfig)
+	var app = new(resp.AppConfig)
+	app.FileUrl = fileUrl
+	//格式化
+	appJson, err := json.Marshal(app)
+	if err != nil {
+		return err
+	}
 	var clientInitResp = &resp.ClientInitResp{
-		FileUrl: fileUrl,
+		Key: key,
+		App: string(appJson),
 	}
 	return response.ReturnOK(clientInitResp)
 }

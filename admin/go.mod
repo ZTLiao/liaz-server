@@ -4,6 +4,7 @@ go 1.21.3
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-xorm/xorm v0.7.9
 	github.com/mssola/user_agent v0.6.0
 	github.com/nacos-group/nacos-sdk-go/v2 v2.2.4
 )
@@ -33,4 +34,6 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	xorm.io/builder v0.3.6 // indirect
+	xorm.io/core v0.7.2-0.20190928055935-90aeac8d08eb // indirect
 )

@@ -1,6 +1,9 @@
 package main
 
-import "core/cmd"
+import (
+	_ "business/router"
+	"core/cmd"
+)
 
 func main() {
 	cmd.Execute("liaz-business")

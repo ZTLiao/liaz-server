@@ -1,8 +1,8 @@
 package controller
 
 import (
-	admin "admin/handler"
-	basic "basic/handler"
+	adminHandler "admin/handler"
+	basicHandler "basic/handler"
 	"basic/storage"
 	"core/file"
 	"core/system"
@@ -17,8 +17,8 @@ func (e *AdminUploadController) Router(iWebRoutes web.IWebRoutes) {
 	minio := system.GetMinioClient()
 	var fileItemDb = storage.NewFileItemDb(db)
 	var fileTemplate = file.NewFileTemplate(minio)
-	var adminUploadHandler = &admin.AdminUploadHandler{
-		FileItemHandler: basic.NewFileItemHandler(fileItemDb, fileTemplate),
+	var adminUploadHandler = &adminHandler.AdminUploadHandler{
+		FileItemHandler: basicHandler.NewFileItemHandler(fileItemDb, fileTemplate),
 	}
 	iWebRoutes.POST("/upload/:bucketName", adminUploadHandler.Upload)
 }

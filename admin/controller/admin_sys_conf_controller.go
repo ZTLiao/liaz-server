@@ -1,8 +1,8 @@
 package controller
 
 import (
-	admin "admin/handler"
-	basic "basic/handler"
+	adminHandler "admin/handler"
+	basicHandler "basic/handler"
 	"basic/storage"
 	"core/redis"
 	"core/system"
@@ -17,8 +17,8 @@ func (e *AdminSysConfController) Router(iWebRoutes web.IWebRoutes) {
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var sysConfDb = storage.NewSysConfDb(db)
 	var sysConfCache = storage.NewSysConfCache(redis)
-	var adminSysConfHandler = &admin.AdminSysConfHandler{
-		SysConfHandler: basic.NewSysConfHandler(sysConfDb, sysConfCache),
+	var adminSysConfHandler = &adminHandler.AdminSysConfHandler{
+		SysConfHandler: basicHandler.NewSysConfHandler(sysConfDb, sysConfCache),
 	}
 	iWebRoutes.GET("/sys/conf", adminSysConfHandler.GetAdminSysConf)
 	iWebRoutes.POST("/sys/conf", adminSysConfHandler.SaveAdminSysConf)
