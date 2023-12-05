@@ -17,10 +17,6 @@ type ClientHandler struct {
 }
 
 func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
-	fileUrl, err := e.SysConfHandler.GetConfValueByKey(constant.FILE_URL)
-	if err != nil {
-		wc.AbortWithError(err)
-	}
 	//获取加密密钥
 	var key = new(resp.KeyConfig)
 	//接口加签
@@ -31,13 +27,8 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 	key.K1 = signKey
 	//数据加密
 	key.K2 = e.SecurityConfig.PublicKey
-	var app = new(resp.AppConfig)
-	app.FileUrl = fileUrl
-	//格式化
-	appJson, err := json.Marshal(app)
-	if err != nil {
-		wc.AbortWithError(err)
-	}
+	//获取配置
+	appJson := e.buildAppConfig(wc)
 	//加密
 	if e.SecurityConfig.Encrypt {
 		encryptPlain, err := utils.PriKeyEncrypt(string(appJson), e.SecurityConfig.PrivateKey)
@@ -51,4 +42,19 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 		App: string(appJson),
 	}
 	return response.ReturnOK(clientInitResp)
+}
+
+func (e *ClientHandler) buildAppConfig(wc *web.WebContext) []byte {
+	fileUrl, err := e.SysConfHandler.GetConfValueByKey(constant.FILE_URL)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	var app = new(resp.AppConfig)
+	app.FileUrl = fileUrl
+	//格式化
+	appJson, err := json.Marshal(app)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return appJson
 }
