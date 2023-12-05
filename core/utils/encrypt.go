@@ -1,10 +1,19 @@
 package utils
 
-import "time"
+import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha1"
+	"crypto/x509"
+	"encoding/pem"
+	"time"
+
+	"github.com/wenzhenxi/gorsa"
+)
 
 var next = time.Now().UnixMilli()
 
-func rand(bound int64) int64 {
+func random(bound int64) int64 {
 	next = next*1103515245 + 12345
 	rand := (next / 65536) % 32768
 	if rand < 0 {
@@ -21,14 +30,14 @@ func EncryptKey(key string) string {
 	for i := 0; i < length; i++ {
 		step := i * word
 		for j, k := 0, word-1; j < word; j, k = j+1, k-1 {
-			rand1 := rand(2)
+			rand1 := random(2)
 			var temp int64 = 0
 			if rand1 == 0 {
 				temp = 26
 			} else {
 				temp = 10
 			}
-			rand2 := rand(int64(temp))
+			rand2 := random(int64(temp))
 			if rand1 == 0 {
 				temp = 97
 			} else {
@@ -47,15 +56,22 @@ func EncryptKey(key string) string {
 	return string(encryptArray)
 }
 
-func DecryptKey(encrypt string) string {
-	encryptArray := []byte(encrypt)
-	word := 8
-	length := len(encryptArray) / word
-	var keyArray = make([]byte, length)
-	for i := 0; i < length; i++ {
-		for j := 0; j < word; j++ {
-			keyArray[i] |= encryptArray[i*word+j] & (128 >> j)
-		}
+func EncryptRSA(plain string, publicKey string) (cipherByte []byte, err error) {
+	msg := []byte(plain)
+	pubBlock, _ := pem.Decode([]byte(publicKey))
+	pubKeyValue, err := x509.ParsePKIXPublicKey(pubBlock.Bytes)
+	if err != nil {
+		panic(err)
 	}
-	return string(keyArray)
+	pub := pubKeyValue.(*rsa.PublicKey)
+	encryptOAEP, err := rsa.EncryptOAEP(sha1.New(), rand.Reader, pub, msg, nil)
+	if err != nil {
+		panic(err)
+	}
+	cipherByte = encryptOAEP
+	return
+}
+
+func PriKeyEncrypt(plain string, privateKey string) (string, error) {
+	return gorsa.PriKeyEncrypt(plain, privateKey)
 }

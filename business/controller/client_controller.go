@@ -4,6 +4,7 @@ import (
 	basic "basic/handler"
 	"basic/storage"
 	"business/handler"
+	"core/config"
 	"core/redis"
 	"core/system"
 	"core/web"
@@ -18,6 +19,7 @@ func (e *ClientController) Router(iWebRoutes web.IWebRoutes) {
 	var sysConfHandler = basic.NewSysConfHandler(storage.NewSysConfDb(db), storage.NewSysConfCache(redis))
 	var clientHandler = &handler.ClientHandler{
 		SysConfHandler: sysConfHandler,
+		SecurityConfig: config.SystemConfig.Security,
 	}
 	iWebRoutes.GET("/client/init", clientHandler.ClientInit)
 }

@@ -1,4 +1,4 @@
-.PHONY: liaz-admin clean
+.PHONY: liaz-admin liaz-business clean
 
 RM			:= rm -rf
 
@@ -8,6 +8,12 @@ BUILD		:= build
 liaz-admin:
 	@echo "cd $(PROJECT_DIR)/admin && CGO_ENABLED=0 go build -ldflags="-w -s" -a -installsuffix "" -gcflags="all=-N -l" -o $(PROJECT_DIR)/$(BUILD)/$@ $(PROJECT_DIR)/admin/main.go" 
 	@cd $(PROJECT_DIR)/admin && CGO_ENABLED=0 go build -ldflags="-w -s" -a -installsuffix "" -gcflags="all=-N -l" -o $(PROJECT_DIR)/$(BUILD)/$@ $(PROJECT_DIR)/admin/main.go
+	@echo Executing $@ complete!
+	$(PROJECT_DIR)/$(BUILD)/$@ start -e prod
+
+liaz-business:
+	@echo "cd $(PROJECT_DIR)/business && CGO_ENABLED=0 go build -ldflags="-w -s" -a -installsuffix "" -gcflags="all=-N -l" -o $(PROJECT_DIR)/$(BUILD)/$@ $(PROJECT_DIR)/business/main.go" 
+	@cd $(PROJECT_DIR)/business && CGO_ENABLED=0 go build -ldflags="-w -s" -a -installsuffix "" -gcflags="all=-N -l" -o $(PROJECT_DIR)/$(BUILD)/$@ $(PROJECT_DIR)/business/main.go
 	@echo Executing $@ complete!
 	$(PROJECT_DIR)/$(BUILD)/$@ start -e prod
 
