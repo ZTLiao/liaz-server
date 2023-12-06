@@ -3,6 +3,7 @@ package constant
 const (
 	AUTHORIZATION = "Authorization"
 	USER_AGENT    = "User-Agent"
+	X_TIMESTAMP   = "X-Timestamp"
 	X_REQUEST_ID  = "X-Request-Id"
 	X_DEVICE_ID   = "X-Device-Id"
 	X_OS          = "X-Os"
