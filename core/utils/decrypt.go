@@ -1,12 +1,6 @@
 package utils
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/sha1"
-	"crypto/x509"
-	"encoding/pem"
-
 	"github.com/wenzhenxi/gorsa"
 )
 
@@ -23,20 +17,10 @@ func DecryptKey(encrypt string) string {
 	return string(keyArray)
 }
 
-func DecryptRSA(cipherByte []byte, privateKey string) (plainText string, err error) {
-	priBlock, _ := pem.Decode([]byte(privateKey))
-	priKey, err := x509.ParsePKCS1PrivateKey(priBlock.Bytes)
-	if err != nil {
-		panic(err)
-	}
-	decryptOAEP, err := rsa.DecryptOAEP(sha1.New(), rand.Reader, priKey, cipherByte, nil)
-	if err != nil {
-		panic(err)
-	}
-	plainText = string(decryptOAEP)
-	return
+func DecryptRSA(cipherText string, privateKey string) (string, error) {
+	return gorsa.PriKeyDecrypt(cipherText, privateKey)
 }
 
-func PublicDecrypt(cipherPlain string, publicKey string) (string, error) {
-	return gorsa.PublicDecrypt(cipherPlain, publicKey)
+func PublicDecrypt(cipherText string, publicKey string) (string, error) {
+	return gorsa.PublicDecrypt(cipherText, publicKey)
 }

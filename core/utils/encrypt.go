@@ -1,11 +1,6 @@
 package utils
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/sha1"
-	"crypto/x509"
-	"encoding/pem"
 	"time"
 
 	"github.com/wenzhenxi/gorsa"
@@ -46,7 +41,7 @@ func EncryptKey(key string) string {
 			encryptArray[step+j] = byte(rand2 + temp)
 			flag := (keyArray[i] & (1 << k)) == 0
 			if flag {
-				b := (int(keyArray[i]) | ^(i<<k)&0xFF)
+				b := (keyArray[i] | ^(1<<k)&0xFF)
 				encryptArray[step+j] &= byte(b)
 			} else {
 				encryptArray[step+j] |= 1 << k
@@ -56,22 +51,10 @@ func EncryptKey(key string) string {
 	return string(encryptArray)
 }
 
-func EncryptRSA(plain string, publicKey string) (cipherByte []byte, err error) {
-	msg := []byte(plain)
-	pubBlock, _ := pem.Decode([]byte(publicKey))
-	pubKeyValue, err := x509.ParsePKIXPublicKey(pubBlock.Bytes)
-	if err != nil {
-		panic(err)
-	}
-	pub := pubKeyValue.(*rsa.PublicKey)
-	encryptOAEP, err := rsa.EncryptOAEP(sha1.New(), rand.Reader, pub, msg, nil)
-	if err != nil {
-		panic(err)
-	}
-	cipherByte = encryptOAEP
-	return
+func EncryptRSA(plainText string, publicKey string) (string, error) {
+	return gorsa.PublicEncrypt(plainText, publicKey)
 }
 
-func PriKeyEncrypt(plain string, privateKey string) (string, error) {
-	return gorsa.PriKeyEncrypt(plain, privateKey)
+func PriKeyEncrypt(plainText string, privateKey string) (string, error) {
+	return gorsa.PriKeyEncrypt(plainText, privateKey)
 }

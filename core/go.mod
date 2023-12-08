@@ -12,6 +12,7 @@ require (
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
+	github.com/wenzhenxi/gorsa v0.0.0-20230530123828-0320cce15d81
 	golang.org/x/text v0.14.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -62,7 +63,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/wenzhenxi/gorsa v0.0.0-20230530123828-0320cce15d81 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect

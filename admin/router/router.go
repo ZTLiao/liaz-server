@@ -21,7 +21,7 @@ func init() {
 	web.AddRouter(func(wrg *web.WebRouterGroup) {
 		db := system.GetXormEngine()
 		redis := redis.NewRedisUtil(system.GetRedisClient())
-		wrg.Use(AdminSecurityHandler(db, redis))
+		wrg.Use(AdminSecurityHandler(config.SystemConfig.Security, db, redis))
 		wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
 			return response.Success()
 		})
@@ -40,10 +40,14 @@ func init() {
 	})
 }
 
-func AdminSecurityHandler(db *xorm.Engine, redis *redis.RedisUtil) gin.HandlerFunc {
+func AdminSecurityHandler(security *config.Security, db *xorm.Engine, redis *redis.RedisUtil) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if !security.Encrypt {
+			c.Next()
+			return
+		}
 		requestUri := c.Request.RequestURI
-		excludes := config.SystemConfig.Security.Excludes
+		excludes := security.Excludes
 		for _, v := range excludes {
 			if requestUri == v {
 				c.Next()

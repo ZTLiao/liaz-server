@@ -24,9 +24,13 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 	if len(signKey) > 0 {
 		signKey = utils.EncryptKey(signKey)
 	}
+	publicKey := e.SecurityConfig.PublicKey
+	if len(publicKey) > 0 {
+		publicKey = utils.EncryptKey(publicKey)
+	}
 	key.K1 = signKey
 	//数据加密
-	key.K2 = e.SecurityConfig.PublicKey
+	key.K2 = publicKey
 	//获取配置
 	appJson := e.buildAppConfig(wc)
 	//加密
