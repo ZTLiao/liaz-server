@@ -11,6 +11,8 @@ import (
 type AdminMenuController struct {
 }
 
+var _ web.IWebController = &AdminMenuController{}
+
 func (e *AdminMenuController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())

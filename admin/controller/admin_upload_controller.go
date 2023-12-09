@@ -12,6 +12,8 @@ import (
 type AdminUploadController struct {
 }
 
+var _ web.IWebController = &AdminUploadController{}
+
 func (e *AdminUploadController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	minio := system.GetMinioClient()

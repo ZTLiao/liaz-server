@@ -17,6 +17,7 @@ type DeviceInfo struct {
 	Imei       string `json:"imei"`
 	Channel    string `json:"channel"`
 	Client     string `json:"client"`
+	ClientIp   string `json:"clientIp"`
 }
 
 func GetDeviceInfo(wc *web.WebContext) *DeviceInfo {
@@ -32,5 +33,6 @@ func GetDeviceInfo(wc *web.WebContext) *DeviceInfo {
 	deviceInfo.Imei = wc.GetHeader(constant.X_IMEI)
 	deviceInfo.Channel = wc.GetHeader(constant.X_CHANNEL)
 	deviceInfo.Client = wc.GetHeader(constant.X_CLIENT)
+	deviceInfo.ClientIp = wc.ClientIP()
 	return deviceInfo
 }

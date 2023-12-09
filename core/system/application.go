@@ -7,6 +7,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 )
 
 type Application struct {
@@ -18,6 +19,7 @@ type Application struct {
 	xormEngine    *xorm.Engine
 	redisClient   *redis.Client
 	minioClient   *minio.Client
+	oauth2Config  *oauth2.Config
 }
 
 func SetEnv(env string) {
@@ -98,6 +100,16 @@ func SetMinioClient(client *minio.Client) {
 
 func GetMinioClient() *minio.Client {
 	return application.minioClient
+}
+
+func SetOauth2Config(config *oauth2.Config) {
+	if application.oauth2Config == nil {
+		application.oauth2Config = config
+	}
+}
+
+func GetOauth2Config() *oauth2.Config {
+	return application.oauth2Config
 }
 
 var application = new(Application)

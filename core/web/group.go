@@ -19,6 +19,10 @@ type IWebRoutes interface {
 	HEAD(string, ...WebHandlerFunc) IWebRoutes
 }
 
+type IWebController interface {
+	Router(iWebRoutes IWebRoutes)
+}
+
 type WebRouterGroup struct {
 	group   *gin.RouterGroup
 	iRoutes gin.IRoutes

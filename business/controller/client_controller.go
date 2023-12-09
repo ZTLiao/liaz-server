@@ -16,6 +16,8 @@ import (
 type ClientController struct {
 }
 
+var _ web.IWebController = &ClientController{}
+
 func (e *ClientController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())

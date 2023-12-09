@@ -11,6 +11,8 @@ import (
 type AdminLoginController struct {
 }
 
+var _ web.IWebController = &AdminLoginController{}
+
 func (e *AdminLoginController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())

@@ -10,6 +10,8 @@ import (
 type AdminRoleController struct {
 }
 
+var _ web.IWebController = &AdminRoleController{}
+
 func (e *AdminRoleController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var adminRoleHandler = &handler.AdminRoleHandler{

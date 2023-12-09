@@ -90,6 +90,10 @@ func (e *WebContext) ShouldBindJSON(obj any) error {
 	return e.context.ShouldBindJSON(obj)
 }
 
+func (e *WebContext) BindJSON(obj any) error {
+	return e.context.BindJSON(obj)
+}
+
 func (e *WebContext) FormFile(key string) (multipart.File, *multipart.FileHeader, error) {
 	return e.context.Request.FormFile(key)
 }

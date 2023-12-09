@@ -11,9 +11,10 @@ import (
 func init() {
 	web.AddRouter(func(wrg *web.WebRouterGroup) {
 		wrg.Use(middleware.SignatureHandler(config.SystemConfig.Security))
-		r := wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
+		wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
 			return response.Success()
 		})
+		r := wrg.Group("/api")
 		{
 			new(controller.ClientController).Router(r)
 		}

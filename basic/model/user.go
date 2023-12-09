@@ -10,7 +10,10 @@ type User struct {
 	Avatar      string     `json:"avatar" xorm:"avatar"`
 	Description string     `json:"description" xorm:"description"`
 	Gender      int8       `json:"gender" xorm:"gender"`
-	UserType    int8       `json:"userType" xorm:"user_type"`
+	Country     string     `json:"country" xorm:"country"`
+	Province    string     `json:"province" xorm:"province"`
+	City        string     `json:"city" xorm:"city"`
+	Type        int8       `json:"type" xorm:"type"`
 	Status      int8       `json:"status" xorm:"status"`
 	CreatedAt   types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at"`

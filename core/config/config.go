@@ -10,6 +10,7 @@ type Config struct {
 	Redis    *Redis    `yaml:"redis"`
 	Security *Security `yaml:"security"`
 	Minio    *Minio    `yaml:"minio"`
+	Oauth2   *Oauth2   `yaml:"oauth2"`
 }
 
 var SystemConfig = new(Config)
@@ -36,6 +37,8 @@ func Setup() {
 	SystemConfig.Redis.Init()
 	//文件储存
 	SystemConfig.Minio.Init()
+	//oauth
+	SystemConfig.Oauth2.Init()
 	//http
 	SystemConfig.Server.Init()
 }
