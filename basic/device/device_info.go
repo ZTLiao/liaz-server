@@ -10,7 +10,7 @@ type DeviceInfo struct {
 	Os         string `json:"os"`
 	OsVersion  string `json:"osVersion"`
 	IspType    string `json:"ispType"`
-	NetType    string `json:"netType"`
+	NetType    string `json:"netType" `
 	App        string `json:"app"`
 	AppVersion string `json:"appVersion"`
 	Model      string `json:"model"`

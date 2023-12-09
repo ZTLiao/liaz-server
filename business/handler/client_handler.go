@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"basic/device"
 	basicHandler "basic/handler"
 	"business/resp"
 	"core/config"
 	"core/constant"
+	"core/event"
 	"core/response"
 	"core/utils"
 	"core/web"
@@ -45,6 +47,8 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 		Key: key,
 		App: string(appJson),
 	}
+	//APP初始化事件
+	event.Bus.Publish(constant.CLIENT_INIT_TOPIC, device.GetDeviceInfo(wc))
 	return response.ReturnOK(clientInitResp)
 }
 
