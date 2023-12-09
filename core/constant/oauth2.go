@@ -1,3 +1,5 @@
 package constant
 
-const OAUTH_TOKEN = "/oauth/token"
+const (
+	OAUTH_TOKEN = "/oauth/token"
+)

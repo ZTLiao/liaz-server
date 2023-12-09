@@ -3,7 +3,6 @@ package handler
 import (
 	"basic/storage"
 	"context"
-	"strconv"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 )
@@ -18,14 +17,14 @@ func (e *UserPasswordAuthorizationHandler) Authorize(ctx context.Context, client
 		err = errors.ErrUnauthorizedClient
 		return
 	}
-	account, err := e.AccountDb.SignIn(username, password)
+	ok, err := e.AccountDb.IsExist(username, password)
 	if err != nil {
 		return "", err
 	}
-	if account == nil {
+	if !ok {
 		err = errors.ErrAccessDenied
 		return
 	}
-	userID = strconv.FormatInt(account.UserId, 10)
+	userID = username
 	return
 }
