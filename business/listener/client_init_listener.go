@@ -6,7 +6,6 @@ import (
 	"basic/storage"
 	"core/event"
 	"core/logger"
-	"core/utils"
 )
 
 type ClientInitListener struct {
@@ -49,36 +48,6 @@ func (e *ClientInitListener) OnListen(event event.Event) {
 			logger.Panic(err.Error())
 		}
 	}
-	clientIp := device.ClientIp
-	var ipRegion string
-	if len(clientIp) > 0 {
-		country, err := utils.GetCountry(clientIp)
-		if err != nil {
-			logger.Error(err.Error())
-		}
-		province, err := utils.GetProvince(clientIp)
-		if err != nil {
-			logger.Error(err.Error())
-		}
-		city, err := utils.GetCity(clientIp)
-		if err != nil {
-			logger.Error(err.Error())
-		}
-		ipRegion = country + utils.COMMA + province + utils.COMMA + city
-	}
 	//APP初始化记录
-	e.ClientInitRecordDb.InsertClientInitRecord(&model.ClientInitRecord{
-		DeviceId:   device.DeviceId,
-		Os:         device.Os,
-		OsVersion:  device.OsVersion,
-		App:        device.App,
-		AppVersion: device.AppVersion,
-		Model:      device.Model,
-		Imei:       device.Imei,
-		Channel:    device.Channel,
-		IspType:    device.IspType,
-		NetType:    device.NetType,
-		ClientIp:   device.ClientIp,
-		IpRegion:   ipRegion,
-	})
+	e.ClientInitRecordDb.InsertClientInitRecord(device)
 }

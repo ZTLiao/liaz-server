@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"oauth/controller"
 	"oauth/handler"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
@@ -43,6 +44,10 @@ func init() {
 			Domain: oauth2Config.AuthServerUrl,
 		})
 		manager.MapClientStorage(clientStore)
+		manager.SetPasswordTokenCfg(&manage.Config{
+			AccessTokenExp:    time.Duration(constant.OAUTH_TOKEN_FOR_EXPIRE_TIME) * time.Second,
+			IsGenerateRefresh: true,
+		})
 		srv := server.NewDefaultServer(manager)
 		srv.SetAllowGetAccessRequest(true)
 		srv.SetClientInfoHandler(server.ClientFormHandler)

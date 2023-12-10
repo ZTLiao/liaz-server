@@ -17,7 +17,7 @@ func (e *UserPasswordAuthorizationHandler) Authorize(ctx context.Context, client
 		err = errors.ErrUnauthorizedClient
 		return
 	}
-	ok, err := e.AccountDb.IsExist(username, password)
+	ok, err := e.AccountDb.IsExistForUsername(username, password)
 	if err != nil {
 		return "", err
 	}

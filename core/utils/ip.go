@@ -39,7 +39,10 @@ func GetProvince(ipAddr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return record.Subdivisions[0].Names["zh-CN"], nil
+	if len(record.Subdivisions) > 0 {
+		return record.Subdivisions[0].Names["zh-CN"], nil
+	}
+	return "", nil
 }
 
 func GetCity(ipAddr string) (string, error) {
@@ -52,4 +55,44 @@ func GetCity(ipAddr string) (string, error) {
 		return "", err
 	}
 	return record.City.Names["zh-CN"], nil
+}
+
+func GetAddress(ipAddr string) (string, error) {
+	var ipRegion string
+	if len(ipAddr) > 0 {
+		country, err := GetCountry(ipAddr)
+		if err != nil {
+			return "", err
+		}
+		province, err := GetProvince(ipAddr)
+		if err != nil {
+			return "", err
+		}
+		city, err := GetCity(ipAddr)
+		if err != nil {
+			return "", err
+		}
+		if len(country) != 0 || len(province) != 0 || len(city) != 0 {
+			ipRegion = country + COMMA + province + COMMA + city
+		}
+	}
+	return ipRegion, nil
+}
+
+func GetLocation(ipAddr string) (country string, province string, city string, err error) {
+	if len(ipAddr) > 0 {
+		country, err = GetCountry(ipAddr)
+		if err != nil {
+			return "", "", "", err
+		}
+		province, err = GetProvince(ipAddr)
+		if err != nil {
+			return "", "", "", err
+		}
+		city, err = GetCity(ipAddr)
+		if err != nil {
+			return "", "", "", err
+		}
+	}
+	return
 }

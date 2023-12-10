@@ -4,7 +4,7 @@ import (
 	"core/types"
 )
 
-type CustomOAuth2Token struct {
+type CustomOAuth2TokenResp struct {
 	AccessToken  string     `json:"access_token"`
 	TokenType    string     `json:"token_type,omitempty"`
 	RefreshToken string     `json:"refresh_token,omitempty"`

@@ -8,21 +8,19 @@ import (
 	"github.com/go-xorm/xorm"
 )
 
-type ClientInitRecordDb struct {
+type AccountLoginRecordDb struct {
 	db *xorm.Engine
 }
 
-func NewClientInitRecordDb(db *xorm.Engine) *ClientInitRecordDb {
-	return &ClientInitRecordDb{db}
+func NewAccountLoginRecordDb(db *xorm.Engine) *AccountLoginRecordDb {
+	return &AccountLoginRecordDb{db}
 }
 
-func (e *ClientInitRecordDb) InsertClientInitRecord(deviceInfo *device.DeviceInfo) error {
+func (e *AccountLoginRecordDb) InsertAccountLoginRecord(userId int64, deviceInfo *device.DeviceInfo) error {
 	clientIp := deviceInfo.ClientIp
-	ipRegion, err := utils.GetAddress(clientIp)
-	if err != nil {
-		return err
-	}
-	_, err = e.db.Insert(&model.ClientInitRecord{
+	ipRegion, _ := utils.GetAddress(clientIp)
+	_, err := e.db.Insert(&model.AccountLoginRecord{
+		UserId:     userId,
 		DeviceId:   deviceInfo.DeviceId,
 		Os:         deviceInfo.Os,
 		OsVersion:  deviceInfo.OsVersion,
