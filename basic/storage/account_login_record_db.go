@@ -16,10 +16,10 @@ func NewAccountLoginRecordDb(db *xorm.Engine) *AccountLoginRecordDb {
 	return &AccountLoginRecordDb{db}
 }
 
-func (e *AccountLoginRecordDb) InsertAccountLoginRecord(userId int64, deviceInfo *device.DeviceInfo) error {
+func (e *AccountLoginRecordDb) InsertAccountLoginRecord(userId int64, deviceInfo *device.DeviceInfo) (*model.AccountLoginRecord, error) {
 	clientIp := deviceInfo.ClientIp
 	ipRegion, _ := utils.GetAddress(clientIp)
-	_, err := e.db.Insert(&model.AccountLoginRecord{
+	var record = &model.AccountLoginRecord{
 		UserId:     userId,
 		DeviceId:   deviceInfo.DeviceId,
 		Os:         deviceInfo.Os,
@@ -33,9 +33,10 @@ func (e *AccountLoginRecordDb) InsertAccountLoginRecord(userId int64, deviceInfo
 		NetType:    deviceInfo.NetType,
 		ClientIp:   deviceInfo.ClientIp,
 		IpRegion:   ipRegion,
-	})
-	if err != nil {
-		return err
 	}
-	return nil
+	_, err := e.db.Insert(record)
+	if err != nil {
+		return nil, err
+	}
+	return record, nil
 }

@@ -36,6 +36,8 @@ func init() {
 			new(controller.AdminUserRoleController).Router(r)
 			new(controller.AdminUploadController).Router(r)
 			new(controller.AdminSysConfController).Router(r)
+			new(controller.AdminRecommendController).Router(r)
+			new(controller.AdminRecommendItemController).Router(r)
 		}
 	})
 }

@@ -47,7 +47,7 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 		Key: key,
 		App: string(appJson),
 	}
-	//APP初始化事件
+	//发布事件
 	event.Bus.Publish(constant.CLIENT_INIT_TOPIC, device.GetDeviceInfo(wc))
 	return response.ReturnOK(clientInitResp)
 }

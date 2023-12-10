@@ -7,6 +7,7 @@ import (
 	"basic/storage"
 	"context"
 	"core/constant"
+	"core/event"
 	"core/response"
 	"core/types"
 	"core/web"
@@ -54,10 +55,12 @@ func (e *OauthSignHandler) SignIn(wc *web.WebContext) interface{} {
 	e.UserDb.UpdateLocation(userId, deviceInfo.ClientIp)
 	//更新设备信息
 	e.UserDeviceDb.SaveOrUpdateUserDevice(userId, deviceInfo.DeviceId)
-	//保存登录记录
-	e.AccountLoginRecordDb.InsertAccountLoginRecord(userId, deviceInfo)
 	//更新token
 	e.OAuth2TokenCache.Set(userId, token.AccessToken)
+	//保存登录记录
+	record, _ := e.AccountLoginRecordDb.InsertAccountLoginRecord(userId, deviceInfo)
+	//发布事件
+	event.Bus.Publish(constant.USER_LOGIN_TOPIC, record)
 	return response.ReturnOK(&resp.CustomOAuth2TokenResp{
 		AccessToken:  token.AccessToken,
 		TokenType:    token.TokenType,

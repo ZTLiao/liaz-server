@@ -86,6 +86,14 @@ func (e *WebContext) Param(key string) string {
 	return e.context.Param(key)
 }
 
+func (e *WebContext) Query(key string) string {
+	return e.context.Query(key)
+}
+
+func (e *WebContext) DefaultQuery(key string, defaultValue string) string {
+	return e.context.DefaultQuery(key, defaultValue)
+}
+
 func (e *WebContext) ShouldBindJSON(obj any) error {
 	return e.context.ShouldBindJSON(obj)
 }
