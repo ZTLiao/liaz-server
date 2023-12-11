@@ -23,11 +23,11 @@ func (e *AdminUserCache) Set(accessToken string, adminUser *model.AdminUser) err
 	if adminUser == nil {
 		return nil
 	}
-	val, err := json.Marshal(adminUser)
+	data, err := json.Marshal(adminUser)
 	if err != nil {
 		return err
 	}
-	err = e.redis.Set(e.RedisKey(accessToken), val, constant.TIME_OF_WEEK)
+	err = e.redis.Set(e.RedisKey(accessToken), data, constant.TIME_OF_WEEK)
 	if err != nil {
 		return err
 	}
@@ -38,15 +38,15 @@ func (e *AdminUserCache) Get(accessToken string) (*model.AdminUser, error) {
 	if len(accessToken) == 0 {
 		return nil, nil
 	}
-	val, err := e.redis.Get(e.RedisKey(accessToken))
+	data, err := e.redis.Get(e.RedisKey(accessToken))
 	if err != nil {
 		return nil, err
 	}
-	if len(val) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 	var adminUser model.AdminUser
-	err = json.Unmarshal([]byte(val), &adminUser)
+	err = json.Unmarshal([]byte(data), &adminUser)
 	if err != nil {
 		return nil, err
 	}

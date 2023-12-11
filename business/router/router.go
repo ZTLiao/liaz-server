@@ -17,6 +17,7 @@ func init() {
 		r := wrg.Group("/api")
 		{
 			new(controller.ClientController).Router(r)
+			new(controller.RecommendController).Router(r)
 		}
 	})
 }

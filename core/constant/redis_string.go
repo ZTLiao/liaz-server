@@ -1,8 +1,9 @@
 package constant
 
 const (
-	ACCESS_TOKEN string = "access_token"
-	ADMIN_USER   string = "admin_user"
-	REDIS_LOCK   string = "redis_lock"
-	OAUTH2_TOKEN string = "oauth2_token"
+	ACCESS_TOKEN = "access_token"
+	ADMIN_USER   = "admin_user"
+	REDIS_LOCK   = "redis_lock"
+	OAUTH2_TOKEN = "oauth2_token"
+	RECOMMEND    = "recommend"
 )
