@@ -50,3 +50,12 @@ func (e *RecommendItemDb) DelRecommendItem(recommendItemId int64) error {
 	}
 	return nil
 }
+
+func (e *RecommendItemDb) GetRecommendItemByRecommendId(reommendId int64) ([]model.RecommendItem, error) {
+	var recommendItems []model.RecommendItem
+	err := e.db.Where("recommend_id = ?", reommendId).OrderBy("seq_no asc").Find(&recommendItems)
+	if err != nil {
+		return nil, err
+	}
+	return recommendItems, nil
+}

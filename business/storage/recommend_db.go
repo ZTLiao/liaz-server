@@ -59,3 +59,12 @@ func (e *RecommendDb) DelRecommend(recommendId int64) error {
 	}
 	return nil
 }
+
+func (e *RecommendDb) GetRecommendByPosition(position int8) ([]model.Recommend, error) {
+	var recommends []model.Recommend
+	err := e.db.Where("position = ?", position).OrderBy("seq_no asc").Find(&recommends)
+	if err != nil {
+		return nil, err
+	}
+	return recommends, nil
+}

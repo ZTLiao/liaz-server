@@ -33,3 +33,23 @@ func (e *RecommendCache) HSet(position int8, recommendType int8, recommend *resp
 	e.redis.Expire(e.RedisKey(position), time.Duration(constant.TIME_OF_MINUTE)*time.Second)
 	return err
 }
+
+func (e *RecommendCache) HGetAll(position int8) ([]resp.RecommendResp, error) {
+	data, err := e.redis.HGetAll(e.RedisKey(position))
+	if err != nil {
+		return nil, err
+	}
+	if len(data) == 0 {
+		return nil, nil
+	}
+	var recommends = make([]resp.RecommendResp, len(data))
+	for _, v := range data {
+		var recommend resp.RecommendResp
+		err = json.Unmarshal([]byte(v), &recommend)
+		if err != nil {
+			return nil, err
+		}
+		recommends = append(recommends, recommend)
+	}
+	return recommends, nil
+}
