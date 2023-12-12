@@ -35,7 +35,7 @@ var (
 			Username:           "nacos",
 			Password:           "nacos",
 			ServerAddr:         "127.0.0.1:8848",
-			Namespace:          "5f49cd28-4eb2-4b0b-a467-bab25f4c9535",
+			Namespace:          "e85ee8e9-472c-4803-bcf0-0b0f7d0ea0b7",
 			SharedDataIds:      "application.yaml,database.yaml",
 			RefreshableDataIds: "application.yaml",
 		},
