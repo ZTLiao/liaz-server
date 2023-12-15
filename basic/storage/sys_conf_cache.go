@@ -39,6 +39,9 @@ func (e *SysConfCache) HGet(key string) (*model.SysConf, error) {
 	if err != nil {
 		return nil, err
 	}
+	if val == "" {
+		return nil, nil
+	}
 	var sysConf model.SysConf
 	err = json.Unmarshal([]byte(val), &sysConf)
 	if err != nil {
@@ -60,6 +63,9 @@ func (e *SysConfCache) HGetAll() (map[string]model.SysConf, error) {
 	val, err := e.redis.HGetAll(e.RedisKey())
 	if err != nil {
 		return nil, err
+	}
+	if len(val) == 0 {
+		return nil, nil
 	}
 	sysConfMap = make(map[string]model.SysConf, len(val))
 	for k, v := range val {
