@@ -38,6 +38,8 @@ func init() {
 			new(controller.AdminSysConfController).Router(r)
 			new(controller.AdminRecommendController).Router(r)
 			new(controller.AdminRecommendItemController).Router(r)
+			new(controller.AdminCategoryController).Router(r)
+			new(controller.AdminAuthorController).Router(r)
 		}
 	})
 }
