@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type Recommend struct {
 	RecommendId   int64      `json:"recommendId" xorm:"recommend_id pk autoincr BIGINT"`
@@ -16,6 +19,8 @@ type Recommend struct {
 	CreatedAt     types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt     types.Time `json:"updatedAt" xorm:"updated_at"`
 }
+
+var _ model.BaseModel = &Recommend{}
 
 func (e *Recommend) TableName() string {
 	return "recommend"

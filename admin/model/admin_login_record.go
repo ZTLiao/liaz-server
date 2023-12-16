@@ -1,6 +1,7 @@
 package model
 
 import (
+	"core/model"
 	"core/types"
 )
 
@@ -19,6 +20,8 @@ type AdminLoginRecord struct {
 	ClientIp       string     `json:"clientIp" xorm:"client_ip"`
 	CreatedAt      types.Time `json:"createdAt" xorm:"created_at"`
 }
+
+var _ model.BaseModel = &AdminLoginRecord{}
 
 func (e *AdminLoginRecord) TableName() string {
 	return "admin_login_record"

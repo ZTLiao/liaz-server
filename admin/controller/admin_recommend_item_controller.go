@@ -1,8 +1,10 @@
 package controller
 
 import (
-	"admin/handler"
+	adminHandler "admin/handler"
+	businessHandler "business/handler"
 	"business/storage"
+	"core/redis"
 	"core/system"
 	"core/web"
 )
@@ -14,8 +16,15 @@ var _ web.IWebController = &AdminRecommendItemController{}
 
 func (e *AdminRecommendItemController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var adminRecommendItemHandler = &handler.AdminRecommendItemHandler{
+	var redis = redis.NewRedisUtil(system.GetRedisClient())
+	var recommendHandler = &businessHandler.RecommendHandler{
+		RecommendDb:     storage.NewRecommendDb(db),
 		RecommendItemDb: storage.NewRecommendItemDb(db),
+		RecommendCache:  storage.NewRecommendCache(redis),
+	}
+	var adminRecommendItemHandler = &adminHandler.AdminRecommendItemHandler{
+		RecommendItemDb:  storage.NewRecommendItemDb(db),
+		RecommendHandler: recommendHandler,
 	}
 	iWebRoutes.GET("/recommend/item/page", adminRecommendItemHandler.GetRecommendItemPage)
 	iWebRoutes.POST("/recommend/item", adminRecommendItemHandler.SaveRecommendItem)

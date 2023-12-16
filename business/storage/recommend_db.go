@@ -68,3 +68,15 @@ func (e *RecommendDb) GetRecommendByPosition(position int8) ([]model.Recommend, 
 	}
 	return recommends, nil
 }
+
+func (e *RecommendDb) GetRecommendById(recommendId int64) (*model.Recommend, error) {
+	if recommendId == 0 {
+		return nil, nil
+	}
+	var recommend model.Recommend
+	_, err := e.db.ID(recommendId).Get(&recommend)
+	if err != nil {
+		return nil, err
+	}
+	return &recommend, nil
+}

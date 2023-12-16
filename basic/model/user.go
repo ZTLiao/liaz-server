@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type User struct {
 	UserId      int64      `json:"userId" xorm:"user_id pk BIGINT"`
@@ -18,6 +21,8 @@ type User struct {
 	CreatedAt   types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at"`
 }
+
+var _ model.BaseModel = &User{}
 
 func (e *User) TableName() string {
 	return "user"

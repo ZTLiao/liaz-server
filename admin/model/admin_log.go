@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type AdminLog struct {
 	LogId     int64      `json:"logId" xorm:"log_id pk autoincr BIGINT"`
@@ -9,6 +12,8 @@ type AdminLog struct {
 	Params    string     `json:"params" xorm:"params"`
 	CreatedAt types.Time `json:"createdAt" xorm:"created_at"`
 }
+
+var _ model.BaseModel = &AdminLog{}
 
 func (e *AdminLog) TableName() string {
 	return "admin_log"

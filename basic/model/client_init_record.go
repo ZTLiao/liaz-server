@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type ClientInitRecord struct {
 	Id         int64      `json:"id" xorm:"id pk BIGINT"`
@@ -18,6 +21,8 @@ type ClientInitRecord struct {
 	IpRegion   string     `json:"ipRegion" xorm:"ip_region"`
 	CreatedAt  types.Time `json:"createdAt" xorm:"created_at"`
 }
+
+var _ model.BaseModel = &ClientInitRecord{}
 
 func (e *ClientInitRecord) TableName() string {
 	return "client_init_record"

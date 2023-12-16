@@ -1,6 +1,7 @@
 package model
 
 import (
+	"core/model"
 	"core/types"
 )
 
@@ -18,6 +19,8 @@ type AdminUser struct {
 	CreatedAt    types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt    types.Time `json:"updatedAt" xorm:"updated_at"`
 }
+
+var _ model.BaseModel = &AdminUser{}
 
 func (e *AdminUser) TableName() string {
 	return "admin_user"

@@ -34,6 +34,7 @@ func (e *AdminMenuDb) GetAdminMemu(adminId int64) ([]model.AdminMenu, error) {
 		left join admin_menu as am on am.menu_id = arm.menu_id
 		where 
 			aur.admin_id = ?
+			and am.menu_id is not null
 		group by am.menu_id
 		order by am.parent_id, am.show_order
 		`, adminId).Find(&adminMenus)

@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type FileItem struct {
 	FileId     int64      `json:"fileId" xorm:"file_id pk autoincr BIGINT"`
@@ -14,6 +17,8 @@ type FileItem struct {
 	CreatedAt  types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt  types.Time `json:"updatedAt" xorm:"updated_at"`
 }
+
+var _ model.BaseModel = &FileItem{}
 
 func (e *FileItem) TableName() string {
 	return "file_item"

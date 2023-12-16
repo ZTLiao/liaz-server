@@ -11,7 +11,7 @@ import (
 
 func GenerateSign(params map[string][]string, timestamp int64, key string) string {
 	if timestamp > 0 {
-		var list = make([]string, 1)
+		var list = make([]string, 0)
 		list = append(list, strconv.FormatInt(timestamp, 10))
 		params["timestamp"] = list
 	}

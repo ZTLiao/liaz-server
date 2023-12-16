@@ -59,3 +59,15 @@ func (e *RecommendItemDb) GetRecommendItemByRecommendId(reommendId int64) ([]mod
 	}
 	return recommendItems, nil
 }
+
+func (e *RecommendItemDb) GetRecommendItemById(recommendItemId int64) (*model.RecommendItem, error) {
+	if recommendItemId == 0 {
+		return nil, nil
+	}
+	var recommendItem model.RecommendItem
+	_, err := e.db.ID(recommendItemId).Get(&recommendItem)
+	if err != nil {
+		return nil, err
+	}
+	return &recommendItem, nil
+}

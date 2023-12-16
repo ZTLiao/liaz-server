@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type Device struct {
 	DeviceId   string     `json:"deviceId" xorm:"device_id pk"`
@@ -14,6 +17,8 @@ type Device struct {
 	CreatedAt  types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt  types.Time `json:"updatedAt" xorm:"updated_at"`
 }
+
+var _ model.BaseModel = &Device{}
 
 func (e *Device) TableName() string {
 	return "device"

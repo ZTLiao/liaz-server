@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type AdminMenu struct {
 	MenuId      int64      `json:"menuId" xorm:"menu_id pk autoincr BIGINT"`
@@ -14,6 +17,8 @@ type AdminMenu struct {
 	CreatedAt   types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at"`
 }
+
+var _ model.BaseModel = &AdminMenu{}
 
 func (e *AdminMenu) TableName() string {
 	return "admin_menu"

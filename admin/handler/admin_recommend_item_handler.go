@@ -2,6 +2,7 @@ package handler
 
 import (
 	"admin/resp"
+	"business/handler"
 	"business/model"
 	"business/storage"
 	"core/response"
@@ -10,7 +11,8 @@ import (
 )
 
 type AdminRecommendItemHandler struct {
-	RecommendItemDb *storage.RecommendItemDb
+	RecommendItemDb  *storage.RecommendItemDb
+	RecommendHandler *handler.RecommendHandler
 }
 
 func (e *AdminRecommendItemHandler) GetRecommendItemPage(wc *web.WebContext) interface{} {
@@ -52,6 +54,8 @@ func (e *AdminRecommendItemHandler) saveOrUpdateRecommendItem(wc *web.WebContext
 		wc.AbortWithError(err)
 	}
 	e.RecommendItemDb.SaveOrUpdateRecommendItem(recommendItem)
+	recommendId := recommendItem.RecommendId
+	e.RecommendHandler.DelRecommendCache(recommendId)
 }
 
 func (e *AdminRecommendItemHandler) DelRecommendItem(wc *web.WebContext) interface{} {
@@ -60,6 +64,10 @@ func (e *AdminRecommendItemHandler) DelRecommendItem(wc *web.WebContext) interfa
 		recommendItemId, err := strconv.ParseInt(recommendItemIdStr, 10, 64)
 		if err != nil {
 			wc.AbortWithError(err)
+		}
+		recommendItem, err := e.RecommendItemDb.GetRecommendItemById(recommendItemId)
+		if recommendItem != nil {
+			e.RecommendHandler.DelRecommendCache(recommendItem.RecommendId)
 		}
 		e.RecommendItemDb.DelRecommendItem(recommendItemId)
 	}

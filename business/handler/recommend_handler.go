@@ -95,3 +95,19 @@ func (e *RecommendHandler) GetRecommendItems(recommendId int64, recommendType in
 	}
 	return recommendItemResps, nil
 }
+
+func (e *RecommendHandler) DelRecommendCache(recommendId int64) error {
+	recommend, err := e.RecommendDb.GetRecommendById(recommendId)
+	if err != nil {
+		return err
+	}
+	if recommend == nil {
+		return nil
+	}
+	position := recommend.Position
+	err = e.RecommendCache.Del(position)
+	if err != nil {
+		return err
+	}
+	return nil
+}

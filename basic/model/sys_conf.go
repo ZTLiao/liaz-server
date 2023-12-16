@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type SysConf struct {
 	ConfId      int64      `json:"confId" xorm:"conf_id pk autoincr BIGINT"`
@@ -14,6 +17,8 @@ type SysConf struct {
 	CreatedAt   types.Time `json:"createdAt" xorm:"created_at"`
 	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at"`
 }
+
+var _ model.BaseModel = &SysConf{}
 
 func (e *SysConf) TableName() string {
 	return "sys_conf"

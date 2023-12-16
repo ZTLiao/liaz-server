@@ -1,6 +1,9 @@
 package model
 
-import "core/types"
+import (
+	"core/model"
+	"core/types"
+)
 
 type AccountLoginRecord struct {
 	Id         int64      `json:"id" xorm:"id pk BIGINT"`
@@ -19,6 +22,8 @@ type AccountLoginRecord struct {
 	IpRegion   string     `json:"ipRegion" xorm:"ip_region"`
 	CreatedAt  types.Time `json:"createdAt" xorm:"created_at"`
 }
+
+var _ model.BaseModel = &AccountLoginRecord{}
 
 func (e *AccountLoginRecord) TableName() string {
 	return "account_login_record"

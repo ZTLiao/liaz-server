@@ -53,3 +53,7 @@ func (e *RecommendCache) HGetAll(position int8) ([]resp.RecommendResp, error) {
 	}
 	return recommends, nil
 }
+
+func (e *RecommendCache) Del(position int8) error {
+	return e.redis.Del(e.RedisKey(position))
+}
