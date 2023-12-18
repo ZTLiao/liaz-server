@@ -16,6 +16,7 @@ func init() {
 		{
 			new(controller.ClientController).Router(r)
 			new(controller.RecommendController).Router(r)
+			new(controller.CategoryController).Router(r)
 		}
 	})
 }

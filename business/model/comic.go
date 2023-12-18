@@ -13,9 +13,11 @@ type Comic struct {
 	FirstLetter  string     `json:"firstLetter" xorm:"first_letter"`
 	Flag         int8       `json:"flag" xorm:"flag"`
 	CategoryIds  string     `json:"categoryIds" xorm:"category_ids"`
-	Categorys    string     `json:"categorys" xorm:"categorys"`
+	Categories   string     `json:"categories" xorm:"categories"`
 	AuthorIds    string     `json:"authorIds" xorm:"author_ids"`
 	Authors      string     `json:"authors" xorm:"authors"`
+	RegionId     int64      `json:"regionId" xorm:"region_id"`
+	Region       string     `json:"region" xorm:"region"`
 	ChapterNum   int32      `json:"chapterNum" xorm:"chapter_num"`
 	StartTime    types.Time `json:"startTime" xorm:"start_time"`
 	EndTime      types.Time `json:"endTime" xorm:"end_time"`

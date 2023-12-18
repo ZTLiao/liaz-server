@@ -2,6 +2,7 @@ package storage
 
 import (
 	"basic/model"
+	"core/constant"
 
 	"github.com/go-xorm/xorm"
 )
@@ -58,4 +59,13 @@ func (e *CategoryDb) DelCategory(categoryId int64) error {
 		return err
 	}
 	return nil
+}
+
+func (e *CategoryDb) GetValidCategory() ([]model.Category, error) {
+	var categories []model.Category
+	err := e.db.Where("status = ?", constant.YES).OrderBy("seq_no asc").Find(&categories)
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
 }
