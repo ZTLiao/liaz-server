@@ -7,6 +7,7 @@ import (
 	"core/constant"
 	"core/response"
 	"core/web"
+	"sort"
 	"strconv"
 )
 
@@ -39,6 +40,9 @@ func (e *RecommendHandler) Recommend(wc *web.WebContext) interface{} {
 	} else {
 		go e.GetRecommend(int8(position))
 	}
+	sort.Slice(recommendResps, func(i, j int) bool {
+		return recommendResps[i].SeqNo < recommendResps[j].SeqNo
+	})
 	return response.ReturnOK(recommendResps)
 }
 
@@ -62,9 +66,12 @@ func (e *RecommendHandler) GetRecommend(position int8) ([]resp.RecommendResp, er
 		recommendResp.IsShowTitle = recommend.ShowTitle == constant.YES
 		recommendResp.OptType = recommend.OptType
 		recommendResp.OptValue = recommend.OptValue
+		recommendResp.SeqNo = recommend.SeqNo
 		recommendResp.Items = recommendItemResps
 		//设置缓存
-		e.RecommendCache.HSet(int8(position), recommendType, recommendResp)
+		if recommendResp.RecommendId != 0 {
+			e.RecommendCache.HSet(int8(position), recommendType, recommendResp)
+		}
 		recommendResps = append(recommendResps, *recommendResp)
 	}
 	return recommendResps, nil

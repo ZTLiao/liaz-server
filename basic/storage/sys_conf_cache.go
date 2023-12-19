@@ -67,7 +67,7 @@ func (e *SysConfCache) HGetAll() (map[string]model.SysConf, error) {
 	if len(val) == 0 {
 		return nil, nil
 	}
-	sysConfMap = make(map[string]model.SysConf, len(val))
+	sysConfMap = make(map[string]model.SysConf, 0)
 	for k, v := range val {
 		var sysConf model.SysConf
 		err = json.Unmarshal([]byte(v), &sysConf)

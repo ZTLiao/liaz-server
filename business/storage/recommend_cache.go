@@ -42,7 +42,7 @@ func (e *RecommendCache) HGetAll(position int8) ([]resp.RecommendResp, error) {
 	if len(data) == 0 {
 		return nil, nil
 	}
-	var recommends = make([]resp.RecommendResp, len(data))
+	var recommends = make([]resp.RecommendResp, 0)
 	for _, v := range data {
 		var recommend resp.RecommendResp
 		err = json.Unmarshal([]byte(v), &recommend)

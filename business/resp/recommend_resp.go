@@ -7,5 +7,6 @@ type RecommendResp struct {
 	IsShowTitle bool                `json:"isShowTitle"`
 	OptType     int8                `json:"optType"`
 	OptValue    string              `json:"optValue"`
+	SeqNo       int                 `json:"seqNo"`
 	Items       []RecommendItemResp `json:"items"`
 }
