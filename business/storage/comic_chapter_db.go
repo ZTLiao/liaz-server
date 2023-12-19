@@ -23,3 +23,12 @@ func (e *ComicChapterDb) UpgradeChapter(comicId int64) (*model.ComicChapter, err
 	}
 	return &comicChapter, nil
 }
+
+func (e *ComicChapterDb) GetComicChapters(comicId int64) ([]model.ComicChapter, error) {
+	var comicChapters []model.ComicChapter
+	err := e.db.Where("comic_id = ? and status = ?", comicId, constant.YES).OrderBy("seq_no desc").Find(&comicChapters)
+	if err != nil {
+		return nil, err
+	}
+	return comicChapters, nil
+}

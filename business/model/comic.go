@@ -12,6 +12,7 @@ type Comic struct {
 	Description  string     `json:"description" xorm:"description"`
 	FirstLetter  string     `json:"firstLetter" xorm:"first_letter"`
 	Flag         int8       `json:"flag" xorm:"flag"`
+	Direction    int8       `json:"direction" xorm:"direction"`
 	CategoryIds  string     `json:"categoryIds" xorm:"category_ids"`
 	Categories   string     `json:"categories" xorm:"categories"`
 	AuthorIds    string     `json:"authorIds" xorm:"author_ids"`

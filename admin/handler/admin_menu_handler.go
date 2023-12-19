@@ -4,7 +4,6 @@ import (
 	"admin/model"
 	"admin/storage"
 	"core/constant"
-	"core/logger"
 	"core/response"
 	"core/web"
 	"fmt"
@@ -104,7 +103,7 @@ func (e *AdminMenuHandler) DelAdminMenu(wc *web.WebContext) interface{} {
 	if len(menuIdStr) > 0 {
 		menuId, err := strconv.ParseInt(menuIdStr, 10, 64)
 		if err != nil {
-			logger.Error(err.Error())
+			wc.AbortWithError(err)
 		}
 		e.AdminMenuDb.DelAdminMenu(menuId)
 		e.AdminRoleMenuDb.DelAdminRoleMenu(0, menuId)

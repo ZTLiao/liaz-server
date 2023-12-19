@@ -12,7 +12,7 @@ var reader *geoip2.Reader
 func init() {
 	db, err := geoip2.Open("config/GeoLite2-City.mmdb")
 	if err != nil {
-		logger.Fatal(err.Error())
+		logger.Error(err.Error())
 		return
 	}
 	reader = db

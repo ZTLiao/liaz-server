@@ -23,3 +23,12 @@ func (e *ComicDb) GetComicUpgradePage(pageNum int32, pageSize int32) ([]model.Co
 	}
 	return comics, nil
 }
+
+func (e *ComicDb) GetComicById(comicId int64) (*model.Comic, error) {
+	var comic model.Comic
+	_, err := e.db.Where("comic_id = ? and status = ?", comicId, constant.YES).Get(&comic)
+	if err != nil {
+		return nil, err
+	}
+	return &comic, nil
+}

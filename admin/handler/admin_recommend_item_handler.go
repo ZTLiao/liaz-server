@@ -66,6 +66,9 @@ func (e *AdminRecommendItemHandler) DelRecommendItem(wc *web.WebContext) interfa
 			wc.AbortWithError(err)
 		}
 		recommendItem, err := e.RecommendItemDb.GetRecommendItemById(recommendItemId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		if recommendItem != nil {
 			e.RecommendHandler.DelRecommendCache(recommendItem.RecommendId)
 		}
