@@ -71,24 +71,30 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 	comicDetail.SubscribeNum = comic.SubscribeNum
 	comicDetail.HitNum = comic.HitNum
 	comicDetail.Updated = comic.EndTime
+	comicDetail.Description = comic.Description
 	comicDetail.Flag = comic.Flag
 	comicDetail.Direction = comic.Direction
 	if len(comicChapters) > 0 {
-		var chapterMap = make(map[int64][]model.ComicChapterItem, 0)
+		var chapterItemMap = make(map[int64][]model.ComicChapterItem, 0)
 		for _, comicChapterItem := range comicChapterItems {
 			comicChapterId := comicChapterItem.ComicChapterId
-			items, ex := chapterMap[comicChapterId]
+			items, ex := chapterItemMap[comicChapterId]
 			if !ex {
 				items = make([]model.ComicChapterItem, 0)
 			}
 			items = append(items, comicChapterItem)
-			chapterMap[comicChapterId] = items
+			chapterItemMap[comicChapterId] = items
 		}
-		var chapters = make([]resp.ComicChapterResp, 0)
+		var chapterMap = make(map[int8][]resp.ComicChapterResp, 0)
 		for _, comicChapter := range comicChapters {
-			var paths = make([]string, 0)
 			comicChapterId := comicChapter.ComicChapterId
-			items, ex := chapterMap[comicChapterId]
+			chapterType := comicChapter.ChapterType
+			chapters, ex := chapterMap[chapterType]
+			if !ex {
+				chapters = make([]resp.ComicChapterResp, 0)
+			}
+			var paths = make([]string, 0)
+			items, ex := chapterItemMap[comicChapterId]
 			if ex {
 				sort.Slice(items, func(i, j int) bool {
 					return items[i].SeqNo < items[j].SeqNo
@@ -102,13 +108,25 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 				ComicId:        comicChapter.ComicId,
 				Flag:           comic.Flag,
 				ChapterName:    comicChapter.ChapterName,
+				ChapterType:    comicChapter.ChapterType,
+				PageNum:        len(paths),
 				SeqNo:          int(comicChapter.SeqNo),
-				Paths:          paths,
 				Direction:      comic.Direction,
+				UpdatedAt:      comicChapter.UpdatedAt,
+				Paths:          paths,
 			}
 			chapters = append(chapters, chapter)
+			chapterMap[chapterType] = chapters
 		}
-		comicDetail.Chapters = chapters
+		var chapterTypes []resp.ComicChapterTypeResp
+		for k, v := range chapterMap {
+			chapterTypes = append(chapterTypes, resp.ComicChapterTypeResp{
+				ChapterType: k,
+				Flag:        comic.Flag,
+				Chapters:    v,
+			})
+		}
+		comicDetail.ChapterTypes = chapterTypes
 	}
 	return response.ReturnOK(comicDetail)
 }

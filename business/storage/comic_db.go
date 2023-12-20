@@ -17,7 +17,7 @@ func NewComicDb(db *xorm.Engine) *ComicDb {
 
 func (e *ComicDb) GetComicUpgradePage(pageNum int32, pageSize int32) ([]model.Comic, error) {
 	var comics []model.Comic
-	err := e.db.Where("status = ?", constant.YES).OrderBy("end_time desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&comics)
+	err := e.db.Where("status = ?", constant.PASS).OrderBy("end_time desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&comics)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (e *ComicDb) GetComicUpgradePage(pageNum int32, pageSize int32) ([]model.Co
 
 func (e *ComicDb) GetComicById(comicId int64) (*model.Comic, error) {
 	var comic model.Comic
-	_, err := e.db.Where("comic_id = ? and status = ?", comicId, constant.YES).Get(&comic)
+	_, err := e.db.Where("comic_id = ? and status = ?", comicId, constant.PASS).Get(&comic)
 	if err != nil {
 		return nil, err
 	}

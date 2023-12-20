@@ -17,7 +17,7 @@ func NewComicChapterDb(db *xorm.Engine) *ComicChapterDb {
 
 func (e *ComicChapterDb) UpgradeChapter(comicId int64) (*model.ComicChapter, error) {
 	var comicChapter model.ComicChapter
-	_, err := e.db.Where("comic_id = ? and status = ?", comicId, constant.YES).OrderBy("seq_no desc").Limit(1, 0).Get(&comicChapter)
+	_, err := e.db.Where("comic_id = ? and status = ?", comicId, constant.PASS).OrderBy("seq_no desc").Limit(1, 0).Get(&comicChapter)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (e *ComicChapterDb) UpgradeChapter(comicId int64) (*model.ComicChapter, err
 
 func (e *ComicChapterDb) GetComicChapters(comicId int64) ([]model.ComicChapter, error) {
 	var comicChapters []model.ComicChapter
-	err := e.db.Where("comic_id = ? and status = ?", comicId, constant.YES).OrderBy("seq_no desc").Find(&comicChapters)
+	err := e.db.Where("comic_id = ? and status = ?", comicId, constant.PASS).OrderBy("seq_no desc").Find(&comicChapters)
 	if err != nil {
 		return nil, err
 	}
