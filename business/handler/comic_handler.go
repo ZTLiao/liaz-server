@@ -171,3 +171,16 @@ func (e *ComicHandler) ComicUpgrade(wc *web.WebContext) interface{} {
 	}
 	return response.ReturnOK(comicUpgrades)
 }
+
+func (e *ComicHandler) GetComicByCategory(wc *web.WebContext) interface{} {
+	categoryIdStr := wc.Query("categoryId")
+	if len(categoryIdStr) == 0 {
+		return response.Success()
+	}
+	categoryId, err := strconv.ParseInt(categoryIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	e.ComicDb.GetComicByCategory(categoryId)
+	return response.Success()
+}

@@ -32,3 +32,7 @@ func (e *ComicDb) GetComicById(comicId int64) (*model.Comic, error) {
 	}
 	return &comic, nil
 }
+
+func (e *ComicDb) GetComicByCategory(categoryId int64) {
+
+}
