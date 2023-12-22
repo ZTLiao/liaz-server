@@ -1,0 +1,7 @@
+package enums
+
+const (
+	ASSET_TYPE_FOR_ALL   = 0
+	ASSET_TYPE_FOR_COMIC = 1
+	ASSET_TYPE_FOR_NOVEL = 2
+)

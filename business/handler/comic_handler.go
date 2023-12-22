@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"business/enums"
 	"business/model"
 	"business/resp"
 	"business/storage"
@@ -181,6 +182,37 @@ func (e *ComicHandler) GetComicByCategory(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	e.ComicDb.GetComicByCategory(categoryId)
-	return response.Success()
+	pageNum, err := strconv.ParseInt(wc.DefaultQuery("pageNum", "1"), 10, 32)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	pageSize, err := strconv.ParseInt(wc.DefaultQuery("pageSize", "10"), 10, 32)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	comics, err := e.ComicDb.GetComicByCategory(categoryId, int32(pageNum), int32(pageSize))
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if len(comics) == 0 {
+		return response.Success()
+	}
+	var categoryItems = make([]resp.CategoryItemResp, 0)
+	for _, comic := range comics {
+		comicId := comic.ComicId
+		comicChapter, err := e.ComicChapterDb.UpgradeChapter(comicId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		var categoryItem = &resp.CategoryItemResp{
+			CategoryId:     categoryId,
+			AssetType:      enums.ASSET_TYPE_FOR_COMIC,
+			Title:          comic.Title,
+			Cover:          comic.Cover,
+			UpgradeChapter: comicChapter.ChapterName,
+			ObjId:          comicChapter.ComicChapterId,
+		}
+		categoryItems = append(categoryItems, *categoryItem)
+	}
+	return response.ReturnOK(categoryItems)
 }

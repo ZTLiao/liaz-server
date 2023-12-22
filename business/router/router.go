@@ -20,6 +20,7 @@ func init() {
 			new(controller.RecommendController).Router(r)
 			new(controller.CategoryController).Router(r)
 			new(controller.ComicController).Router(r)
+			new(controller.CategorySearchController).Router(r)
 		}
 	})
 }

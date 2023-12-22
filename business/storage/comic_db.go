@@ -33,6 +33,11 @@ func (e *ComicDb) GetComicById(comicId int64) (*model.Comic, error) {
 	return &comic, nil
 }
 
-func (e *ComicDb) GetComicByCategory(categoryId int64) {
-
+func (e *ComicDb) GetComicByCategory(categoryId int64, pageNum int32, pageSize int32) ([]model.Comic, error) {
+	var comics []model.Comic
+	err := e.db.Where("find_in_set(?, category_ids) and status = ?", categoryId, constant.PASS).OrderBy("end_time desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&comics)
+	if err != nil {
+		return nil, err
+	}
+	return comics, nil
 }
