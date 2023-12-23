@@ -32,3 +32,12 @@ func (e *ComicChapterDb) GetComicChapters(comicId int64) ([]model.ComicChapter, 
 	}
 	return comicChapters, nil
 }
+
+func (e *ComicChapterDb) GetComicChapterById(comicChapterId int64) (*model.ComicChapter, error) {
+	var comicChapter model.ComicChapter
+	_, err := e.db.ID(comicChapterId).Get(&comicChapter)
+	if err != nil {
+		return nil, err
+	}
+	return &comicChapter, nil
+}

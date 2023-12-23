@@ -21,4 +21,5 @@ func (e *ComicController) Router(iWebRoutes web.IWebRoutes) {
 	}
 	iWebRoutes.GET("/comic/:comicId", comicHandler.ComicDetail)
 	iWebRoutes.GET("/comic/upgrade", comicHandler.ComicUpgrade)
+	iWebRoutes.GET("/comic/catalogue", comicHandler.ComicCatalogue)
 }

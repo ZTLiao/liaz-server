@@ -21,6 +21,7 @@ func init() {
 			new(controller.CategoryController).Router(r)
 			new(controller.ComicController).Router(r)
 			new(controller.CategorySearchController).Router(r)
+			new(controller.ComicChapterController).Router(r)
 		}
 	})
 }

@@ -28,20 +28,28 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	comic, err := e.ComicDb.GetComicById(comicId)
+	comicDetail, err := e.GetComicDetail(comicId)
 	if err != nil {
 		wc.AbortWithError(err)
 	}
+	return response.ReturnOK(comicDetail)
+}
+
+func (e *ComicHandler) GetComicDetail(comicId int64) (*resp.ComicDetailResp, error) {
+	comic, err := e.ComicDb.GetComicById(comicId)
+	if err != nil {
+		return nil, err
+	}
 	if comic == nil {
-		return response.Success()
+		return nil, nil
 	}
 	comicChapters, err := e.ComicChapterDb.GetComicChapters(comicId)
 	if err != nil {
-		wc.AbortWithError(err)
+		return nil, err
 	}
-	comicChapterItems, err := e.ComicChapterItemDb.GetComicChapterItems(comicId)
+	comicChapterItems, err := e.ComicChapterItemDb.GetComicChapterItemByComicId(comicId)
 	if err != nil {
-		wc.AbortWithError(err)
+		return nil, err
 	}
 	var comicDetail = new(resp.ComicDetailResp)
 	comicDetail.ComicId = comic.ComicId
@@ -52,7 +60,7 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 	for _, v := range authorIds {
 		authorId, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
-			wc.AbortWithError(err)
+			return nil, err
 		}
 		authorIdList = append(authorIdList, authorId)
 	}
@@ -63,7 +71,7 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 	for _, v := range categoryIds {
 		categoryId, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
-			wc.AbortWithError(err)
+			return nil, err
 		}
 		categoryIdList = append(categoryIdList, categoryId)
 	}
@@ -129,7 +137,7 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 		}
 		comicDetail.ChapterTypes = chapterTypes
 	}
-	return response.ReturnOK(comicDetail)
+	return comicDetail, nil
 }
 
 func (e *ComicHandler) ComicUpgrade(wc *web.WebContext) interface{} {
@@ -215,4 +223,38 @@ func (e *ComicHandler) GetComicByCategory(wc *web.WebContext) interface{} {
 		categoryItems = append(categoryItems, *categoryItem)
 	}
 	return response.ReturnOK(categoryItems)
+}
+
+func (e *ComicHandler) ComicCatalogue(wc *web.WebContext) interface{} {
+	comicChapterIdStr := wc.Query("comicChapterId")
+	if len(comicChapterIdStr) == 0 {
+		return response.Success()
+	}
+	comicChapterId, err := strconv.ParseInt(comicChapterIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	comicChapter, err := e.ComicChapterDb.GetComicChapterById(comicChapterId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if comicChapter == nil {
+		return response.Success()
+	}
+	comicDetail, err := e.GetComicDetail(comicChapter.ComicId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	chatperTypes := comicDetail.ChapterTypes
+	if len(chatperTypes) == 0 {
+		return response.Success()
+	}
+	var chapters []resp.ComicChapterResp
+	for _, v := range chatperTypes {
+		if v.ChapterType == comicChapter.ChapterType {
+			chapters = v.Chapters
+			break
+		}
+	}
+	return response.ReturnOK(chapters)
 }
