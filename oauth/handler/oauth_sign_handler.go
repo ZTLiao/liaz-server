@@ -11,6 +11,7 @@ import (
 	"core/response"
 	"core/types"
 	"core/web"
+	"net/http"
 	oauthEnums "oauth/enums"
 	"oauth/resp"
 	"strconv"
@@ -47,6 +48,9 @@ func (e *OauthSignHandler) SignIn(wc *web.WebContext) interface{} {
 		if err != nil {
 			wc.AbortWithError(err)
 		}
+	}
+	if account == nil {
+		return response.ReturnError(http.StatusForbidden, constant.USERNAME_NOT_EXISTS)
 	}
 	userId := account.UserId
 	//设备信息

@@ -5,7 +5,9 @@ import (
 	"basic/model"
 	"core/constant"
 	"core/errors"
+	"core/types"
 	"net/http"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -42,11 +44,14 @@ func (e *AccountDb) SignIn(username string, password string) (*model.Account, er
 }
 
 func (e *AccountDb) SignUpForUsername(username string, password string, flag int8) (int64, error) {
+	var now = types.Time(time.Now())
 	var account = new(model.Account)
 	account.Username = username
 	account.Password = password
 	account.Flag = flag
 	account.Status = enums.ACCOUNT_STATUS_OF_ENABLE
+	account.CreatedAt = now
+	account.UpdatedAt = now
 	count, err := e.db.Where("username = ?", username).Count(account)
 	if err != nil {
 		return 0, err

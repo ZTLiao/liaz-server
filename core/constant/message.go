@@ -1,12 +1,13 @@
 package constant
 
 const (
-	UNAUTHORIZED    = "未授权"
-	ILLEGAL_REQUEST = "非法请求"
-	LOGIN_ERROR     = "账号或密码错误"
-	UPLOAD_ERROR    = "上传失败"
-	USERNAME_EMPTY  = "账号不允许为空"
-	PASSWORD_EMPTY  = "密码不允许为空"
-	NICKNAME_EMPTY  = "昵称不允许为空"
-	USERNAME_EXISTS = "账号已存在"
+	UNAUTHORIZED        = "未授权"
+	ILLEGAL_REQUEST     = "非法请求"
+	LOGIN_ERROR         = "账号或密码错误"
+	UPLOAD_ERROR        = "上传失败"
+	USERNAME_EMPTY      = "账号不允许为空"
+	PASSWORD_EMPTY      = "密码不允许为空"
+	NICKNAME_EMPTY      = "昵称不允许为空"
+	USERNAME_EXISTS     = "账号已存在"
+	USERNAME_NOT_EXISTS = "账号不存在"
 )
