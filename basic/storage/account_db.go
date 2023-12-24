@@ -65,3 +65,12 @@ func (e *AccountDb) SignUpForUsername(username string, password string, flag int
 	}
 	return account.UserId, nil
 }
+
+func (e *AccountDb) GetAccountById(userId int64) (*model.Account, error) {
+	var account model.Account
+	_, err := e.db.ID(userId).Get(&account)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
+}

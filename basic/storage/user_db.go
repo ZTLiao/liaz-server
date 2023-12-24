@@ -3,7 +3,9 @@ package storage
 import (
 	"basic/enums"
 	"basic/model"
+	"core/types"
 	"core/utils"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -40,6 +42,7 @@ func (e *UserDb) UpdateLocation(userId int64, ipAddr string) error {
 }
 
 func (e *UserDb) SignUp(userId int64, nickname string, avatar string, gender int8, userType int8) error {
+	var now = types.Time(time.Now())
 	var user = new(model.User)
 	user.UserId = userId
 	user.Nickname = nickname
@@ -47,6 +50,8 @@ func (e *UserDb) SignUp(userId int64, nickname string, avatar string, gender int
 	user.Gender = gender
 	user.Type = userType
 	user.Status = enums.USER_STATUS_OF_ENABLE
+	user.CreatedAt = now
+	user.UpdatedAt = now
 	count, err := e.db.Where("user_id = ?", userId).Count(user)
 	if err != nil {
 		return err
@@ -63,4 +68,13 @@ func (e *UserDb) SignUp(userId int64, nickname string, avatar string, gender int
 		}
 	}
 	return nil
+}
+
+func (e *UserDb) GetUserById(userId int64) (*model.User, error) {
+	var user model.User
+	_, err := e.db.ID(userId).Get(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

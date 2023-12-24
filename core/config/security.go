@@ -6,4 +6,5 @@ type Security struct {
 	PublicKey  string   `yaml:"publicKey"`
 	PrivateKey string   `yaml:"privateKey"`
 	Excludes   []string `yaml:"excludes"`
+	Authorizes []string `yaml:"authorizes"`
 }

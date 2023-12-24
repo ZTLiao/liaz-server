@@ -17,6 +17,7 @@ const (
 	DASHED      string = "-"
 	SLASH       string = "/"
 	DOT         string = "."
+	SPACE       string = " "
 )
 
 // 单词全部转化为大写
