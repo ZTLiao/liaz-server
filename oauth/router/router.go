@@ -72,7 +72,8 @@ func init() {
 		})
 		r := wrg.Group("/oauth")
 		{
-			new(controller.OauthSignContoller).Router(r)
+			new(controller.OAuthSignContoller).Router(r)
+			new(controller.OAuthRefreshController).Router(r)
 		}
 	})
 }

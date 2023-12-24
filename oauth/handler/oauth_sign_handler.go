@@ -19,8 +19,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type OauthSignHandler struct {
-	Oauth2Config         *oauth2.Config
+type OAuthSignHandler struct {
+	OAuth2Config         *oauth2.Config
 	AccountDb            *storage.AccountDb
 	AccountLoginRecordDb *storage.AccountLoginRecordDb
 	UserDeviceDb         *storage.UserDeviceDb
@@ -28,7 +28,7 @@ type OauthSignHandler struct {
 	OAuth2TokenCache     *storage.OAuth2TokenCache
 }
 
-func (e *OauthSignHandler) SignIn(wc *web.WebContext) interface{} {
+func (e *OAuthSignHandler) SignIn(wc *web.WebContext) interface{} {
 	username := wc.PostForm("username")
 	password := wc.PostForm("password")
 	grantType := wc.PostForm("grantType")
@@ -36,7 +36,7 @@ func (e *OauthSignHandler) SignIn(wc *web.WebContext) interface{} {
 	var account *model.Account
 	var err error
 	if grantType == oauthEnums.GRANT_TYPE_FOR_PASSWORD {
-		token, err = e.Oauth2Config.PasswordCredentialsToken(context.Background(), username, password)
+		token, err = e.OAuth2Config.PasswordCredentialsToken(context.Background(), username, password)
 		if err != nil {
 			if e, ok := err.(*oauth2.RetrieveError); ok {
 				wc.Error("errorCode : %s, errorDescription : %s", e.ErrorCode, e.ErrorDescription)
@@ -74,7 +74,7 @@ func (e *OauthSignHandler) SignIn(wc *web.WebContext) interface{} {
 	})
 }
 
-func (e *OauthSignHandler) SignUp(wc *web.WebContext) interface{} {
+func (e *OAuthSignHandler) SignUp(wc *web.WebContext) interface{} {
 	password := wc.PostForm("password")
 	nickname := wc.PostForm("nickname")
 	avatar := wc.PostForm("avatar")

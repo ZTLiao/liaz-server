@@ -20,6 +20,7 @@ func (e *Oauth2) Init() {
 	system.SetOauth2Config(&oauth2.Config{
 		ClientID:     e.ClientId,
 		ClientSecret: e.ClientSecret,
+		Scopes:       []string{"all"},
 		Endpoint: oauth2.Endpoint{
 			TokenURL: e.AuthServerUrl + constant.OAUTH_TOKEN,
 		},

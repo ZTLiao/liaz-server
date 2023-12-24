@@ -26,6 +26,7 @@ func SecurityHandler(security *config.Security, oauth2TokenCache *storage.OAuth2
 		}
 		if !isExist {
 			c.Next()
+			return
 		}
 		clientToken := c.Request.Header.Get(constant.AUTHORIZATION)
 		if len(clientToken) == 0 {
@@ -33,7 +34,14 @@ func SecurityHandler(security *config.Security, oauth2TokenCache *storage.OAuth2
 			c.Abort()
 			return
 		}
-		clientToken = strings.Split(clientToken, utils.SPACE)[1]
+		tokenArray := strings.Split(clientToken, utils.SPACE)
+		tokenType := tokenArray[0]
+		if tokenType != constant.TOKEN_TYPE {
+			c.JSON(http.StatusUnauthorized, response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED))
+			c.Abort()
+			return
+		}
+		clientToken = tokenArray[1]
 		userIdStr := c.Request.Header.Get(constant.X_USER_ID)
 		if len(userIdStr) == 0 {
 			c.JSON(http.StatusUnauthorized, response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED))

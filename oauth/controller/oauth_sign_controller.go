@@ -8,17 +8,17 @@ import (
 	"oauth/handler"
 )
 
-type OauthSignContoller struct {
+type OAuthSignContoller struct {
 }
 
-var _ web.IWebController = &OauthSignContoller{}
+var _ web.IWebController = &OAuthSignContoller{}
 
-func (e *OauthSignContoller) Router(iWebRoutes web.IWebRoutes) {
+func (e *OAuthSignContoller) Router(iWebRoutes web.IWebRoutes) {
 	oauth2Config := system.GetOauth2Config()
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
-	var oauthSignHander = handler.OauthSignHandler{
-		Oauth2Config:         oauth2Config,
+	var oauthSignHander = handler.OAuthSignHandler{
+		OAuth2Config:         oauth2Config,
 		AccountDb:            storage.NewAccountDb(db),
 		AccountLoginRecordDb: storage.NewAccountLoginRecordDb(db),
 		UserDeviceDb:         storage.NewUserDeviceDb(db),
