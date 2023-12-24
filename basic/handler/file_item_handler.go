@@ -4,12 +4,14 @@ import (
 	"basic/model"
 	"basic/storage"
 	"core/constant"
+	"core/errors"
 	"core/file"
 	"core/redis"
 	"core/response"
 	"core/utils"
 	"core/web"
 	"io"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -44,6 +46,14 @@ func (e *FileItemHandler) UploadFile(wc *web.WebContext) interface{} {
 		return response.Fail(err.Error())
 	}
 	fileName := header.Filename
+	fileItem, err := e.Upload(bucketName, fileName, header.Size, data)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(fileItem)
+}
+
+func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize int64, data []byte) (*model.FileItem, error) {
 	//获取后缀
 	var suffix string
 	if strings.Contains(fileName, utils.DOT) {
@@ -52,29 +62,32 @@ func (e *FileItemHandler) UploadFile(wc *web.WebContext) interface{} {
 	//判断文件类型
 	kind, err := filetype.Match(data)
 	if err != nil {
-		wc.AbortWithError(err)
+		return nil, err
 	}
 	fileType := kind.MIME.Value
 	timestamp := strconv.FormatInt(time.Now().UnixMicro(), 10)
 	//加锁
 	var redisLock = redis.NewRedisLock(timestamp)
 	if !redisLock.Lock() {
-		return response.Fail(constant.UPLOAD_ERROR)
+		return nil, errors.New(http.StatusInternalServerError, constant.UPLOAD_ERROR)
 	}
 	fileInfo, err := e.fileTemplate.PutObject(bucketName, timestamp, data)
+	if err != nil {
+		return nil, err
+	}
 	if fileInfo == nil {
 		redisLock.Unlock()
-		return response.Fail(constant.UPLOAD_ERROR)
+		return nil, errors.New(http.StatusInternalServerError, constant.UPLOAD_ERROR)
 	}
 	var fileItem = model.FileItem{}
 	fileItem.BucketName = bucketName
 	fileItem.ObjectName = fileName
-	fileItem.Size = header.Size
+	fileItem.Size = fileSize
 	fileItem.Path = utils.SLASH + bucketName + utils.SLASH + timestamp
 	fileItem.UnqiueId = timestamp
 	fileItem.Suffix = suffix
 	fileItem.FileType = fileType
 	e.fileItemDb.SaveFileItem(&fileItem)
 	redisLock.Unlock()
-	return response.ReturnOK(fileItem)
+	return &fileItem, nil
 }

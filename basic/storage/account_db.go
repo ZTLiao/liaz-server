@@ -57,7 +57,7 @@ func (e *AccountDb) SignUpForUsername(username string, password string, flag int
 		return 0, err
 	}
 	if count > 0 {
-		return 0, errors.New(http.StatusInternalServerError, constant.USERNAME_EXISTS)
+		return 0, errors.New(http.StatusForbidden, constant.USERNAME_EXISTS)
 	}
 	_, err = e.db.Insert(account)
 	if err != nil {

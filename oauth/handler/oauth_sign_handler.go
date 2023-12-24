@@ -40,7 +40,7 @@ func (e *OauthSignHandler) SignIn(wc *web.WebContext) interface{} {
 		if err != nil {
 			if e, ok := err.(*oauth2.RetrieveError); ok {
 				wc.Error("errorCode : %s, errorDescription : %s", e.ErrorCode, e.ErrorDescription)
-				return response.Fail(e.ErrorDescription)
+				return response.Fail(constant.USERNAME_OR_PASSWORD_ERROR)
 			}
 			wc.AbortWithError(err)
 		}
