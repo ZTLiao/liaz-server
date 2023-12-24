@@ -29,6 +29,7 @@ func init() {
 			new(controller.CategorySearchController).Router(r)
 			new(controller.ComicChapterController).Router(r)
 			new(controller.FileController).Router(r)
+			new(controller.UserController).Router(r)
 		}
 	})
 }
