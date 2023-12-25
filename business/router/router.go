@@ -30,6 +30,7 @@ func init() {
 			new(controller.ComicChapterController).Router(r)
 			new(controller.FileController).Router(r)
 			new(controller.UserController).Router(r)
+			new(controller.NovelController).Router(r)
 		}
 	})
 }
