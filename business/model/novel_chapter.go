@@ -12,8 +12,8 @@ type NovelChapter struct {
 	ChapterType    int8       `json:"chapterType" xorm:"chapter_type"`
 	PageNum        int32      `json:"pageNum" xorm:"page_num"`
 	SeqNo          int64      `json:"seqNo" xorm:"seq_no"`
-	CreatedAt      types.Time `json:"createdAt" xorm:"created_at"`
-	UpdatedAt      types.Time `json:"updatedAt" xorm:"updated_at"`
+	CreatedAt      types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	UpdatedAt      types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
 }
 
 var _ model.BaseModel = &NovelChapter{}

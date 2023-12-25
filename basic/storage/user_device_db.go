@@ -3,6 +3,8 @@ package storage
 import (
 	"basic/model"
 	"core/constant"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -19,6 +21,7 @@ func (e *UserDeviceDb) SaveOrUpdateUserDevice(userId int64, deviceId string) err
 	if userId == 0 || len(deviceId) == 0 {
 		return nil
 	}
+	var now = types.Time(time.Now())
 	var userDevice = new(model.UserDevice)
 	userDevice.UserId = userId
 	userDevice.DeviceId = deviceId
@@ -30,11 +33,13 @@ func (e *UserDeviceDb) SaveOrUpdateUserDevice(userId int64, deviceId string) err
 	}
 	userDevice.IsUsed = constant.YES
 	if count == 0 {
+		userDevice.CreatedAt = now
 		_, err := e.db.Insert(userDevice)
 		if err != nil {
 			return err
 		}
 	} else {
+		userDevice.UpdatedAt = now
 		_, err := e.db.Update(userDevice)
 		if err != nil {
 			return err

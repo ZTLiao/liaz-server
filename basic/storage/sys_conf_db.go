@@ -3,6 +3,8 @@ package storage
 import (
 	"basic/model"
 	"core/constant"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -16,6 +18,9 @@ func NewSysConfDb(db *xorm.Engine) *SysConfDb {
 }
 
 func (e *SysConfDb) SaveSysConf(sysConf *model.SysConf) (*model.SysConf, error) {
+	var now = types.Time(time.Now())
+	sysConf.CreatedAt = now
+	sysConf.UpdatedAt = now
 	_, err := e.db.Insert(sysConf)
 	if err != nil {
 		return nil, err

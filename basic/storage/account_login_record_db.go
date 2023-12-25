@@ -3,7 +3,9 @@ package storage
 import (
 	"basic/device"
 	"basic/model"
+	"core/types"
 	"core/utils"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -17,6 +19,7 @@ func NewAccountLoginRecordDb(db *xorm.Engine) *AccountLoginRecordDb {
 }
 
 func (e *AccountLoginRecordDb) InsertAccountLoginRecord(userId int64, deviceInfo *device.DeviceInfo) (*model.AccountLoginRecord, error) {
+	var now = types.Time(time.Now())
 	clientIp := deviceInfo.ClientIp
 	ipRegion, _ := utils.GetAddress(clientIp)
 	var record = &model.AccountLoginRecord{
@@ -33,6 +36,7 @@ func (e *AccountLoginRecordDb) InsertAccountLoginRecord(userId int64, deviceInfo
 		NetType:    deviceInfo.NetType,
 		ClientIp:   deviceInfo.ClientIp,
 		IpRegion:   ipRegion,
+		CreatedAt:  now,
 	}
 	_, err := e.db.Insert(record)
 	if err != nil {

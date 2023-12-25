@@ -2,6 +2,8 @@ package storage
 
 import (
 	"basic/model"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -15,6 +17,9 @@ func NewFileItemDb(db *xorm.Engine) *FileItemDb {
 }
 
 func (e *FileItemDb) SaveFileItem(fileItem *model.FileItem) (*model.FileItem, error) {
+	var now = types.Time(time.Now())
+	fileItem.CreatedAt = now
+	fileItem.UpdatedAt = now
 	_, err := e.db.Insert(fileItem)
 	if err != nil {
 		return nil, err

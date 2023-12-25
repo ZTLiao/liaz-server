@@ -16,8 +16,8 @@ type AdminUser struct {
 	Email        string     `json:"email" xorm:"email"`
 	Introduction string     `json:"introduction" xorm:"introduction"`
 	Status       int8       `json:"status" xorm:"status"`
-	CreatedAt    types.Time `json:"createdAt" xorm:"created_at"`
-	UpdatedAt    types.Time `json:"updatedAt" xorm:"updated_at"`
+	CreatedAt    types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	UpdatedAt    types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
 }
 
 var _ model.BaseModel = &AdminUser{}

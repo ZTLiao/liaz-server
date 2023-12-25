@@ -3,7 +3,9 @@ package storage
 import (
 	"basic/device"
 	"basic/model"
+	"core/types"
 	"core/utils"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -17,6 +19,7 @@ func NewClientInitRecordDb(db *xorm.Engine) *ClientInitRecordDb {
 }
 
 func (e *ClientInitRecordDb) InsertClientInitRecord(deviceInfo *device.DeviceInfo) error {
+	var now = types.Time(time.Now())
 	clientIp := deviceInfo.ClientIp
 	ipRegion, err := utils.GetAddress(clientIp)
 	if err != nil {
@@ -35,6 +38,7 @@ func (e *ClientInitRecordDb) InsertClientInitRecord(deviceInfo *device.DeviceInf
 		NetType:    deviceInfo.NetType,
 		ClientIp:   deviceInfo.ClientIp,
 		IpRegion:   ipRegion,
+		CreatedAt:  now,
 	})
 	if err != nil {
 		return err

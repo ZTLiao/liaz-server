@@ -2,6 +2,8 @@ package storage
 
 import (
 	"admin/model"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -54,6 +56,7 @@ func (e *AdminMenuDb) GetAdminMenuList() ([]model.AdminMenu, error) {
 }
 
 func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) error {
+	var now = types.Time(time.Now())
 	menuId := adminMenu.MenuId
 	name := adminMenu.Name
 	path := adminMenu.Path
@@ -63,12 +66,14 @@ func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) error {
 			return err
 		}
 		if count == 0 {
+			adminMenu.CreatedAt = now
 			_, err := e.db.Insert(adminMenu)
 			if err != nil {
 				return err
 			}
 		}
 	} else {
+		adminMenu.UpdatedAt = now
 		_, err := e.db.ID(menuId).Update(adminMenu)
 		if err != nil {
 			return err

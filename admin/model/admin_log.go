@@ -10,7 +10,7 @@ type AdminLog struct {
 	AdminId   int64      `json:"adminId" xorm:"admin_id"`
 	Uri       string     `json:"uri" xorm:"uri"`
 	Params    string     `json:"params" xorm:"params"`
-	CreatedAt types.Time `json:"createdAt" xorm:"created_at"`
+	CreatedAt types.Time `json:"createdAt" xorm:"created_at timestampz created"`
 }
 
 var _ model.BaseModel = &AdminLog{}

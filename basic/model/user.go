@@ -18,8 +18,8 @@ type User struct {
 	City        string     `json:"city" xorm:"city"`
 	Type        int8       `json:"type" xorm:"type"`
 	Status      int8       `json:"status" xorm:"status"`
-	CreatedAt   types.Time `json:"createdAt" xorm:"created_at"`
-	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at"`
+	CreatedAt   types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
 }
 
 var _ model.BaseModel = &User{}

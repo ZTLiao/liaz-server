@@ -1,14 +1,15 @@
 package handler
 
 import (
-	"business/enums"
+	"business/resp"
+	"business/storage"
 	"core/response"
 	"core/web"
 	"strconv"
 )
 
 type CategorySearchHandler struct {
-	ComicHandler *ComicHandler
+	AssetDb *storage.AssetDb
 }
 
 func (e *CategorySearchHandler) GetContent(wc *web.WebContext) interface{} {
@@ -20,12 +21,31 @@ func (e *CategorySearchHandler) GetContent(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	if enums.ASSET_TYPE_FOR_ALL == assetType {
-
-	} else if enums.ASSET_TYPE_FOR_COMIC == assetType {
-		return e.ComicHandler.GetComicByCategory(wc)
-	} else if enums.ASSET_TYPE_FOR_NOVEL == assetType {
-
+	categoryIdStr := wc.Query("categoryId")
+	if len(categoryIdStr) == 0 {
+		return response.Success()
 	}
-	return response.Success()
+	categoryId, err := strconv.ParseInt(categoryIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	assets, err := e.AssetDb.GetAssetByCategoryId(int8(assetType), categoryId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if len(assets) == 0 {
+		return response.Success()
+	}
+	var categoryItems = make([]resp.CategoryItemResp, 0)
+	for _, asset := range assets {
+		categoryItems = append(categoryItems, resp.CategoryItemResp{
+			CategoryId:     categoryId,
+			AssetType:      asset.AssetType,
+			Title:          asset.Title,
+			Cover:          asset.Cover,
+			UpgradeChapter: asset.UpgradeChapter,
+			ObjId:          asset.ObjId,
+		})
+	}
+	return response.ReturnOK(categoryItems)
 }

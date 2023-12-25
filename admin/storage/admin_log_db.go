@@ -2,7 +2,9 @@ package storage
 
 import (
 	"admin/model"
+	"core/types"
 	"encoding/json"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -16,9 +18,11 @@ func NewAdminLogDb(db *xorm.Engine) *AdminLogDb {
 }
 
 func (e *AdminLogDb) AddLog(adminId int64, uri string, headers map[string]any, queryParams map[string]any, formParams map[string]any, bodyParams string) error {
+	var now = types.Time(time.Now())
 	var adminLog = new(model.AdminLog)
 	adminLog.AdminId = adminId
 	adminLog.Uri = uri
+	adminLog.CreatedAt = now
 	headersJson, err := json.Marshal(headers)
 	if err != nil {
 		return err

@@ -3,6 +3,7 @@ package storage
 import (
 	"admin/model"
 	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 	"github.com/mssola/user_agent"
@@ -17,6 +18,7 @@ func NewAdminLoginRecordDb(db *xorm.Engine) *AdminLoginRecordDb {
 }
 
 func (e *AdminLoginRecordDb) AddRecord(adminId int64, clientIp string, userAgent string) error {
+	var now = types.Time(time.Now())
 	ua := user_agent.New(userAgent)
 	var record = new(model.AdminLoginRecord)
 	record.AdminId = adminId
@@ -32,6 +34,7 @@ func (e *AdminLoginRecordDb) AddRecord(adminId int64, clientIp string, userAgent
 	record.BrowserName = browserName
 	record.BrowserVersion = browserVersion
 	record.ClientIp = clientIp
+	record.CreatedAt = now
 	if _, err := e.db.Insert(record); err != nil {
 		return err
 	}

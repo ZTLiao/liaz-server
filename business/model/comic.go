@@ -25,8 +25,8 @@ type Comic struct {
 	SubscribeNum int32      `json:"subscribeNum" xorm:"subscribe_num"`
 	HitNum       int32      `json:"hitNum" xorm:"hit_num"`
 	Status       int8       `json:"status" xorm:"status"`
-	CreatedAt    types.Time `json:"createdAt" xorm:"created_at"`
-	UpdatedAt    types.Time `json:"updatedAt" xorm:"updated_at"`
+	CreatedAt    types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	UpdatedAt    types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
 }
 
 var _ model.BaseModel = &Comic{}

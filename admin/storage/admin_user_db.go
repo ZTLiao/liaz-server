@@ -3,6 +3,8 @@ package storage
 import (
 	"admin/enums"
 	"admin/model"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -38,13 +40,16 @@ func (e *AdminUserDb) GetAdminUserList() ([]model.AdminUser, error) {
 }
 
 func (e *AdminUserDb) SaveOrUpdateAdminUser(adminUser *model.AdminUser) error {
+	var now = types.Time(time.Now())
 	adminId := adminUser.AdminId
 	if adminId == 0 {
+		adminUser.CreatedAt = now
 		_, err := e.db.Insert(adminUser)
 		if err != nil {
 			return err
 		}
 	} else {
+		adminUser.UpdatedAt = now
 		_, err := e.db.ID(adminId).Update(adminUser)
 		if err != nil {
 			return err

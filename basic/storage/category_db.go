@@ -3,6 +3,8 @@ package storage
 import (
 	"basic/model"
 	"core/constant"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -38,13 +40,16 @@ func (e *CategoryDb) GetCategoryList() ([]model.Category, error) {
 }
 
 func (e *CategoryDb) SaveOrUpdateCategory(category *model.Category) error {
+	var now = types.Time(time.Now())
 	categoryId := category.CategoryId
 	if categoryId == 0 {
+		category.UpdatedAt = now
 		_, err := e.db.Insert(category)
 		if err != nil {
 			return err
 		}
 	} else {
+		category.UpdatedAt = now
 		_, err := e.db.ID(categoryId).Update(category)
 		if err != nil {
 			return err

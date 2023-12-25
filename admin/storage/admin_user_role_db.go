@@ -2,6 +2,8 @@ package storage
 
 import (
 	"admin/model"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -53,6 +55,7 @@ func (e *AdminUserRoleDb) AddAdminUserRole(adminId int64, roleId int64) error {
 	}
 	adminUserRole.AdminId = adminId
 	adminUserRole.RoleId = roleId
+	adminUserRole.CreatedAt = types.Time(time.Now())
 	_, err = e.db.Insert(adminUserRole)
 	if err != nil {
 		return err

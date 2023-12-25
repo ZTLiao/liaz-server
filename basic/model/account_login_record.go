@@ -20,7 +20,7 @@ type AccountLoginRecord struct {
 	NetType    string     `json:"netType" xorm:"net_type"`
 	ClientIp   string     `json:"clientIp" xorm:"client_ip"`
 	IpRegion   string     `json:"ipRegion" xorm:"ip_region"`
-	CreatedAt  types.Time `json:"createdAt" xorm:"created_at"`
+	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestampz created"`
 }
 
 var _ model.BaseModel = &AccountLoginRecord{}

@@ -2,6 +2,8 @@ package storage
 
 import (
 	"admin/model"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -24,6 +26,7 @@ func (e *AdminRoleDb) GetAdminRole() ([]model.AdminRole, error) {
 }
 
 func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) error {
+	var now = types.Time(time.Now())
 	roleId := adminRole.RoleId
 	name := adminRole.Name
 	if roleId == 0 {
@@ -32,12 +35,14 @@ func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) error {
 			return err
 		}
 		if count == 0 {
+			adminRole.CreatedAt = now
 			_, err := e.db.Insert(adminRole)
 			if err != nil {
 				return err
 			}
 		}
 	} else {
+		adminRole.UpdatedAt = now
 		_, err := e.db.ID(roleId).Update(adminRole)
 		if err != nil {
 			return err

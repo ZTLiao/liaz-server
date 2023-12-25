@@ -16,8 +16,8 @@ type Recommend struct {
 	OptValue      string     `json:"optValue" xorm:"opt_value"`
 	SeqNo         int        `json:"seqNo" xorm:"seq_no"`
 	Status        int8       `json:"status" xorm:"status"`
-	CreatedAt     types.Time `json:"createdAt" xorm:"created_at"`
-	UpdatedAt     types.Time `json:"updatedAt" xorm:"updated_at"`
+	CreatedAt     types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	UpdatedAt     types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
 }
 
 var _ model.BaseModel = &Recommend{}

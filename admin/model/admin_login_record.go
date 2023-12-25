@@ -18,7 +18,7 @@ type AdminLoginRecord struct {
 	BrowserName    string     `json:"browserName" xorm:"broswer_name"`
 	BrowserVersion string     `json:"browserVersion" xorm:"broswer_version"`
 	ClientIp       string     `json:"clientIp" xorm:"client_ip"`
-	CreatedAt      types.Time `json:"createdAt" xorm:"created_at"`
+	CreatedAt      types.Time `json:"createdAt" xorm:"created_at timestampz created"`
 }
 
 var _ model.BaseModel = &AdminLoginRecord{}

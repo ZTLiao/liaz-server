@@ -2,6 +2,8 @@ package storage
 
 import (
 	"basic/model"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -37,13 +39,16 @@ func (e *AuthorDb) GetAuthorList() ([]model.Author, error) {
 }
 
 func (e *AuthorDb) SaveOrUpdateAuthor(author *model.Author) error {
+	var now = types.Time(time.Now())
 	authorId := author.AuthorId
 	if authorId == 0 {
+		author.CreatedAt = now
 		_, err := e.db.Insert(author)
 		if err != nil {
 			return err
 		}
 	} else {
+		author.UpdatedAt = now
 		_, err := e.db.ID(authorId).Update(author)
 		if err != nil {
 			return err
