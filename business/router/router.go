@@ -31,6 +31,7 @@ func init() {
 			new(controller.FileController).Router(r)
 			new(controller.UserController).Router(r)
 			new(controller.NovelController).Router(r)
+			new(controller.NovelChapterController).Router(r)
 		}
 	})
 }

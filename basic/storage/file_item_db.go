@@ -48,3 +48,15 @@ func (e *FileItemDb) DeleteFileItem(fileId int64) error {
 	}
 	return nil
 }
+
+func (e *FileItemDb) GetFileTypeByPath(path string) (string, error) {
+	var fileItem model.FileItem
+	_, err := e.db.Where("path = ?", path).Get(&fileItem)
+	if err != nil {
+		return "", err
+	}
+	if fileItem.FileId == 0 {
+		return "", nil
+	}
+	return fileItem.FileType, nil
+}

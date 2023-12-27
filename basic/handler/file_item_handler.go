@@ -65,6 +65,9 @@ func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize in
 		return nil, err
 	}
 	fileType := kind.MIME.Value
+	if len(fileType) == 0 {
+		fileType = constant.TEXT_PLAIN
+	}
 	timestamp := strconv.FormatInt(time.Now().UnixMicro(), 10)
 	//加锁
 	var redisLock = redis.NewRedisLock(timestamp)

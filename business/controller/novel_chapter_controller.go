@@ -8,20 +8,18 @@ import (
 	"core/web"
 )
 
-type NovelController struct {
+type NovelChapterController struct {
 }
 
-var _ web.IWebController = &NovelController{}
+var _ web.IWebController = &NovelChapterController{}
 
-func (e *NovelController) Router(iWebRoutes web.IWebRoutes) {
+func (e *NovelChapterController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var novelHandler = handler.NovelHandler{
+	var novelChapterHandler = &handler.NovelChapterHandler{
 		NovelDb:            businessStorage.NewNovelDb(db),
 		NovelChapterDb:     businessStorage.NewNovelChapterDb(db),
 		NovelChapterItemDb: businessStorage.NewNovelChapterItemDb(db),
 		FileItemDb:         basicStorage.NewFileItemDb(db),
 	}
-	iWebRoutes.GET("/novel/:novelId", novelHandler.NovelDetail)
-	iWebRoutes.GET("/novel/upgrade", novelHandler.NovelUpgrade)
-	iWebRoutes.GET("/novel/catalogue", novelHandler.NovelCatalogue)
+	iWebRoutes.GET("/novel/chapter", novelChapterHandler.GetNovelChapter)
 }
