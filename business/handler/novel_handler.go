@@ -16,6 +16,7 @@ import (
 
 type NovelHandler struct {
 	NovelDb            *businessStorage.NovelDb
+	NovelVolumeDb      *businessStorage.NovelVolumeDb
 	NovelChapterDb     *businessStorage.NovelChapterDb
 	NovelChapterItemDb *businessStorage.NovelChapterItemDb
 	FileItemDb         *basicStorage.FileItemDb
@@ -96,11 +97,11 @@ func (e *NovelHandler) GetNovelDetail(novelId int64) (*resp.NovelDetailResp, err
 			items = append(items, novelChapterItem)
 			chapterItemMap[novelChapterId] = items
 		}
-		var chapterMap = make(map[int8][]resp.NovelChapterResp, 0)
+		var chapterMap = make(map[int64][]resp.NovelChapterResp, 0)
 		for _, novelChapter := range novelChapters {
 			novelChapterId := novelChapter.NovelChapterId
-			chapterType := novelChapter.ChapterType
-			chapters, ex := chapterMap[chapterType]
+			novelVolumeId := novelChapter.NovelVolumeId
+			chapters, ex := chapterMap[novelVolumeId]
 			if !ex {
 				chapters = make([]resp.NovelChapterResp, 0)
 			}
@@ -135,17 +136,30 @@ func (e *NovelHandler) GetNovelDetail(novelId int64) (*resp.NovelDetailResp, err
 				Types:          types,
 			}
 			chapters = append(chapters, chapter)
-			chapterMap[chapterType] = chapters
+			chapterMap[novelVolumeId] = chapters
 		}
-		var chapterTypes []resp.NovelChapterTypeResp
+		var novelVolumes = make([]resp.NovelVolumeResp, 0)
 		for k, v := range chapterMap {
-			chapterTypes = append(chapterTypes, resp.NovelChapterTypeResp{
-				ChapterType: k,
-				Flag:        novel.Flag,
-				Chapters:    v,
+			var volumeName string
+			var seqNo int64
+			if k != 0 {
+				novelVolume, err := e.NovelVolumeDb.GetNovelVolumeById(k)
+				if err != nil {
+					return nil, err
+				}
+				if novelVolume != nil {
+					volumeName = novelVolume.VolumeName
+					seqNo = novelVolume.SeqNo
+				}
+			}
+			novelVolumes = append(novelVolumes, resp.NovelVolumeResp{
+				NovelVolumeId: k,
+				VolumeName:    volumeName,
+				SeqNo:         seqNo,
+				Chapters:      v,
 			})
 		}
-		novelDetail.ChapterTypes = chapterTypes
+		novelDetail.Volumes = novelVolumes
 	}
 	return novelDetail, nil
 }
@@ -255,13 +269,13 @@ func (e *NovelHandler) NovelCatalogue(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	chatperTypes := novelDetail.ChapterTypes
-	if len(chatperTypes) == 0 {
+	volumes := novelDetail.Volumes
+	if len(volumes) == 0 {
 		return response.Success()
 	}
 	var chapters []resp.NovelChapterResp
-	for _, v := range chatperTypes {
-		if v.ChapterType == novelChapter.ChapterType {
+	for _, v := range volumes {
+		if v.NovelVolumeId == novelChapter.NovelVolumeId {
 			chapters = v.Chapters
 			break
 		}

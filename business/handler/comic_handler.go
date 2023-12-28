@@ -127,7 +127,7 @@ func (e *ComicHandler) GetComicDetail(comicId int64) (*resp.ComicDetailResp, err
 			chapters = append(chapters, chapter)
 			chapterMap[chapterType] = chapters
 		}
-		var chapterTypes []resp.ComicChapterTypeResp
+		var chapterTypes = make([]resp.ComicChapterTypeResp, 0)
 		for k, v := range chapterMap {
 			chapterTypes = append(chapterTypes, resp.ComicChapterTypeResp{
 				ChapterType: k,
