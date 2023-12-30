@@ -3,6 +3,8 @@ package file
 import (
 	"bytes"
 	"context"
+	"net/url"
+	"time"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -58,4 +60,16 @@ func (e *MinioTemplate) PutObject(bucketName string, objectName string, data []b
 		LastModified: uploadInfo.LastModified,
 		Expires:      uploadInfo.Expiration,
 	}, nil
+}
+
+func (e *MinioTemplate) PresignedGetObject(bucketName string, objectName string, headers map[string]string, expires time.Duration) (string, error) {
+	var reqParams = make(url.Values)
+	for k, v := range headers {
+		reqParams.Set(k, v)
+	}
+	presignedURL, err := e.minioClient.PresignedGetObject(context.Background(), bucketName, objectName, expires, reqParams)
+	if err != nil {
+		return "", err
+	}
+	return presignedURL.RequestURI(), err
 }

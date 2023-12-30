@@ -110,7 +110,7 @@ func (e *NovelHandler) GetNovelDetail(novelId int64) (*resp.NovelDetailResp, err
 			items, ex := chapterItemMap[novelChapterId]
 			if ex {
 				sort.Slice(items, func(i, j int) bool {
-					return items[i].SeqNo < items[j].SeqNo
+					return items[i].SeqNo > items[j].SeqNo
 				})
 				for _, item := range items {
 					path := item.Path
@@ -159,6 +159,9 @@ func (e *NovelHandler) GetNovelDetail(novelId int64) (*resp.NovelDetailResp, err
 				Chapters:      v,
 			})
 		}
+		sort.Slice(novelVolumes, func(i, j int) bool {
+			return novelVolumes[i].SeqNo > novelVolumes[j].SeqNo
+		})
 		novelDetail.Volumes = novelVolumes
 	}
 	return novelDetail, nil

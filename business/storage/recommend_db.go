@@ -2,6 +2,8 @@ package storage
 
 import (
 	"business/model"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -37,13 +39,16 @@ func (e *RecommendDb) GetRecommendList() ([]model.Recommend, error) {
 }
 
 func (e *RecommendDb) SaveOrUpdateRecommend(recommend *model.Recommend) error {
+	var now = types.Time(time.Now())
 	recommendId := recommend.RecommendId
 	if recommendId == 0 {
+		recommend.CreatedAt = now
 		_, err := e.db.Insert(recommend)
 		if err != nil {
 			return err
 		}
 	} else {
+		recommend.UpdatedAt = now
 		_, err := e.db.ID(recommendId).Update(recommend)
 		if err != nil {
 			return err

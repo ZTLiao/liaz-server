@@ -18,6 +18,7 @@ const (
 	SLASH       string = "/"
 	DOT         string = "."
 	SPACE       string = " "
+	QUESTION    string = "?"
 )
 
 // 单词全部转化为大写

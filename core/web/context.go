@@ -6,6 +6,7 @@ import (
 	"core/system"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -104,4 +105,14 @@ func (e *WebContext) BindJSON(obj any) error {
 
 func (e *WebContext) FormFile(key string) (multipart.File, *multipart.FileHeader, error) {
 	return e.context.Request.FormFile(key)
+}
+
+func GetUserId(wc *WebContext) int64 {
+	userIdStr := wc.GetHeader(constant.X_USER_ID)
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	if err != nil {
+		wc.Error(err.Error())
+		return 0
+	}
+	return userId
 }

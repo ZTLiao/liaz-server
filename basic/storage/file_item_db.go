@@ -60,3 +60,15 @@ func (e *FileItemDb) GetFileTypeByPath(path string) (string, error) {
 	}
 	return fileItem.FileType, nil
 }
+
+func (e *FileItemDb) GetFileItemByPath(path string) (*model.FileItem, error) {
+	var fileItem model.FileItem
+	_, err := e.db.Where("path = ?", path).Get(&fileItem)
+	if err != nil {
+		return nil, err
+	}
+	if fileItem.FileId == 0 {
+		return nil, nil
+	}
+	return &fileItem, nil
+}

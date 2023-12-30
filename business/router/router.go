@@ -32,6 +32,7 @@ func init() {
 			new(controller.UserController).Router(r)
 			new(controller.NovelController).Router(r)
 			new(controller.NovelChapterController).Router(r)
+			new(controller.BrowseController).Router(r)
 		}
 	})
 }

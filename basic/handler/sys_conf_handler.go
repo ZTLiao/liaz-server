@@ -3,6 +3,7 @@ package handler
 import (
 	"basic/model"
 	"basic/storage"
+	"strconv"
 )
 
 type SysConfHandler struct {
@@ -120,4 +121,23 @@ func (e *SysConfHandler) GetConfValueByKey(confKey string) (string, error) {
 		return "", nil
 	}
 	return sysConf.ConfValue, nil
+}
+
+func (e *SysConfHandler) GetIntValueByKey(confKey string) (int, error) {
+	sysConf, err := e.GetSysConfByKey(confKey)
+	if err != nil {
+		return 0, err
+	}
+	if sysConf == nil {
+		return 0, nil
+	}
+	confValue := sysConf.ConfValue
+	if len(confValue) == 0 {
+		return 0, nil
+	}
+	intValue, err := strconv.ParseInt(confValue, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return int(intValue), nil
 }

@@ -10,6 +10,7 @@ type FileTemplate interface {
 	CreateBucket(string) error
 	ListObjects(string) []FileObjectInfo
 	PutObject(string, string, []byte) (*FileObjectInfo, error)
+	PresignedGetObject(bucketName string, objectName string, headers map[string]string, expires time.Duration) (string, error)
 }
 
 type FileObjectInfo struct {

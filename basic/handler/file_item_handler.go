@@ -94,3 +94,11 @@ func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize in
 	redisLock.Unlock()
 	return &fileItem, nil
 }
+
+func (e *FileItemHandler) GetFileItemByPath(path string) (*model.FileItem, error) {
+	return e.fileItemDb.GetFileItemByPath(path)
+}
+
+func (e *FileItemHandler) PresignedGetObject(bucketName string, objectName string, headers map[string]string, expires time.Duration) (string, error) {
+	return e.fileTemplate.PresignedGetObject(bucketName, objectName, headers, expires)
+}

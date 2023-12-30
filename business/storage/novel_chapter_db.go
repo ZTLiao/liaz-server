@@ -26,7 +26,7 @@ func (e *NovelChapterDb) UpgradeChapter(novelId int64) (*model.NovelChapter, err
 
 func (e *NovelChapterDb) GetNovelChapters(novelId int64) ([]model.NovelChapter, error) {
 	var novelChapters []model.NovelChapter
-	err := e.db.Where("novel_id = ? and status = ?", novelId, constant.PASS).OrderBy("seq_no desc").Find(&novelChapters)
+	err := e.db.Where("novel_id = ? and status = ?", novelId, constant.PASS).OrderBy("seq_no asc").Find(&novelChapters)
 	if err != nil {
 		return nil, err
 	}
