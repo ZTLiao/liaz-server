@@ -2,6 +2,7 @@ package handler
 
 import (
 	"basic/device"
+	"basic/enums"
 	basicHandler "basic/handler"
 	"business/resp"
 	"core/config"
@@ -11,6 +12,7 @@ import (
 	"core/utils"
 	"core/web"
 	"encoding/json"
+	"strconv"
 )
 
 type ClientHandler struct {
@@ -34,7 +36,10 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 	//数据加密
 	key.K2 = publicKey
 	//获取配置
-	appJson := e.buildAppConfig(wc)
+	appJson, err := e.buildAppConfig()
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	//加密
 	if e.SecurityConfig.Encrypt {
 		encryptPlain, err := utils.PriKeyEncrypt(string(appJson), e.SecurityConfig.PrivateKey)
@@ -52,17 +57,48 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 	return response.ReturnOK(clientInitResp)
 }
 
-func (e *ClientHandler) buildAppConfig(wc *web.WebContext) []byte {
-	fileUrl, err := e.SysConfHandler.GetConfValueByKey(constant.FILE_URL)
+func (e *ClientHandler) buildAppConfig() ([]byte, error) {
+	sysConfs, err := e.SysConfHandler.GetSysConfByType(int8(enums.CONF_TYPE_OF_COMMON | enums.CONF_TYPE_OF_CLIENT))
 	if err != nil {
-		wc.AbortWithError(err)
+		return nil, err
+	}
+	if len(sysConfs) == 0 {
+		return nil, nil
+	}
+	var confMap = make(map[string]any)
+	//0 自定义 1 文本 2 布尔 3 JSON
+	for _, v := range sysConfs {
+		confKey := v.ConfKey
+		confKind := v.ConfKind
+		confValue := v.ConfValue
+		if confKind == enums.CONF_KIND_OF_BOOL {
+			boolValue, err := strconv.ParseBool(confValue)
+			if err != nil {
+				return nil, err
+			}
+			confMap[confKey] = boolValue
+		} else if confKind == enums.CONF_KIND_OF_JSON {
+			var jsonValue map[string]interface{}
+			err := json.Unmarshal([]byte(confValue), &jsonValue)
+			if err != nil {
+				return nil, err
+			}
+			confMap[confKey] = jsonValue
+		} else {
+			confMap[confKey] = confValue
+		}
 	}
 	var app = new(resp.AppConfig)
-	app.FileUrl = fileUrl
+	if fileUrl, ex := confMap[constant.FILE_URL]; ex {
+		app.FileUrl = fileUrl.(string)
+	}
+	if resourceAuthority, ex := confMap[constant.RESOURCE_AUTHORITY]; ex {
+		app.ResourceAuthority = resourceAuthority.(bool)
+	}
 	//格式化
 	appJson, err := json.Marshal(app)
 	if err != nil {
-		wc.AbortWithError(err)
+		return nil, err
 	}
-	return appJson
+	return appJson, nil
 }

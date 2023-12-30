@@ -77,6 +77,8 @@ func (e *EventBus) UnSubscribe(topic string) {
 	e.rm.Unlock()
 }
 
-var Bus = &EventBus{
-	subscribers: map[string]ChannelSlice{},
-}
+var (
+	Bus = &EventBus{
+		subscribers: map[string]ChannelSlice{},
+	}
+)

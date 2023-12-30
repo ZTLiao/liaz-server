@@ -26,5 +26,5 @@ func (e *AdminSysConfController) Router(iWebRoutes web.IWebRoutes) {
 	iWebRoutes.POST("/sys/conf", adminSysConfHandler.SaveAdminSysConf)
 	iWebRoutes.PUT("/sys/conf", adminSysConfHandler.UpdateAdminSysConf)
 	iWebRoutes.DELETE("/sys/conf/:confId", adminSysConfHandler.DelAdminSysConf)
-	iWebRoutes.GET("/sys/conf/:confKind", adminSysConfHandler.GetAdminSysConfByKind)
+	iWebRoutes.GET("/sys/conf/:confType", adminSysConfHandler.GetAdminSysConfByType)
 }

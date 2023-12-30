@@ -11,5 +11,6 @@ type KeyConfig struct {
 }
 
 type AppConfig struct {
-	FileUrl string `json:"fileUrl"`
+	FileUrl           string `json:"fileUrl"`
+	ResourceAuthority bool   `json:"resourceAuthority"`
 }

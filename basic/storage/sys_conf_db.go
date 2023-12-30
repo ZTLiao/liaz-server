@@ -75,7 +75,7 @@ func (e *SysConfDb) GetSysConfByKey(confKey string) (*model.SysConf, error) {
 	return nil, nil
 }
 
-func (e *SysConfDb) GetSysConfByKind(confKind int8) ([]model.SysConf, error) {
+func (e *SysConfDb) GetSysConfByType(confType int8) ([]model.SysConf, error) {
 	var sysConfs []model.SysConf
 	err := e.db.SQL(
 		`
@@ -94,8 +94,8 @@ func (e *SysConfDb) GetSysConfByKind(confKind int8) ([]model.SysConf, error) {
 			sys_conf as sc
 		where 
 			sc.status = 1
-			and (sc.conf_kind & ?) != 0
-		`, confKind).Find(&sysConfs)
+			and (sc.conf_type & ?) != 0
+		`, confType).Find(&sysConfs)
 	if err != nil {
 		return nil, err
 	}

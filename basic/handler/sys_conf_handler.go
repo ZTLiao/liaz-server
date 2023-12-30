@@ -3,6 +3,7 @@ package handler
 import (
 	"basic/model"
 	"basic/storage"
+	"core/constant"
 	"strconv"
 )
 
@@ -80,13 +81,13 @@ func (e *SysConfHandler) GetSysConfByKey(confKey string) (*model.SysConf, error)
 	return sysConf, nil
 }
 
-func (e *SysConfHandler) GetSysConfByKind(confKind int8) ([]model.SysConf, error) {
+func (e *SysConfHandler) GetSysConfByType(confType int8) ([]model.SysConf, error) {
 	sysConfMap, err := e.sysConfCache.HGetAll()
 	if err != nil {
 		return nil, err
 	}
 	if len(sysConfMap) == 0 {
-		sysConfs, err := e.sysConfDb.GetSysConfByKind(confKind)
+		sysConfs, err := e.sysConfDb.GetSysConfByType(confType)
 		if err != nil {
 			return nil, err
 		}
@@ -104,7 +105,7 @@ func (e *SysConfHandler) GetSysConfByKind(confKind int8) ([]model.SysConf, error
 	var sysConfs = make([]model.SysConf, 0)
 	if len(sysConfMap) > 0 {
 		for _, v := range sysConfMap {
-			if (v.ConfKind&confKind) != 0 && len(v.ConfKey) > 0 {
+			if (v.ConfType&confType) != 0 && v.Status == constant.YES && len(v.ConfKey) > 0 {
 				sysConfs = append(sysConfs, v)
 			}
 		}
