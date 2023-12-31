@@ -34,7 +34,7 @@ func init() {
 			new(controller.AdminRoleController).Router(r)
 			new(controller.AdminRoleMenuController).Router(r)
 			new(controller.AdminUserRoleController).Router(r)
-			new(controller.AdminUploadController).Router(r)
+			new(controller.AdminFileController).Router(r)
 			new(controller.AdminSysConfController).Router(r)
 			new(controller.AdminRecommendController).Router(r)
 			new(controller.AdminRecommendItemController).Router(r)
