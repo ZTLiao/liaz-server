@@ -45,7 +45,7 @@ func (e *FileHandler) PresignedGetObject(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	expires := time.Second * 24 * 60 * 60 * time.Duration(expireTime)
+	expires := time.Second * 60 * 60 * time.Duration(expireTime)
 	if expires == 0 {
 		return response.Success()
 	}
