@@ -19,4 +19,5 @@ type ComicDetailResp struct {
 	Flag         int8                   `json:"flag"`
 	Direction    int8                   `json:"direction"`
 	ChapterTypes []ComicChapterTypeResp `json:"chapterTypes"`
+	IsSubscribe  bool                   `json:"isSubscribe"`
 }

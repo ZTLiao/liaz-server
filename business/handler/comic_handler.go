@@ -17,6 +17,7 @@ type ComicHandler struct {
 	ComicDb            *storage.ComicDb
 	ComicChapterDb     *storage.ComicChapterDb
 	ComicChapterItemDb *storage.ComicChapterItemDb
+	ComicSubscribeDb   *storage.ComicSubscribeDb
 }
 
 func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
@@ -31,6 +32,17 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 	comicDetail, err := e.GetComicDetail(comicId)
 	if err != nil {
 		wc.AbortWithError(err)
+	}
+	if comicDetail == nil {
+		return response.Success()
+	}
+	userId := web.GetUserId(wc)
+	if userId != 0 {
+		isSubscribe, err := e.ComicSubscribeDb.IsSubscribe(comicId, userId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		comicDetail.IsSubscribe = isSubscribe
 	}
 	return response.ReturnOK(comicDetail)
 }
@@ -257,4 +269,20 @@ func (e *ComicHandler) ComicCatalogue(wc *web.WebContext) interface{} {
 		}
 	}
 	return response.ReturnOK(chapters)
+}
+
+func (e *ComicHandler) GetComic(wc *web.WebContext) interface{} {
+	comicIdStr := wc.Query("comicId")
+	if len(comicIdStr) == 0 {
+		return response.Success()
+	}
+	comicId, err := strconv.ParseInt(comicIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	comic, err := e.ComicDb.GetComicById(comicId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(comic)
 }

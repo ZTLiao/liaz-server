@@ -33,6 +33,8 @@ func init() {
 			new(controller.NovelController).Router(r)
 			new(controller.NovelChapterController).Router(r)
 			new(controller.BrowseController).Router(r)
+			new(controller.ComicSubscribeController).Router(r)
+			new(controller.NovelSubscribeController).Router(r)
 		}
 	})
 }

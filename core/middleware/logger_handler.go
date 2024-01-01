@@ -73,7 +73,11 @@ func printf(params map[string]any) string {
 	}
 	if len(content) > 0 {
 		rs := []rune(content)
-		content = string(rs[0 : len(content)-1])
+		var end = len(content)
+		if len(rs) < len(content) {
+			end = len(rs)
+		}
+		content = string(rs[0 : end-1])
 	}
 	return content
 }

@@ -19,4 +19,5 @@ type NovelDetailResp struct {
 	Flag         int8              `json:"flag"`
 	Direction    int8              `json:"direction"`
 	Volumes      []NovelVolumeResp `json:"volumes"`
+	IsSubscribe  bool              `json:"isSubscribe"`
 }

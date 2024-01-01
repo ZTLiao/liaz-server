@@ -20,6 +20,7 @@ type NovelHandler struct {
 	NovelChapterDb     *businessStorage.NovelChapterDb
 	NovelChapterItemDb *businessStorage.NovelChapterItemDb
 	FileItemDb         *basicStorage.FileItemDb
+	NovelSubscribeDb   *businessStorage.NovelSubscribeDb
 }
 
 func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
@@ -34,6 +35,17 @@ func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
 	novelDetail, err := e.GetNovelDetail(novelId)
 	if err != nil {
 		wc.AbortWithError(err)
+	}
+	if novelDetail == nil {
+		return response.Success()
+	}
+	userId := web.GetUserId(wc)
+	if userId != 0 {
+		isSubscribe, err := e.NovelSubscribeDb.IsSubscribe(novelId, userId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		novelDetail.IsSubscribe = isSubscribe
 	}
 	return response.ReturnOK(novelDetail)
 }
@@ -284,4 +296,20 @@ func (e *NovelHandler) NovelCatalogue(wc *web.WebContext) interface{} {
 		}
 	}
 	return response.ReturnOK(chapters)
+}
+
+func (e *NovelHandler) GetNovel(wc *web.WebContext) interface{} {
+	novelIdStr := wc.Query("novelId")
+	if len(novelIdStr) == 0 {
+		return response.Success()
+	}
+	novelId, err := strconv.ParseInt(novelIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	novel, err := e.NovelDb.GetNovelById(novelId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(novel)
 }

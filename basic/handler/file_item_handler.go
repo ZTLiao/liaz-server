@@ -8,6 +8,7 @@ import (
 	"core/file"
 	"core/redis"
 	"core/response"
+	"core/types"
 	"core/utils"
 	"core/web"
 	"io"
@@ -82,6 +83,7 @@ func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize in
 		redisLock.Unlock()
 		return nil, errors.New(http.StatusInternalServerError, constant.UPLOAD_ERROR)
 	}
+	var now = types.Time(time.Now())
 	var fileItem = model.FileItem{}
 	fileItem.BucketName = bucketName
 	fileItem.ObjectName = fileName
@@ -90,6 +92,8 @@ func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize in
 	fileItem.UnqiueId = timestamp
 	fileItem.Suffix = suffix
 	fileItem.FileType = fileType
+	fileItem.CreatedAt = now
+	fileItem.UpdatedAt = now
 	e.fileItemDb.SaveFileItem(&fileItem)
 	redisLock.Unlock()
 	return &fileItem, nil

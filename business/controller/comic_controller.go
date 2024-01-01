@@ -18,8 +18,10 @@ func (e *ComicController) Router(iWebRoutes web.IWebRoutes) {
 		ComicDb:            storage.NewComicDb(db),
 		ComicChapterDb:     storage.NewComicChapterDb(db),
 		ComicChapterItemDb: storage.NewComicChapterItemDb(db),
+		ComicSubscribeDb:   storage.NewComicSubscribeDb(db),
 	}
 	iWebRoutes.GET("/comic/:comicId", comicHandler.ComicDetail)
 	iWebRoutes.GET("/comic/upgrade", comicHandler.ComicUpgrade)
 	iWebRoutes.GET("/comic/catalogue", comicHandler.ComicCatalogue)
+	iWebRoutes.GET("/comic/get", comicHandler.GetComic)
 }
