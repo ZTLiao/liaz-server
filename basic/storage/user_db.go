@@ -29,12 +29,14 @@ func (e *UserDb) UpdateLocation(userId int64, ipAddr string) error {
 	if len(country) == 0 && len(province) == 0 && len(city) == 0 {
 		return nil
 	}
+	var now = types.Time(time.Now())
 	var user = new(model.User)
 	user.UserId = userId
 	user.Country = country
 	user.Province = province
 	user.City = city
-	_, err = e.db.ID(userId).Cols("country", "province", "city").Update(user)
+	user.UpdatedAt = now
+	_, err = e.db.ID(userId).Cols("country", "province", "city", "updatedAt").Update(user)
 	if err != nil {
 		return err
 	}
