@@ -109,6 +109,9 @@ func (e *WebContext) FormFile(key string) (multipart.File, *multipart.FileHeader
 
 func GetUserId(wc *WebContext) int64 {
 	userIdStr := wc.GetHeader(constant.X_USER_ID)
+	if len(userIdStr) == 0 {
+		return 0
+	}
 	userId, err := strconv.ParseInt(userIdStr, 10, 64)
 	if err != nil {
 		wc.Error(err.Error())

@@ -16,12 +16,11 @@ func NewAssetDb(db *xorm.Engine) *AssetDb {
 
 func (e *AssetDb) GetAssetByCategoryId(assetType int8, categoryId int64) ([]model.Asset, error) {
 	var assets []model.Asset
-	var err error
+	session := e.db.Where("find_in_set(?, category_ids)", categoryId)
 	if assetType != 0 {
-		err = e.db.Where("asset_type = ? and find_in_set(?, category_ids)", assetType, categoryId).Find(&assets)
-	} else {
-		err = e.db.Where("find_in_set(?, category_ids)", categoryId).Find(&assets)
+		session = session.And("asset_type = ?", assetType)
 	}
+	err := session.Find(&assets)
 	if err != nil {
 		return nil, err
 	}

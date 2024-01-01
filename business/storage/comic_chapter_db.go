@@ -1,8 +1,11 @@
 package storage
 
 import (
+	"business/enums"
 	"business/model"
+	"business/transfer"
 	"core/constant"
+	"strings"
 
 	"github.com/go-xorm/xorm"
 )
@@ -40,4 +43,37 @@ func (e *ComicChapterDb) GetComicChapterById(comicChapterId int64) (*model.Comic
 		return nil, err
 	}
 	return &comicChapter, nil
+}
+
+func (e *ComicChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int32, pageSize int32) ([]transfer.ComicChapterDto, error) {
+	var comicChapters []transfer.ComicChapterDto
+	var builder strings.Builder
+	builder.WriteString(
+		`
+		select 
+			c.comic_id,
+			c.title,
+			c.cover,
+			cc.comic_chapter_id,
+			cc.chapter_name
+		from comic_subscribe as cs 
+		left join comic as c on c.comic_id = cs.comic_id
+		left join comic_chapter as cc on cc.comic_id = cs.comic_id
+		left join browse as b on b.obj_id = c.comic_id and b.asset_type = 1
+		where 
+			cs.user_id = ?
+		group by c.comic_id
+		`)
+	if sortType == enums.SORT_TYPE_OF_UPDATE {
+		builder.WriteString("order by cc.comic_chapter_id desc")
+	} else if sortType == enums.SORT_TYPE_OF_SUBSCRIBE {
+		builder.WriteString("order by cs.comic_subscribe_id desc, cc.comic_chapter_id desc")
+	} else if sortType == enums.SORT_TYPE_OF_BROWSE {
+		builder.WriteString("order by b.updated_at desc, cc.comic_chapter_id desc")
+	}
+	err := e.db.SQL(builder.String(), userId).Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&comicChapters)
+	if err != nil {
+		return nil, err
+	}
+	return comicChapters, nil
 }
