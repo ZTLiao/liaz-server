@@ -5,6 +5,7 @@ import (
 	"business/model"
 	"business/transfer"
 	"core/constant"
+	"strconv"
 	"strings"
 
 	"github.com/go-xorm/xorm"
@@ -65,13 +66,14 @@ func (e *ComicChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 		group by c.comic_id
 		`)
 	if sortType == enums.SORT_TYPE_OF_UPDATE {
-		builder.WriteString("order by cc.comic_chapter_id desc")
+		builder.WriteString(" order by cc.comic_chapter_id desc")
 	} else if sortType == enums.SORT_TYPE_OF_SUBSCRIBE {
-		builder.WriteString("order by cs.comic_subscribe_id desc, cc.comic_chapter_id desc")
+		builder.WriteString(" order by cs.comic_subscribe_id desc, cc.comic_chapter_id desc")
 	} else if sortType == enums.SORT_TYPE_OF_BROWSE {
-		builder.WriteString("order by b.updated_at desc, cc.comic_chapter_id desc")
+		builder.WriteString(" order by b.updated_at desc, cc.comic_chapter_id desc")
 	}
-	err := e.db.SQL(builder.String(), userId).Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&comicChapters)
+	builder.WriteString(" limit " + strconv.FormatInt(int64((pageNum-1)*pageSize), 10) + "," + strconv.FormatInt(int64(pageSize), 10))
+	err := e.db.SQL(builder.String(), userId).Find(&comicChapters)
 	if err != nil {
 		return nil, err
 	}

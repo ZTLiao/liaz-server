@@ -21,6 +21,7 @@ func (e *NovelController) Router(iWebRoutes web.IWebRoutes) {
 		NovelChapterItemDb: businessStorage.NewNovelChapterItemDb(db),
 		FileItemDb:         basicStorage.NewFileItemDb(db),
 		NovelSubscribeDb:   businessStorage.NewNovelSubscribeDb(db),
+		BrowseDb:           businessStorage.NewBrowseDb(db),
 	}
 	iWebRoutes.GET("/novel/:novelId", novelHandler.NovelDetail)
 	iWebRoutes.GET("/novel/upgrade", novelHandler.NovelUpgrade)

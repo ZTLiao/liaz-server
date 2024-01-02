@@ -21,6 +21,7 @@ type NovelHandler struct {
 	NovelChapterItemDb *businessStorage.NovelChapterItemDb
 	FileItemDb         *basicStorage.FileItemDb
 	NovelSubscribeDb   *businessStorage.NovelSubscribeDb
+	BrowseDb           *businessStorage.BrowseDb
 }
 
 func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
@@ -46,6 +47,14 @@ func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
 			wc.AbortWithError(err)
 		}
 		novelDetail.IsSubscribe = isSubscribe
+		browse, err := e.BrowseDb.GetBrowseByObjId(userId, enums.ASSET_TYPE_FOR_NOVEL, novelId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		if browse != nil {
+			novelDetail.BrowseChapterId = browse.ChapterId
+			novelDetail.CurrentIndex = browse.StopIndex
+		}
 	}
 	return response.ReturnOK(novelDetail)
 }

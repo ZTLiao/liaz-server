@@ -29,7 +29,15 @@ func (e *CategorySearchHandler) GetContent(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	assets, err := e.AssetDb.GetAssetByCategoryId(int8(assetType), categoryId)
+	pageNum, err := strconv.ParseInt(wc.DefaultQuery("pageNum", "1"), 10, 32)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	pageSize, err := strconv.ParseInt(wc.DefaultQuery("pageSize", "10"), 10, 32)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	assets, err := e.AssetDb.GetAssetByCategoryId(int8(assetType), categoryId, int32(pageNum), int32(pageSize))
 	if err != nil {
 		wc.AbortWithError(err)
 	}

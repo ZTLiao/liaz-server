@@ -53,3 +53,12 @@ func (e *BrowseDb) SaveOrUpdateBrowse(userId int64, objId int64, assetType int8,
 	}
 	return nil
 }
+
+func (e *BrowseDb) GetBrowseByObjId(userId int64, assetType int, objId int64) (*model.Browse, error) {
+	var browse model.Browse
+	_, err := e.db.Where("user_id = ? and asset_type = ? and obj_id = ?", userId, assetType, objId).Get(&browse)
+	if err != nil {
+		return nil, err
+	}
+	return &browse, nil
+}

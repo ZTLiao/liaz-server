@@ -18,6 +18,7 @@ type ComicHandler struct {
 	ComicChapterDb     *storage.ComicChapterDb
 	ComicChapterItemDb *storage.ComicChapterItemDb
 	ComicSubscribeDb   *storage.ComicSubscribeDb
+	BrowseDb           *storage.BrowseDb
 }
 
 func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
@@ -43,6 +44,14 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 			wc.AbortWithError(err)
 		}
 		comicDetail.IsSubscribe = isSubscribe
+		browse, err := e.BrowseDb.GetBrowseByObjId(userId, enums.ASSET_TYPE_FOR_COMIC, comicId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		if browse != nil {
+			comicDetail.BrowseChapterId = browse.ChapterId
+			comicDetail.CurrentIndex = browse.StopIndex
+		}
 	}
 	return response.ReturnOK(comicDetail)
 }
