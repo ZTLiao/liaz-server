@@ -4,6 +4,7 @@ import (
 	basicStorage "basic/storage"
 	"business/handler"
 	businessStorage "business/storage"
+	"core/redis"
 	"core/system"
 	"core/web"
 )
@@ -15,13 +16,17 @@ var _ web.IWebController = &NovelController{}
 
 func (e *NovelController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
+	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var novelHandler = handler.NovelHandler{
-		NovelDb:            businessStorage.NewNovelDb(db),
-		NovelChapterDb:     businessStorage.NewNovelChapterDb(db),
-		NovelChapterItemDb: businessStorage.NewNovelChapterItemDb(db),
-		FileItemDb:         basicStorage.NewFileItemDb(db),
-		NovelSubscribeDb:   businessStorage.NewNovelSubscribeDb(db),
-		BrowseDb:           businessStorage.NewBrowseDb(db),
+		NovelDb:                businessStorage.NewNovelDb(db),
+		NovelVolumeDb:          businessStorage.NewNovelVolumeDb(db),
+		NovelChapterDb:         businessStorage.NewNovelChapterDb(db),
+		NovelChapterItemDb:     businessStorage.NewNovelChapterItemDb(db),
+		FileItemDb:             basicStorage.NewFileItemDb(db),
+		NovelSubscribeDb:       businessStorage.NewNovelSubscribeDb(db),
+		BrowseDb:               businessStorage.NewBrowseDb(db),
+		NovelSubscribeNumCache: businessStorage.NewNovelSubscribeNumCache(redis),
+		NovelHitNumCache:       businessStorage.NewNovelHitNumCache(redis),
 	}
 	iWebRoutes.GET("/novel/:novelId", novelHandler.NovelDetail)
 	iWebRoutes.GET("/novel/upgrade", novelHandler.NovelUpgrade)

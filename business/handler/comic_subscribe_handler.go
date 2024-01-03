@@ -9,7 +9,8 @@ import (
 )
 
 type ComicSubscribeHandler struct {
-	ComicSubscribeDb *storage.ComicSubscribeDb
+	ComicSubscribeDb       *storage.ComicSubscribeDb
+	ComicSubscribeNumCache *storage.ComicSubscribeNumCache
 }
 
 func (e *ComicSubscribeHandler) Subscribe(wc *web.WebContext) interface{} {
@@ -26,8 +27,10 @@ func (e *ComicSubscribeHandler) Subscribe(wc *web.WebContext) interface{} {
 	userId := web.GetUserId(wc)
 	if int8(isSubscribe) == constant.YES {
 		e.ComicSubscribeDb.SaveComicSubscribe(comicId, userId)
+		e.ComicSubscribeNumCache.Incr(comicId)
 	} else {
 		e.ComicSubscribeDb.DelComicSubscribe(comicId, userId)
+		e.ComicSubscribeNumCache.Decr(comicId)
 	}
 	return response.Success()
 }

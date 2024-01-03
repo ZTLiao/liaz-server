@@ -200,3 +200,52 @@ func (e *RedisUtil) SetNX(key string, value interface{}, dur time.Duration) (boo
 	}
 	return res, err
 }
+
+func (e *RedisUtil) ZAdd(key string, member string, score float64) (int64, error) {
+	res, err := e.db.ZAdd(context.TODO(), key, redis.Z{
+		Score:  score,
+		Member: member,
+	}).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
+func (e *RedisUtil) ZIncrBy(key string, increment float64, member string) (float64, error) {
+	res, err := e.db.ZIncrBy(context.TODO(), key, increment, member).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
+func (e *RedisUtil) ZScore(key string, member string) (float64, error) {
+	count, err := e.db.Exists(context.TODO(), key).Result()
+	if err != nil {
+		return 0, err
+	}
+	if count == 0 {
+		return 0, nil
+	}
+	res, err := e.db.ZScore(context.TODO(), key, member).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
+func (e *RedisUtil) ZRevRangeWithScores(key string, start int64, stop int64) ([]redis.Z, error) {
+	count, err := e.db.Exists(context.TODO(), key).Result()
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return nil, nil
+	}
+	res, err := e.db.ZRevRangeWithScores(context.TODO(), key, start, stop).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}

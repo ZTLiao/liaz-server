@@ -15,13 +15,15 @@ import (
 )
 
 type NovelHandler struct {
-	NovelDb            *businessStorage.NovelDb
-	NovelVolumeDb      *businessStorage.NovelVolumeDb
-	NovelChapterDb     *businessStorage.NovelChapterDb
-	NovelChapterItemDb *businessStorage.NovelChapterItemDb
-	FileItemDb         *basicStorage.FileItemDb
-	NovelSubscribeDb   *businessStorage.NovelSubscribeDb
-	BrowseDb           *businessStorage.BrowseDb
+	NovelDb                *businessStorage.NovelDb
+	NovelVolumeDb          *businessStorage.NovelVolumeDb
+	NovelChapterDb         *businessStorage.NovelChapterDb
+	NovelChapterItemDb     *businessStorage.NovelChapterItemDb
+	FileItemDb             *basicStorage.FileItemDb
+	NovelSubscribeDb       *businessStorage.NovelSubscribeDb
+	BrowseDb               *businessStorage.BrowseDb
+	NovelSubscribeNumCache *businessStorage.NovelSubscribeNumCache
+	NovelHitNumCache       *businessStorage.NovelHitNumCache
 }
 
 func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
@@ -56,6 +58,16 @@ func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
 			novelDetail.CurrentIndex = browse.StopIndex
 		}
 	}
+	subscribeNum, err := e.NovelSubscribeNumCache.Get(novelId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	novelDetail.SubscribeNum = int32(subscribeNum)
+	hitNum, err := e.NovelHitNumCache.Incr(novelId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	novelDetail.HitNum = int32(hitNum)
 	return response.ReturnOK(novelDetail)
 }
 

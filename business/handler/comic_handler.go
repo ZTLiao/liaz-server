@@ -14,11 +14,13 @@ import (
 )
 
 type ComicHandler struct {
-	ComicDb            *storage.ComicDb
-	ComicChapterDb     *storage.ComicChapterDb
-	ComicChapterItemDb *storage.ComicChapterItemDb
-	ComicSubscribeDb   *storage.ComicSubscribeDb
-	BrowseDb           *storage.BrowseDb
+	ComicDb                *storage.ComicDb
+	ComicChapterDb         *storage.ComicChapterDb
+	ComicChapterItemDb     *storage.ComicChapterItemDb
+	ComicSubscribeDb       *storage.ComicSubscribeDb
+	BrowseDb               *storage.BrowseDb
+	ComicSubscribeNumCache *storage.ComicSubscribeNumCache
+	ComicHitNumCache       *storage.ComicHitNumCache
 }
 
 func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
@@ -53,6 +55,16 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 			comicDetail.CurrentIndex = browse.StopIndex
 		}
 	}
+	subscribeNum, err := e.ComicSubscribeNumCache.Get(comicId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	comicDetail.SubscribeNum = int32(subscribeNum)
+	hitNum, err := e.ComicHitNumCache.Incr(comicId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	comicDetail.HitNum = int32(hitNum)
 	return response.ReturnOK(comicDetail)
 }
 
