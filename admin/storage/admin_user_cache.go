@@ -27,10 +27,7 @@ func (e *AdminUserCache) Set(accessToken string, adminUser *model.AdminUser) err
 	if err != nil {
 		return err
 	}
-	err = e.redis.Set(e.RedisKey(accessToken), data, constant.TIME_OF_WEEK)
-	if err != nil {
-		return err
-	}
+	e.redis.Set(e.RedisKey(accessToken), data, constant.TIME_OF_WEEK)
 	return nil
 }
 
@@ -40,7 +37,7 @@ func (e *AdminUserCache) Get(accessToken string) (*model.AdminUser, error) {
 	}
 	data, err := e.redis.Get(e.RedisKey(accessToken))
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	if len(data) == 0 {
 		return nil, nil
@@ -56,7 +53,7 @@ func (e *AdminUserCache) Get(accessToken string) (*model.AdminUser, error) {
 func (e *AdminUserCache) Del(accessToken string) error {
 	err := e.redis.Del(e.RedisKey(accessToken))
 	if err != nil {
-		return err
+		return nil
 	}
 	return nil
 }

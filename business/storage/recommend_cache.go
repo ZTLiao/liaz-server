@@ -37,7 +37,7 @@ func (e *RecommendCache) HSet(position int8, recommendType int8, recommend *resp
 func (e *RecommendCache) HGetAll(position int8) ([]resp.RecommendResp, error) {
 	data, err := e.redis.HGetAll(e.RedisKey(position))
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	if len(data) == 0 {
 		return nil, nil

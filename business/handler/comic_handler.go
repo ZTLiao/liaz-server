@@ -89,27 +89,35 @@ func (e *ComicHandler) GetComicDetail(comicId int64) (*resp.ComicDetailResp, err
 	comicDetail.Title = comic.Title
 	comicDetail.Cover = comic.Cover
 	var authorIdList = make([]int64, 0)
-	authorIds := strings.Split(comic.AuthorIds, utils.COMMA)
-	for _, v := range authorIds {
-		authorId, err := strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			return nil, err
+	if len(comic.AuthorIds) > 0 {
+		authorIds := strings.Split(comic.AuthorIds, utils.COMMA)
+		for _, v := range authorIds {
+			authorId, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return nil, err
+			}
+			authorIdList = append(authorIdList, authorId)
 		}
-		authorIdList = append(authorIdList, authorId)
 	}
 	comicDetail.AuthorIds = authorIdList
-	comicDetail.Authors = strings.Split(comic.Authors, utils.COMMA)
+	if len(comic.Authors) > 0 {
+		comicDetail.Authors = strings.Split(comic.Authors, utils.COMMA)
+	}
 	var categoryIdList = make([]int64, 0)
-	categoryIds := strings.Split(comic.CategoryIds, utils.COMMA)
-	for _, v := range categoryIds {
-		categoryId, err := strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			return nil, err
+	if len(comic.CategoryIds) > 0 {
+		categoryIds := strings.Split(comic.CategoryIds, utils.COMMA)
+		for _, v := range categoryIds {
+			categoryId, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return nil, err
+			}
+			categoryIdList = append(categoryIdList, categoryId)
 		}
-		categoryIdList = append(categoryIdList, categoryId)
 	}
 	comicDetail.CategoryIds = categoryIdList
-	comicDetail.Categories = strings.Split(comic.Categories, utils.COMMA)
+	if len(comic.Categories) > 0 {
+		comicDetail.Categories = strings.Split(comic.Categories, utils.COMMA)
+	}
 	comicDetail.SubscribeNum = comic.SubscribeNum
 	comicDetail.HitNum = comic.HitNum
 	comicDetail.Updated = comic.EndTime

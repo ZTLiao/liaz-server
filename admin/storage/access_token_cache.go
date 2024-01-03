@@ -28,7 +28,7 @@ func (e *AccessTokenCache) Set(adminId int64, accessToken string) error {
 func (e *AccessTokenCache) Get(adminId int64) (string, error) {
 	data, err := e.redis.Get(e.RedisKey(adminId))
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 	if len(data) == 0 {
 		return "", nil
@@ -51,7 +51,7 @@ func (e *AccessTokenCache) TTL(adminId int64) (int64, error) {
 func (e *AccessTokenCache) IsExist(adminId int64) (bool, error) {
 	num, err := e.redis.Exists(e.RedisKey(adminId))
 	if err != nil {
-		return false, err
+		return false, nil
 	}
 	return num > 0, nil
 }

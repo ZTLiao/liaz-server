@@ -37,7 +37,7 @@ func (e *NovelSubscribeNumCache) Decr(novelId int64) error {
 func (e *NovelSubscribeNumCache) Get(novelId int64) (int64, error) {
 	score, err := e.redis.ZScore(e.RedisKey(), strconv.FormatInt(novelId, 10))
 	if err != nil {
-		return 0, err
+		return 0, nil
 	}
 	return int64(score), nil
 }
@@ -45,7 +45,7 @@ func (e *NovelSubscribeNumCache) Get(novelId int64) (int64, error) {
 func (e *NovelSubscribeNumCache) Rank(startIndex int64, stopIndex int64) ([]map[int64]int64, error) {
 	res, err := e.redis.ZRevRangeWithScores(e.RedisKey(), startIndex, stopIndex)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	var data = make([]map[int64]int64, 0)
 	if len(res) == 0 {

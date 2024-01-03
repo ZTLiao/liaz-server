@@ -28,7 +28,7 @@ func (e *OAuth2TokenCache) Set(userId int64, accessToken string) error {
 func (e *OAuth2TokenCache) Get(userId int64) (string, error) {
 	data, err := e.redis.Get(e.RedisKey(userId))
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 	if len(data) == 0 {
 		return "", nil
@@ -51,7 +51,7 @@ func (e *OAuth2TokenCache) TTL(userId int64) (int64, error) {
 func (e *OAuth2TokenCache) IsExist(userId int64) (bool, error) {
 	num, err := e.redis.Exists(e.RedisKey(userId))
 	if err != nil {
-		return false, err
+		return false, nil
 	}
 	return num > 0, nil
 }

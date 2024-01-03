@@ -29,7 +29,7 @@ func (e *SysConfCache) HSet(key string, sysConf *model.SysConf) error {
 	}
 	_, err = e.redis.HSet(e.RedisKey(), key, string(val))
 	if err != nil {
-		return err
+		return nil
 	}
 	return nil
 }
@@ -37,7 +37,7 @@ func (e *SysConfCache) HSet(key string, sysConf *model.SysConf) error {
 func (e *SysConfCache) HGet(key string) (*model.SysConf, error) {
 	val, err := e.redis.HGet(e.RedisKey(), key)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	if val == "" {
 		return nil, nil
@@ -62,7 +62,7 @@ func (e *SysConfCache) HGetAll() (map[string]model.SysConf, error) {
 	var sysConfMap map[string]model.SysConf
 	val, err := e.redis.HGetAll(e.RedisKey())
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	if len(val) == 0 {
 		return nil, nil

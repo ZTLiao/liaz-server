@@ -92,27 +92,35 @@ func (e *NovelHandler) GetNovelDetail(novelId int64) (*resp.NovelDetailResp, err
 	novelDetail.Title = novel.Title
 	novelDetail.Cover = novel.Cover
 	var authorIdList = make([]int64, 0)
-	authorIds := strings.Split(novel.AuthorIds, utils.COMMA)
-	for _, v := range authorIds {
-		authorId, err := strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			return nil, err
+	if len(novel.AuthorIds) > 0 {
+		authorIds := strings.Split(novel.AuthorIds, utils.COMMA)
+		for _, v := range authorIds {
+			authorId, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return nil, err
+			}
+			authorIdList = append(authorIdList, authorId)
 		}
-		authorIdList = append(authorIdList, authorId)
 	}
 	novelDetail.AuthorIds = authorIdList
-	novelDetail.Authors = strings.Split(novel.Authors, utils.COMMA)
+	if len(novel.Authors) > 0 {
+		novelDetail.Authors = strings.Split(novel.Authors, utils.COMMA)
+	}
 	var categoryIdList = make([]int64, 0)
-	categoryIds := strings.Split(novel.CategoryIds, utils.COMMA)
-	for _, v := range categoryIds {
-		categoryId, err := strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			return nil, err
+	if len(novel.CategoryIds) > 0 {
+		categoryIds := strings.Split(novel.CategoryIds, utils.COMMA)
+		for _, v := range categoryIds {
+			categoryId, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return nil, err
+			}
+			categoryIdList = append(categoryIdList, categoryId)
 		}
-		categoryIdList = append(categoryIdList, categoryId)
 	}
 	novelDetail.CategoryIds = categoryIdList
-	novelDetail.Categories = strings.Split(novel.Categories, utils.COMMA)
+	if len(novel.Categories) > 0 {
+		novelDetail.Categories = strings.Split(novel.Categories, utils.COMMA)
+	}
 	novelDetail.SubscribeNum = novel.SubscribeNum
 	novelDetail.HitNum = novel.HitNum
 	novelDetail.Updated = novel.EndTime

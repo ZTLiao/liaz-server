@@ -69,13 +69,6 @@ func (e *RedisUtil) Unlock(key string, lockVal string) error {
 }
 
 func (e *RedisUtil) Get(key string) (string, error) {
-	count, err := e.db.Exists(context.TODO(), key).Result()
-	if err != nil {
-		return "", err
-	}
-	if count == 0 {
-		return "", nil
-	}
 	res, err := e.db.Get(context.TODO(), key).Result()
 	if err != nil {
 		logger.Error(err.Error())
@@ -108,13 +101,6 @@ func (e *RedisUtil) HSet(hk string, value ...string) (int64, error) {
 }
 
 func (e *RedisUtil) HGet(hk, key string) (string, error) {
-	count, err := e.db.Exists(context.TODO(), hk).Result()
-	if err != nil {
-		return "", err
-	}
-	if count == 0 {
-		return "", nil
-	}
 	res, err := e.db.HGet(context.TODO(), hk, key).Result()
 	if err != nil {
 		logger.Error(err.Error())
@@ -131,13 +117,6 @@ func (e *RedisUtil) HDel(hk, key string) error {
 }
 
 func (e *RedisUtil) HGetAll(hk string) (map[string]string, error) {
-	count, err := e.db.Exists(context.TODO(), hk).Result()
-	if err != nil {
-		return nil, err
-	}
-	if count == 0 {
-		return nil, nil
-	}
 	res, err := e.db.HGetAll(context.TODO(), hk).Result()
 	if err != nil {
 		logger.Error(err.Error())
@@ -221,13 +200,6 @@ func (e *RedisUtil) ZIncrBy(key string, increment float64, member string) (float
 }
 
 func (e *RedisUtil) ZScore(key string, member string) (float64, error) {
-	count, err := e.db.Exists(context.TODO(), key).Result()
-	if err != nil {
-		return 0, err
-	}
-	if count == 0 {
-		return 0, nil
-	}
 	res, err := e.db.ZScore(context.TODO(), key, member).Result()
 	if err != nil {
 		logger.Error(err.Error())
@@ -236,13 +208,6 @@ func (e *RedisUtil) ZScore(key string, member string) (float64, error) {
 }
 
 func (e *RedisUtil) ZRevRangeWithScores(key string, start int64, stop int64) ([]redis.Z, error) {
-	count, err := e.db.Exists(context.TODO(), key).Result()
-	if err != nil {
-		return nil, err
-	}
-	if count == 0 {
-		return nil, nil
-	}
 	res, err := e.db.ZRevRangeWithScores(context.TODO(), key, start, stop).Result()
 	if err != nil {
 		logger.Error(err.Error())
