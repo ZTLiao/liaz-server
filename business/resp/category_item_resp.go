@@ -10,4 +10,5 @@ type CategoryItemResp struct {
 	ObjId          int64      `json:"objId"`
 	UpgradeChapter string     `json:"upgradeChapter"`
 	UpdatedAt      types.Time `json:"updatedAt"`
+	IsUpgrade      int8       `json:"isUpgrade"`
 }

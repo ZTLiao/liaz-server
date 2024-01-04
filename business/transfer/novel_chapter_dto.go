@@ -9,4 +9,5 @@ type NovelChapterDto struct {
 	EndTime     types.Time `xorm:"end_time"`
 	ChapterId   int64      `xorm:"chapter_id"`
 	ChapterName string     `xorm:"chapter_name"`
+	IsUpgrade   int8       `xorm:"is_upgrade"`
 }

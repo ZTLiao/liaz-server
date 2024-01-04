@@ -55,6 +55,7 @@ func (e *NovelChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 			n.title,
 			n.cover,
 			n.end_time,
+			ns.is_upgrade,
 			b.chapter_id,
 			b.chapter_name
 		from novel_subscribe as ns 
@@ -65,7 +66,7 @@ func (e *NovelChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 		group by n.novel_id
 		`)
 	if sortType == enums.SORT_TYPE_OF_UPDATE {
-		builder.WriteString("order by nc.end_time desc")
+		builder.WriteString("order by n.end_time desc")
 	} else if sortType == enums.SORT_TYPE_OF_SUBSCRIBE {
 		builder.WriteString("order by ns.novel_subscribe_id desc")
 	} else if sortType == enums.SORT_TYPE_OF_BROWSE {

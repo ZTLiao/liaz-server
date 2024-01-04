@@ -4,9 +4,12 @@ import (
 	"business/enums"
 	"business/resp"
 	"business/storage"
+	"core/constant"
 	"core/response"
+	"core/utils"
 	"core/web"
 	"strconv"
+	"time"
 )
 
 type BookshelfHandler struct {
@@ -40,14 +43,20 @@ func (e *BookshelfHandler) GetComic(wc *web.WebContext) interface{} {
 	}
 	var categoryItems = make([]resp.CategoryItemResp, 0)
 	for _, v := range comicChapters {
+		upgradeChapter := v.ChapterName
+		isUpgrade := v.IsUpgrade
+		if isUpgrade == constant.YES {
+			upgradeChapter = time.Time(v.EndTime).Format(utils.NORM_DATE_PATTERN)
+		}
 		categoryItems = append(categoryItems, resp.CategoryItemResp{
 			CategoryId:     v.ComicId,
 			AssetType:      enums.ASSET_TYPE_FOR_COMIC,
 			Title:          v.Title,
 			Cover:          v.Cover,
 			ObjId:          v.ChapterId,
-			UpgradeChapter: v.ChapterName,
+			UpgradeChapter: upgradeChapter,
 			UpdatedAt:      v.EndTime,
+			IsUpgrade:      isUpgrade,
 		})
 	}
 	return response.ReturnOK(categoryItems)
@@ -79,14 +88,20 @@ func (e *BookshelfHandler) GetNovel(wc *web.WebContext) interface{} {
 	}
 	var categoryItems = make([]resp.CategoryItemResp, 0)
 	for _, v := range novelChapters {
+		upgradeChapter := v.ChapterName
+		isUpgrade := v.IsUpgrade
+		if isUpgrade == constant.YES {
+			upgradeChapter = time.Time(v.EndTime).Format(utils.NORM_DATE_PATTERN)
+		}
 		categoryItems = append(categoryItems, resp.CategoryItemResp{
 			CategoryId:     v.NovelId,
 			AssetType:      enums.ASSET_TYPE_FOR_NOVEL,
 			Title:          v.Title,
 			Cover:          v.Cover,
 			ObjId:          v.ChapterId,
-			UpgradeChapter: v.ChapterName,
+			UpgradeChapter: upgradeChapter,
 			UpdatedAt:      v.EndTime,
+			IsUpgrade:      isUpgrade,
 		})
 	}
 	return response.ReturnOK(categoryItems)

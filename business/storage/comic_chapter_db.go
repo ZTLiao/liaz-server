@@ -56,6 +56,7 @@ func (e *ComicChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 			c.title,
 			c.cover,
 			c.end_time,
+			cs.is_upgrade,
 			b.chapter_id,
 			b.chapter_name
 		from comic_subscribe as cs 
