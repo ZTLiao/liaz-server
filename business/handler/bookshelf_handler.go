@@ -45,8 +45,9 @@ func (e *BookshelfHandler) GetComic(wc *web.WebContext) interface{} {
 			AssetType:      enums.ASSET_TYPE_FOR_COMIC,
 			Title:          v.Title,
 			Cover:          v.Cover,
-			ObjId:          v.ComicChapterId,
+			ObjId:          v.ChapterId,
 			UpgradeChapter: v.ChapterName,
+			UpdatedAt:      v.EndTime,
 		})
 	}
 	return response.ReturnOK(categoryItems)
@@ -83,8 +84,9 @@ func (e *BookshelfHandler) GetNovel(wc *web.WebContext) interface{} {
 			AssetType:      enums.ASSET_TYPE_FOR_NOVEL,
 			Title:          v.Title,
 			Cover:          v.Cover,
-			ObjId:          v.NovelChapterId,
+			ObjId:          v.ChapterId,
 			UpgradeChapter: v.ChapterName,
+			UpdatedAt:      v.EndTime,
 		})
 	}
 	return response.ReturnOK(categoryItems)

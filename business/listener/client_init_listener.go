@@ -9,14 +9,17 @@ import (
 )
 
 type ClientInitListener struct {
-	DeviceDb           *storage.DeviceDb
-	ClientInitRecordDb *storage.ClientInitRecordDb
+	deviceDb           *storage.DeviceDb
+	clientInitRecordDb *storage.ClientInitRecordDb
 }
 
 var _ event.Listener = &ClientInitListener{}
 
-func NewClientInitListener(deviceDb *storage.DeviceDb, ClientInitRecordDb *storage.ClientInitRecordDb) *ClientInitListener {
-	return &ClientInitListener{DeviceDb: deviceDb, ClientInitRecordDb: ClientInitRecordDb}
+func NewClientInitListener(deviceDb *storage.DeviceDb, clientInitRecordDb *storage.ClientInitRecordDb) *ClientInitListener {
+	return &ClientInitListener{
+		deviceDb:           deviceDb,
+		clientInitRecordDb: clientInitRecordDb,
+	}
 }
 
 func (e *ClientInitListener) OnListen(event event.Event) {
@@ -33,8 +36,8 @@ func (e *ClientInitListener) OnListen(event event.Event) {
 	app := device.App
 	appVersion := device.AppVersion
 	//是否更新设备
-	if ok, _ := e.DeviceDb.IsUpgrade(deviceId, app, appVersion); ok {
-		err := e.DeviceDb.SaveOrUpdateDevice(&model.Device{
+	if ok, _ := e.deviceDb.IsUpgrade(deviceId, app, appVersion); ok {
+		err := e.deviceDb.SaveOrUpdateDevice(&model.Device{
 			DeviceId:   device.DeviceId,
 			Os:         device.Os,
 			OsVersion:  device.OsVersion,
@@ -49,5 +52,5 @@ func (e *ClientInitListener) OnListen(event event.Event) {
 		}
 	}
 	//APP初始化记录
-	e.ClientInitRecordDb.InsertClientInitRecord(device)
+	e.clientInitRecordDb.InsertClientInitRecord(device)
 }

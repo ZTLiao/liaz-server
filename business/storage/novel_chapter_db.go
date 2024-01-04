@@ -54,22 +54,22 @@ func (e *NovelChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 			n.novel_id,
 			n.title,
 			n.cover,
-			nc.novel_chapter_id,
-			nc.chapter_name
+			n.end_time,
+			b.chapter_id,
+			b.chapter_name
 		from novel_subscribe as ns 
 		left join novel as n on n.novel_id = ns.novel_id
-		left join novel_chapter as nc on nc.novel_id = ns.novel_id
 		left join browse as b on b.obj_id = n.novel_id and b.asset_type = 2
 		where 
 			ns.user_id = ?
 		group by n.novel_id
 		`)
 	if sortType == enums.SORT_TYPE_OF_UPDATE {
-		builder.WriteString("order by nc.novel_chapter_id desc")
+		builder.WriteString("order by nc.end_time desc")
 	} else if sortType == enums.SORT_TYPE_OF_SUBSCRIBE {
-		builder.WriteString("order by ns.novel_subscribe_id desc, nc.novel_chapter_id desc")
+		builder.WriteString("order by ns.novel_subscribe_id desc")
 	} else if sortType == enums.SORT_TYPE_OF_BROWSE {
-		builder.WriteString("order by b.updated_at desc, nc.novel_chapter_id desc")
+		builder.WriteString("order by b.updated_at desc")
 	}
 	err := e.db.SQL(builder.String(), userId).Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&novelChapters)
 	if err != nil {

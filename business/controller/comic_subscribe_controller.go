@@ -2,7 +2,10 @@ package controller
 
 import (
 	"business/handler"
+	"business/listener"
 	"business/storage"
+	"core/constant"
+	"core/event"
 	"core/redis"
 	"core/system"
 	"core/web"
@@ -16,9 +19,11 @@ var _ web.IWebController = &ComicSubscribeController{}
 func (e *ComicSubscribeController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
+	var comicSubscribeNumCache = storage.NewComicSubscribeNumCache(redis)
+	event.Bus.Subscribe(constant.COMIC_SUBSCRIBE_TOPIC, listener.NewComicSubscribeListener(storage.NewComicDb(db), comicSubscribeNumCache))
 	var comicSubscribeHandler = &handler.ComicSubscribeHandler{
 		ComicSubscribeDb:       storage.NewComicSubscribeDb(db),
-		ComicSubscribeNumCache: storage.NewComicSubscribeNumCache(redis),
+		ComicSubscribeNumCache: comicSubscribeNumCache,
 	}
 	iWebRoutes.POST("/comic/subscribe", comicSubscribeHandler.Subscribe)
 }

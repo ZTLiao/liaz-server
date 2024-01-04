@@ -3,6 +3,8 @@ package storage
 import (
 	"business/model"
 	"core/constant"
+	"core/types"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -40,4 +42,32 @@ func (e *ComicDb) GetComicByCategory(categoryId int64, pageNum int32, pageSize i
 		return nil, err
 	}
 	return comics, nil
+}
+
+func (e *ComicDb) UpdateHitNum(comicId int64, hitNum int32) error {
+	if comicId == 0 {
+		return nil
+	}
+	_, err := e.db.ID(comicId).Cols("hit_num", "updated_at").Update(&model.Comic{
+		HitNum:    hitNum,
+		UpdatedAt: types.Time(time.Now()),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *ComicDb) UpdateSubscribeNum(comicId int64, subscribeNum int32) error {
+	if comicId == 0 {
+		return nil
+	}
+	_, err := e.db.ID(comicId).Cols("subscribe_num", "updated_at").Update(&model.Comic{
+		SubscribeNum: subscribeNum,
+		UpdatedAt:    types.Time(time.Now()),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

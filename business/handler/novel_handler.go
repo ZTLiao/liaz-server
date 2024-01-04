@@ -6,6 +6,8 @@ import (
 	"business/model"
 	"business/resp"
 	businessStorage "business/storage"
+	"core/constant"
+	"core/event"
 	"core/response"
 	"core/utils"
 	"core/web"
@@ -68,6 +70,7 @@ func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
 		wc.AbortWithError(err)
 	}
 	novelDetail.HitNum = int32(hitNum)
+	event.Bus.Publish(constant.NOVEL_HIT_TOPIC, novelId)
 	return response.ReturnOK(novelDetail)
 }
 

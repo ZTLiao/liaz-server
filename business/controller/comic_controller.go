@@ -2,7 +2,10 @@ package controller
 
 import (
 	"business/handler"
+	"business/listener"
 	"business/storage"
+	"core/constant"
+	"core/event"
 	"core/redis"
 	"core/system"
 	"core/web"
@@ -16,14 +19,17 @@ var _ web.IWebController = &ComicController{}
 func (e *ComicController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
+	var comicDb = storage.NewComicDb(db)
+	var comicHitNumCache = storage.NewComicHitNumCache(redis)
+	event.Bus.Subscribe(constant.COMIC_HIT_TOPIC, listener.NewComicHitListener(comicDb, comicHitNumCache))
 	var comicHandler = &handler.ComicHandler{
-		ComicDb:                storage.NewComicDb(db),
+		ComicDb:                comicDb,
 		ComicChapterDb:         storage.NewComicChapterDb(db),
 		ComicChapterItemDb:     storage.NewComicChapterItemDb(db),
 		ComicSubscribeDb:       storage.NewComicSubscribeDb(db),
 		BrowseDb:               storage.NewBrowseDb(db),
 		ComicSubscribeNumCache: storage.NewComicSubscribeNumCache(redis),
-		ComicHitNumCache:       storage.NewComicHitNumCache(redis),
+		ComicHitNumCache:       comicHitNumCache,
 	}
 	iWebRoutes.GET("/comic/:comicId", comicHandler.ComicDetail)
 	iWebRoutes.GET("/comic/upgrade", comicHandler.ComicUpgrade)

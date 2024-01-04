@@ -3,6 +3,7 @@ package handler
 import (
 	"business/storage"
 	"core/constant"
+	"core/event"
 	"core/response"
 	"core/web"
 	"strconv"
@@ -32,5 +33,6 @@ func (e *NovelSubscribeHandler) Subscribe(wc *web.WebContext) interface{} {
 		e.NovelSubscribeDb.DelNovelSubscribe(novelId, userId)
 		e.NovelSubscribeNumCache.Decr(novelId)
 	}
+	event.Bus.Publish(constant.NOVEL_SUBSCRIBE_TOPIC, novelId)
 	return response.Success()
 }

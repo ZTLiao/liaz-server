@@ -5,6 +5,8 @@ import (
 	"business/model"
 	"business/resp"
 	"business/storage"
+	"core/constant"
+	"core/event"
 	"core/response"
 	"core/utils"
 	"core/web"
@@ -65,6 +67,7 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 		wc.AbortWithError(err)
 	}
 	comicDetail.HitNum = int32(hitNum)
+	event.Bus.Publish(constant.COMIC_HIT_TOPIC, comicId)
 	return response.ReturnOK(comicDetail)
 }
 
