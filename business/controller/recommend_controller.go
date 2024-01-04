@@ -20,6 +20,7 @@ func (e *RecommendController) Router(iWebRoutes web.IWebRoutes) {
 		RecommendDb:     storage.NewRecommendDb(db),
 		RecommendItemDb: storage.NewRecommendItemDb(db),
 		RecommendCache:  storage.NewRecommendCache(redis),
+		AssetDb:         storage.NewAssetDb(db),
 	}
 	iWebRoutes.GET("/recommend/:position", recommendHandler.Recommend)
 }

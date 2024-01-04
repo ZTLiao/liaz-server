@@ -19,6 +19,7 @@ const (
 	DOT         string = "."
 	SPACE       string = " "
 	QUESTION    string = "?"
+	PIPE        string = "|"
 )
 
 // 单词全部转化为大写
