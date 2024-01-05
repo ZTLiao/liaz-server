@@ -4,6 +4,7 @@ import (
 	"basic/model"
 	"basic/storage"
 	"core/constant"
+	"core/logger"
 	"strconv"
 )
 
@@ -116,7 +117,8 @@ func (e *SysConfHandler) GetSysConfByType(confType int8) ([]model.SysConf, error
 func (e *SysConfHandler) GetConfValueByKey(confKey string) (string, error) {
 	sysConf, err := e.GetSysConfByKey(confKey)
 	if err != nil {
-		return "", err
+		logger.Error(err.Error())
+		return "", nil
 	}
 	if sysConf == nil {
 		return "", nil
@@ -127,7 +129,8 @@ func (e *SysConfHandler) GetConfValueByKey(confKey string) (string, error) {
 func (e *SysConfHandler) GetIntValueByKey(confKey string) (int, error) {
 	sysConf, err := e.GetSysConfByKey(confKey)
 	if err != nil {
-		return 0, err
+		logger.Error(err.Error())
+		return 0, nil
 	}
 	if sysConf == nil {
 		return 0, nil

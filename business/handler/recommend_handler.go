@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"basic/handler"
 	"business/enums"
 	"business/model"
 	"business/resp"
@@ -19,6 +20,7 @@ type RecommendHandler struct {
 	RecommendItemDb *storage.RecommendItemDb
 	RecommendCache  *storage.RecommendCache
 	AssetDb         *storage.AssetDb
+	SysConfHandler  *handler.SysConfHandler
 }
 
 func (e *RecommendHandler) Recommend(wc *web.WebContext) interface{} {
@@ -46,16 +48,22 @@ func (e *RecommendHandler) Recommend(wc *web.WebContext) interface{} {
 	}
 	userId := web.GetUserId(wc)
 	if userId != 0 && len(recommendResps) > 0 {
-		for _, recommendResp := range recommendResps {
+		for i, recommendResp := range recommendResps {
 			recommendType := recommendResp.RecommendType
 			if enums.RECOMMEND_TYPE_FOR_MY_SUBSCRIBE == recommendType {
-				var recommendItemResps []resp.RecommendItemResp
-				assets, err := e.AssetDb.GetAssetForMySubscribe(userId, 18)
+				intValue, err := e.SysConfHandler.GetIntValueByKey(constant.RECOMMEND_FOR_MY_SUBSCRIBE)
 				if err != nil {
 					wc.AbortWithError(err)
 				}
-				e.ConvertRecommendItem(assets, recommendItemResps)
-				recommendResp.Items = recommendItemResps
+				if intValue == 0 {
+					intValue = 20
+				}
+				assets, err := e.AssetDb.GetAssetForMySubscribe(userId, int64(intValue))
+				if err != nil {
+					wc.AbortWithError(err)
+				}
+				recommendResp.Items = e.convertItem(assets, true)
+				recommendResps[i] = recommendResp
 				break
 			}
 		}
@@ -117,41 +125,60 @@ func (e *RecommendHandler) GetRecommendItems(recommendId int64, recommendType in
 			})
 		}
 	} else if enums.RECOMMEND_TYPE_FOR_HOT == recommendType {
-		assets, err := e.AssetDb.GetAssetForHot(9)
+		intValue, err := e.SysConfHandler.GetIntValueByKey(constant.RECOMMEND_FOR_HOT)
 		if err != nil {
 			return nil, err
 		}
-		e.ConvertRecommendItem(assets, recommendItemResps)
+		if intValue == 0 {
+			intValue = 9
+		}
+		assets, err := e.AssetDb.GetAssetForHot(int64(intValue))
+		if err != nil {
+			return nil, err
+		}
+		recommendItemResps = e.convertItem(assets, false)
 	} else if enums.RECOMMEND_TYPE_FOR_UPGRADE == recommendType {
-		assets, err := e.AssetDb.GetAssetForUpgrade(9)
+		intValue, err := e.SysConfHandler.GetIntValueByKey(constant.RECOMMEND_FOR_UPGRADE)
 		if err != nil {
 			return nil, err
 		}
-		e.ConvertRecommendItem(assets, recommendItemResps)
+		if intValue == 0 {
+			intValue = 9
+		}
+		assets, err := e.AssetDb.GetAssetForUpgrade(int64(intValue))
+		if err != nil {
+			return nil, err
+		}
+		recommendItemResps = e.convertItem(assets, false)
 	}
 	return recommendItemResps, nil
 }
 
-func (e *RecommendHandler) ConvertRecommendItem(assets []model.Asset, recommendItemResps []resp.RecommendItemResp) {
+func (e *RecommendHandler) convertItem(assets []model.Asset, isUpgrade bool) []resp.RecommendItemResp {
+	var recommendItemResps []resp.RecommendItemResp
+	if len(assets) == 0 {
+		return recommendItemResps
+	}
 	for _, asset := range assets {
+		subTitle := asset.UpgradeChapter
 		assetKey := asset.AssetKey
-		var authors string
-		if len(assetKey) > 0 {
-			assetKeyArray := strings.Split(assetKey, utils.PIPE)
-			if len(assetKeyArray) > 1 {
-				authors = assetKeyArray[1]
+		if !isUpgrade && len(assetKey) > 0 {
+			array := strings.Split(assetKey, utils.PIPE)
+			if len(array) > 1 {
+				subTitle = array[1]
 			}
 		}
 		recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
 			RecommendItemId: asset.AssetId,
 			Title:           asset.Title,
-			SubTitle:        authors,
+			SubTitle:        subTitle,
 			ShowValue:       asset.Cover,
 			SkipType:        asset.AssetType,
 			SkipValue:       strconv.FormatInt(asset.ObjId, 10),
 			ObjId:           strconv.FormatInt(asset.ObjId, 10),
 		})
 	}
+	return recommendItemResps
 }
 
 func (e *RecommendHandler) DelRecommendCache(recommendId int64) error {
