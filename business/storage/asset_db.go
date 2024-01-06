@@ -40,6 +40,7 @@ func (e *AssetDb) GetAssetForUpgrade(limit int64) ([]model.Asset, error) {
 			a.upgrade_chapter,
 			a.category_ids,
 			a.author_ids,
+			a.chapter_id,
 			a.obj_id,
 			a.created_at,
 			a.updated_at 
@@ -68,12 +69,13 @@ func (e *AssetDb) GetAssetForHot(limit int64) ([]model.Asset, error) {
 			a.upgrade_chapter,
 			a.category_ids,
 			a.author_ids,
+			a.chapter_id,
 			a.obj_id,
 			a.created_at,
 			a.updated_at
 		from asset as a
-		left join comic_chapter as cc on cc.comic_chapter_id = a.obj_id and a.asset_type = 1
-		left join novel_chapter as nc on nc.novel_chapter_id = a.obj_id and a.asset_type = 2
+		left join comic_chapter as cc on cc.comic_chapter_id = a.chapter_id and a.asset_type = 1
+		left join novel_chapter as nc on nc.novel_chapter_id = a.chapter_id and a.asset_type = 2
 		left join comic as c on c.comic_id = cc.comic_id and c.status = 1
 		left join novel as n on n.novel_id = nc.novel_id and n.status = 1
 		group by a.asset_id
@@ -99,12 +101,13 @@ func (e *AssetDb) GetAssetForMySubscribe(userId int64, limit int64) ([]model.Ass
 			a.upgrade_chapter,
 			a.category_ids,
 			a.author_ids,
+			a.chapter_id,
 			a.obj_id,
 			a.created_at,
 			a.updated_at
 		from asset as a
-		left join comic_chapter as cc on cc.comic_chapter_id = a.obj_id and a.asset_type = 1
-		left join novel_chapter as nc on nc.novel_chapter_id = a.obj_id and a.asset_type = 2
+		left join comic_chapter as cc on cc.comic_chapter_id = a.chapter_id and a.asset_type = 1
+		left join novel_chapter as nc on nc.novel_chapter_id = a.chapter_id and a.asset_type = 2
 		left join comic as c on c.comic_id = cc.comic_id and c.status = 1
 		left join novel as n on n.novel_id = nc.novel_id and n.status = 1
 		left join comic_subscribe as cs on cs.comic_id = c.comic_id and cs.user_id = ?
@@ -116,6 +119,34 @@ func (e *AssetDb) GetAssetForMySubscribe(userId int64, limit int64) ([]model.Ass
 		order by a.updated_at desc
 		limit ?
 		`, userId, userId, limit).Find(&assets)
+	if err != nil {
+		return nil, err
+	}
+	return assets, nil
+}
+
+func (e *AssetDb) Search(key string, pageNum int32, pageSize int32) ([]model.Asset, error) {
+	var assets []model.Asset
+	err := e.db.SQL(
+		`
+		select 
+			a.asset_id,
+			a.asset_key,
+			a.asset_type,
+			a.title,
+			a.cover,
+			a.upgrade_chapter,
+			a.category_ids,
+			a.author_ids,
+			a.chapter_id,
+			a.obj_id,
+			a.created_at,
+			a.updated_at
+		from asset as a 
+		where locate(?, a.asset_key) > 0
+		order by a.updated_at desc
+		limit ?, ?
+		`, key, (pageNum-1)*pageSize, pageSize).Find(&assets)
 	if err != nil {
 		return nil, err
 	}

@@ -174,7 +174,7 @@ func (e *RecommendHandler) convertItem(assets []model.Asset, isUpgrade bool) []r
 			SubTitle:        subTitle,
 			ShowValue:       asset.Cover,
 			SkipType:        asset.AssetType,
-			SkipValue:       strconv.FormatInt(asset.ObjId, 10),
+			SkipValue:       strconv.FormatInt(asset.ChapterId, 10),
 			ObjId:           strconv.FormatInt(asset.ObjId, 10),
 		})
 	}

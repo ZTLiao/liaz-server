@@ -51,8 +51,9 @@ func (e *CategorySearchHandler) GetContent(wc *web.WebContext) interface{} {
 			AssetType:      asset.AssetType,
 			Title:          asset.Title,
 			Cover:          asset.Cover,
-			UpgradeChapter: asset.UpgradeChapter,
 			ObjId:          asset.ObjId,
+			ChapterId:      asset.ChapterId,
+			UpgradeChapter: asset.UpgradeChapter,
 		})
 	}
 	return response.ReturnOK(categoryItems)

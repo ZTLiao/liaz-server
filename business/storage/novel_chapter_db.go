@@ -5,6 +5,7 @@ import (
 	"business/model"
 	"business/transfer"
 	"core/constant"
+	"strconv"
 	"strings"
 
 	"github.com/go-xorm/xorm"
@@ -72,7 +73,8 @@ func (e *NovelChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 	} else if sortType == enums.SORT_TYPE_OF_BROWSE {
 		builder.WriteString("order by b.updated_at desc")
 	}
-	err := e.db.SQL(builder.String(), userId).Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&novelChapters)
+	builder.WriteString(" limit " + strconv.FormatInt(int64((pageNum-1)*pageSize), 10) + "," + strconv.FormatInt(int64(pageSize), 10))
+	err := e.db.SQL(builder.String(), userId).Find(&novelChapters)
 	if err != nil {
 		return nil, err
 	}
