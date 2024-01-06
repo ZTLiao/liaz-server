@@ -20,13 +20,14 @@ func (e *ComicController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var comicDb = storage.NewComicDb(db)
+	var comicSubscribeDb = storage.NewComicSubscribeDb(db)
 	var comicHitNumCache = storage.NewComicHitNumCache(redis)
-	event.Bus.Subscribe(constant.COMIC_HIT_TOPIC, listener.NewComicHitListener(comicDb, comicHitNumCache))
+	event.Bus.Subscribe(constant.COMIC_HIT_TOPIC, listener.NewComicHitListener(comicDb, comicSubscribeDb, comicHitNumCache))
 	var comicHandler = &handler.ComicHandler{
 		ComicDb:                comicDb,
 		ComicChapterDb:         storage.NewComicChapterDb(db),
 		ComicChapterItemDb:     storage.NewComicChapterItemDb(db),
-		ComicSubscribeDb:       storage.NewComicSubscribeDb(db),
+		ComicSubscribeDb:       comicSubscribeDb,
 		BrowseDb:               storage.NewBrowseDb(db),
 		ComicSubscribeNumCache: storage.NewComicSubscribeNumCache(redis),
 		ComicHitNumCache:       comicHitNumCache,

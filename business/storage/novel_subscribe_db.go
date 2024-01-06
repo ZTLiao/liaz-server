@@ -2,6 +2,7 @@ package storage
 
 import (
 	"business/model"
+	"core/constant"
 	"core/types"
 	"time"
 
@@ -57,4 +58,17 @@ func (e *NovelSubscribeDb) IsSubscribe(novelId int64, userId int64) (bool, error
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (e *NovelSubscribeDb) SetRead(novelId int64, userId int64) error {
+	if novelId == 0 || userId == 0 {
+		return nil
+	}
+	_, err := e.db.Where("novel_id = ? and user_id = ?", novelId, userId).Update(&model.NovelSubscribe{
+		IsUpgrade: constant.NO,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

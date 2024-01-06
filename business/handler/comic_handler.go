@@ -5,6 +5,7 @@ import (
 	"business/model"
 	"business/resp"
 	"business/storage"
+	"business/transfer"
 	"core/constant"
 	"core/event"
 	"core/response"
@@ -67,7 +68,10 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 		wc.AbortWithError(err)
 	}
 	comicDetail.HitNum = int32(hitNum)
-	event.Bus.Publish(constant.COMIC_HIT_TOPIC, comicId)
+	event.Bus.Publish(constant.COMIC_HIT_TOPIC, &transfer.ComicHitDto{
+		ComicId: comicId,
+		UserId:  web.GetUserId(wc),
+	})
 	return response.ReturnOK(comicDetail)
 }
 
