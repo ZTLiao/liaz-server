@@ -11,6 +11,7 @@ type NovelSubscribe struct {
 	NovelId          int64      `json:"novelId" xorm:"novel_id"`
 	IsUpgrade        int8       `json:"isUpgrade" xorm:"is_upgrade"`
 	CreatedAt        types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	UpdatedAt        types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
 }
 
 var _ model.BaseModel = &NovelSubscribe{}

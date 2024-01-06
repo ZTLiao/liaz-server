@@ -2,6 +2,7 @@ package handler
 
 import (
 	"basic/device"
+	"business/enums"
 	"business/storage"
 	"core/response"
 	"core/web"
@@ -9,8 +10,10 @@ import (
 )
 
 type BrowseHandler struct {
-	BrowseDb  *storage.BrowseDb
-	HistoryDb *storage.HistoryDb
+	BrowseDb         *storage.BrowseDb
+	HistoryDb        *storage.HistoryDb
+	ComicSubscribeDb *storage.ComicSubscribeDb
+	NovelSubscribeDb *storage.NovelSubscribeDb
 }
 
 func (e *BrowseHandler) BrowseHistory(wc *web.WebContext) interface{} {
@@ -43,6 +46,11 @@ func (e *BrowseHandler) BrowseHistory(wc *web.WebContext) interface{} {
 		err := e.BrowseDb.SaveOrUpdateBrowse(userId, objId, int8(assetType), title, cover, chapterId, chapterName, path, int(stopIndex))
 		if err != nil {
 			wc.AbortWithError(err)
+		}
+		if enums.ASSET_TYPE_FOR_COMIC == assetType {
+			e.ComicSubscribeDb.SetRead(objId, userId)
+		} else if enums.ASSET_TYPE_FOR_NOVEL == assetType {
+			e.NovelSubscribeDb.SetRead(objId, userId)
 		}
 	}
 	deviceInfo := device.GetDeviceInfo(wc)

@@ -26,10 +26,12 @@ func (e *NovelSubscribeDb) SaveNovelSubscribe(novelId int64, userId int64) error
 		return err
 	}
 	if count == 0 {
+		var now = types.Time(time.Now())
 		_, err := e.db.Insert(&model.NovelSubscribe{
 			NovelId:   novelId,
 			UserId:    userId,
-			CreatedAt: types.Time(time.Now()),
+			CreatedAt: now,
+			UpdatedAt: now,
 		})
 		if err != nil {
 			return err
@@ -64,8 +66,9 @@ func (e *NovelSubscribeDb) SetRead(novelId int64, userId int64) error {
 	if novelId == 0 || userId == 0 {
 		return nil
 	}
-	_, err := e.db.Where("novel_id = ? and user_id = ?", novelId, userId).Update(&model.NovelSubscribe{
+	_, err := e.db.Where("novel_id = ? and user_id = ?", novelId, userId).Cols("is_upgrade", "updated_at").Update(&model.NovelSubscribe{
 		IsUpgrade: constant.NO,
+		UpdatedAt: types.Time(time.Now()),
 	})
 	if err != nil {
 		return err

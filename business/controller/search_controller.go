@@ -3,6 +3,7 @@ package controller
 import (
 	"business/handler"
 	"business/storage"
+	"core/redis"
 	"core/system"
 	"core/web"
 )
@@ -14,8 +15,11 @@ var _ web.IWebController = &SearchController{}
 
 func (e *SearchController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
+	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var searchHandler = &handler.SearchHandler{
-		AssetDb: storage.NewAssetDb(db),
+		SearchDb:    storage.NewSearchDb(db),
+		AssetDb:     storage.NewAssetDb(db),
+		SearchCache: storage.NewSearchCache(redis),
 	}
 	iWebRoutes.GET("/search", searchHandler.Search)
 }

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"business/model"
+	"business/transfer"
 
 	"github.com/go-xorm/xorm"
 )
@@ -125,30 +126,29 @@ func (e *AssetDb) GetAssetForMySubscribe(userId int64, limit int64) ([]model.Ass
 	return assets, nil
 }
 
-func (e *AssetDb) Search(key string, pageNum int32, pageSize int32) ([]model.Asset, error) {
-	var assets []model.Asset
+func (e *AssetDb) Search(key string, pageNum int32, pageSize int32) ([]transfer.SearchDto, error) {
+	var searchs []transfer.SearchDto
 	err := e.db.SQL(
 		`
 		select 
 			a.asset_id,
-			a.asset_key,
-			a.asset_type,
 			a.title,
 			a.cover,
+			a.asset_type,
+			group_concat(distinct ca.category_name) as categories,
+			group_concat(distinct au.author_name) as authors,
 			a.upgrade_chapter,
-			a.category_ids,
-			a.author_ids,
-			a.chapter_id,
-			a.obj_id,
-			a.created_at,
-			a.updated_at
+			a.obj_id
 		from asset as a 
+		left join category as ca on find_in_set(ca.category_id, a.category_ids)
+		left join author as au on find_in_set(au.author_id, a.author_ids)
 		where locate(?, a.asset_key) > 0
+		group by a.asset_id
 		order by a.updated_at desc
 		limit ?, ?
-		`, key, (pageNum-1)*pageSize, pageSize).Find(&assets)
+		`, key, (pageNum-1)*pageSize, pageSize).Find(&searchs)
 	if err != nil {
 		return nil, err
 	}
-	return assets, nil
+	return searchs, nil
 }
