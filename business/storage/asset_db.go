@@ -3,6 +3,8 @@ package storage
 import (
 	"business/model"
 	"business/transfer"
+	"core/utils"
+	"strings"
 
 	"github.com/go-xorm/xorm"
 )
@@ -151,4 +153,27 @@ func (e *AssetDb) Search(key string, pageNum int32, pageSize int32) ([]transfer.
 		return nil, err
 	}
 	return searchs, nil
+}
+
+func (e *AssetDb) GetAssetByIds(assetIds []int64) ([]model.Asset, error) {
+	if len(assetIds) == 0 {
+		return nil, nil
+	}
+	var assets []model.Asset
+	var builder strings.Builder
+	var params = make([]interface{}, 0)
+	builder.WriteString("asset_id in (")
+	for i, length := 0, len(assetIds); i < length; i++ {
+		builder.WriteString(utils.QUESTION)
+		params = append(params, assetIds[i])
+		if i != length-1 {
+			builder.WriteString(utils.COMMA)
+		}
+	}
+	builder.WriteString(")")
+	err := e.db.Where(builder.String(), params...).Find(&assets)
+	if err != nil {
+		return nil, err
+	}
+	return assets, nil
 }

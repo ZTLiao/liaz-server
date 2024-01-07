@@ -42,12 +42,12 @@ func (e *NovelSubscribeNumCache) Get(novelId int64) (int64, error) {
 	return int64(score), nil
 }
 
-func (e *NovelSubscribeNumCache) Rank(startIndex int64, stopIndex int64) ([]map[int64]int64, error) {
+func (e *NovelSubscribeNumCache) Rank(startIndex int64, stopIndex int64) (map[int64]int64, error) {
 	res, err := e.redis.ZRevRangeWithScores(e.RedisKey(), startIndex, stopIndex)
 	if err != nil {
 		return nil, nil
 	}
-	var data = make([]map[int64]int64, 0)
+	var data = make(map[int64]int64, 0)
 	if len(res) == 0 {
 		return data, nil
 	}
@@ -56,9 +56,7 @@ func (e *NovelSubscribeNumCache) Rank(startIndex int64, stopIndex int64) ([]map[
 		if err != nil {
 			return nil, err
 		}
-		data = append(data, map[int64]int64{
-			member: int64(v.Score),
-		})
+		data[member] = int64(v.Score)
 	}
 	return data, nil
 }

@@ -7,6 +7,7 @@ import (
 	"core/response"
 	"core/utils"
 	"core/web"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -58,4 +59,26 @@ func (e *SearchHandler) Search(wc *web.WebContext) interface{} {
 	userId := web.GetUserId(wc)
 	e.SearchDb.SaveSearch(key, deviceInfo.DeviceId, userId, result)
 	return response.ReturnOK(searchResps)
+}
+
+func (e *SearchHandler) HotRank(wc *web.WebContext) interface{} {
+	members, err := e.SearchCache.Rank(0, 30)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if len(members) == 0 {
+		return response.Success()
+	}
+	var assetIds = make([]int64, 0)
+	for k := range members {
+		assetIds = append(assetIds, k)
+	}
+	assets, err := e.AssetDb.GetAssetByIds(assetIds)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	sort.Slice(assets, func(i, j int) bool {
+		return members[assets[i].AssetId] > members[assets[j].AssetId]
+	})
+	return response.ReturnOK(assets)
 }

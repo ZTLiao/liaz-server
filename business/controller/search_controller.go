@@ -22,4 +22,5 @@ func (e *SearchController) Router(iWebRoutes web.IWebRoutes) {
 		SearchCache: storage.NewSearchCache(redis),
 	}
 	iWebRoutes.GET("/search", searchHandler.Search)
+	iWebRoutes.GET("/search/hot/rank", searchHandler.HotRank)
 }
