@@ -35,6 +35,15 @@ func (e *ComicDb) GetComicById(comicId int64) (*model.Comic, error) {
 	return &comic, nil
 }
 
+func (e *ComicDb) GetComicByAuthor(authorId int64, pageNum int32, pageSize int32) ([]model.Comic, error) {
+	var comics []model.Comic
+	err := e.db.Where("find_in_set(?, author_ids) and status = ?", authorId, constant.PASS).OrderBy("end_time desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&comics)
+	if err != nil {
+		return nil, err
+	}
+	return comics, nil
+}
+
 func (e *ComicDb) GetComicByCategory(categoryId int64, pageNum int32, pageSize int32) ([]model.Comic, error) {
 	var comics []model.Comic
 	err := e.db.Where("find_in_set(?, category_ids) and status = ?", categoryId, constant.PASS).OrderBy("end_time desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&comics)
@@ -70,4 +79,22 @@ func (e *ComicDb) UpdateSubscribeNum(comicId int64, subscribeNum int32) error {
 		return err
 	}
 	return nil
+}
+
+func (e *ComicDb) GetComicByAuthorId(authorId int64) ([]model.Comic, error) {
+	var comics []model.Comic
+	err := e.db.Where("find_in_set(?, author_ids) and status = ?", authorId, constant.PASS).OrderBy("end_time desc").Find(&comics)
+	if err != nil {
+		return nil, err
+	}
+	return comics, nil
+}
+
+func (e *ComicDb) GetComicByCategoryId(categoryId int64) ([]model.Comic, error) {
+	var comics []model.Comic
+	err := e.db.Where("find_in_set(?, category_ids) and status = ?", categoryId, constant.PASS).OrderBy("end_time desc").Find(&comics)
+	if err != nil {
+		return nil, err
+	}
+	return comics, nil
 }

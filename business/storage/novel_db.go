@@ -35,6 +35,15 @@ func (e *NovelDb) GetNovelById(novelId int64) (*model.Novel, error) {
 	return &novel, nil
 }
 
+func (e *NovelDb) GetNovelByAuthor(authorId int64, pageNum int32, pageSize int32) ([]model.Novel, error) {
+	var novels []model.Novel
+	err := e.db.Where("find_in_set(?, author_ids) and status = ?", authorId, constant.PASS).OrderBy("end_time desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&novels)
+	if err != nil {
+		return nil, err
+	}
+	return novels, nil
+}
+
 func (e *NovelDb) GetNovelByCategory(categoryId int64, pageNum int32, pageSize int32) ([]model.Novel, error) {
 	var novels []model.Novel
 	err := e.db.Where("find_in_set(?, category_ids) and status = ?", categoryId, constant.PASS).OrderBy("end_time desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&novels)
@@ -70,4 +79,22 @@ func (e *NovelDb) UpdateSubscribeNum(novelId int64, subscribeNum int32) error {
 		return err
 	}
 	return nil
+}
+
+func (e *NovelDb) GetNovelByAuthorId(authorId int64) ([]model.Novel, error) {
+	var novels []model.Novel
+	err := e.db.Where("find_in_set(?, author_ids) and status = ?", authorId, constant.PASS).OrderBy("end_time desc").Find(&novels)
+	if err != nil {
+		return nil, err
+	}
+	return novels, nil
+}
+
+func (e *NovelDb) GetNovelByCategoryId(categoryId int64) ([]model.Novel, error) {
+	var novels []model.Novel
+	err := e.db.Where("find_in_set(?, category_ids) and status = ?", categoryId, constant.PASS).OrderBy("end_time desc").Find(&novels)
+	if err != nil {
+		return nil, err
+	}
+	return novels, nil
 }

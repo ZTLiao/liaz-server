@@ -200,7 +200,7 @@ func (e *RecommendHandler) DelRecommendCache(recommendId int64) error {
 }
 
 func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
-	comicIdStr := wc.Param("comicId")
+	comicIdStr := wc.Query("comicId")
 	if len(comicIdStr) == 0 {
 		return response.Success()
 	}
@@ -218,10 +218,10 @@ func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
 	var recommendResps []resp.RecommendResp
 	authorIds := comic.AuthorIds
 	authors := comic.Authors
-	if len(authorIds) != 0 {
+	if len(authorIds) > 0 {
 		authorIdArray := strings.Split(authorIds, utils.COMMA)
 		authorArray := strings.Split(authors, utils.COMMA)
-		for i, authorId := range authorIdArray {
+		for i, authorIdStr := range authorIdArray {
 			author := authorArray[i]
 			var recommendResp = new(resp.RecommendResp)
 			recommendResp.RecommendId = comicId
@@ -230,9 +230,227 @@ func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
 			recommendResp.ShowType = enums.SHOW_TYPE_FOR_NONE
 			recommendResp.IsShowTitle = true
 			recommendResp.OptType = enums.OPT_TYPE_FOR_JUMP
-			recommendResp.OptValue = authorId
+			recommendResp.OptValue = authorIdStr
 			recommendResp.SeqNo = i
-			// TODO
+			authorId, err := strconv.ParseInt(authorIdStr, 10, 64)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			var recommendItemResps []resp.RecommendItemResp
+			novels, err := e.NovelDb.GetNovelByAuthor(authorId, 1, 10)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if len(novels) > 0 {
+				for _, novel := range novels {
+					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
+						RecommendItemId: novel.NovelId,
+						Title:           novel.Title,
+						SubTitle:        novel.Authors,
+						ShowValue:       novel.Cover,
+						SkipType:        enums.SKIP_TYPE_FOR_NOVEL,
+						SkipValue:       utils.EMPTY,
+						ObjId:           strconv.FormatInt(novel.NovelId, 10),
+					})
+				}
+				recommendResp.Items = recommendItemResps
+			}
+			comics, err := e.ComicDb.GetComicByAuthor(authorId, 1, 10)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if len(comics) > 0 {
+				for _, comic := range comics {
+					if comicId == comic.ComicId {
+						continue
+					}
+					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
+						RecommendItemId: comic.ComicId,
+						Title:           comic.Title,
+						SubTitle:        comic.Authors,
+						ShowValue:       comic.Cover,
+						SkipType:        enums.SKIP_TYPE_FOR_COMIC,
+						SkipValue:       utils.EMPTY,
+						ObjId:           strconv.FormatInt(comic.ComicId, 10),
+					})
+				}
+				recommendResp.Items = recommendItemResps
+			}
+			recommendResps = append(recommendResps, *recommendResp)
+		}
+	}
+	categoryIds := comic.CategoryIds
+	categories := comic.Categories
+	if len(categoryIds) > 0 {
+		categoryIdArray := strings.Split(categoryIds, utils.COMMA)
+		categoryArray := strings.Split(categories, utils.COMMA)
+		for i, categoryIdStr := range categoryIdArray {
+			category := categoryArray[i]
+			var recommendResp = new(resp.RecommendResp)
+			recommendResp.RecommendId = comicId
+			recommendResp.RecommendType = enums.RECOMMEND_TYPE_FOR_CATEGORY
+			recommendResp.Title = category
+			recommendResp.ShowType = enums.SHOW_TYPE_FOR_NONE
+			recommendResp.IsShowTitle = true
+			recommendResp.OptType = enums.OPT_TYPE_FOR_JUMP
+			recommendResp.OptValue = categoryIdStr
+			recommendResp.SeqNo = i
+			categoryId, err := strconv.ParseInt(categoryIdStr, 10, 64)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			var recommendItemResps []resp.RecommendItemResp
+			comics, err := e.ComicDb.GetComicByCategory(categoryId, 1, 10)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if len(comics) > 0 {
+				for _, comic := range comics {
+					if comicId == comic.ComicId {
+						continue
+					}
+					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
+						RecommendItemId: comic.ComicId,
+						Title:           comic.Title,
+						SubTitle:        comic.Authors,
+						ShowValue:       comic.Cover,
+						SkipType:        enums.SKIP_TYPE_FOR_COMIC,
+						SkipValue:       utils.EMPTY,
+						ObjId:           strconv.FormatInt(comic.ComicId, 10),
+					})
+				}
+				recommendResp.Items = recommendItemResps
+			}
+			recommendResps = append(recommendResps, *recommendResp)
+		}
+	}
+	return response.ReturnOK(recommendResps)
+}
+
+func (e *RecommendHandler) RecommendNovel(wc *web.WebContext) interface{} {
+	novelIdStr := wc.Query("novelId")
+	if len(novelIdStr) == 0 {
+		return response.Success()
+	}
+	novelId, err := strconv.ParseInt(novelIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	novel, err := e.NovelDb.GetNovelById(novelId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if novel == nil {
+		return response.Success()
+	}
+	var recommendResps []resp.RecommendResp
+	authorIds := novel.AuthorIds
+	authors := novel.Authors
+	if len(authorIds) > 0 {
+		authorIdArray := strings.Split(authorIds, utils.COMMA)
+		authorArray := strings.Split(authors, utils.COMMA)
+		for i, authorIdStr := range authorIdArray {
+			author := authorArray[i]
+			var recommendResp = new(resp.RecommendResp)
+			recommendResp.RecommendId = novelId
+			recommendResp.RecommendType = enums.RECOMMEND_TYPE_FOR_AUTHOR
+			recommendResp.Title = author
+			recommendResp.ShowType = enums.SHOW_TYPE_FOR_NONE
+			recommendResp.IsShowTitle = true
+			recommendResp.OptType = enums.OPT_TYPE_FOR_JUMP
+			recommendResp.OptValue = authorIdStr
+			recommendResp.SeqNo = i
+			authorId, err := strconv.ParseInt(authorIdStr, 10, 64)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			var recommendItemResps []resp.RecommendItemResp
+			comics, err := e.ComicDb.GetComicByAuthor(authorId, 1, 10)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if len(comics) > 0 {
+				for _, comic := range comics {
+					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
+						RecommendItemId: comic.ComicId,
+						Title:           comic.Title,
+						SubTitle:        comic.Authors,
+						ShowValue:       comic.Cover,
+						SkipType:        enums.SKIP_TYPE_FOR_COMIC,
+						SkipValue:       utils.EMPTY,
+						ObjId:           strconv.FormatInt(comic.ComicId, 10),
+					})
+				}
+				recommendResp.Items = recommendItemResps
+			}
+			novels, err := e.NovelDb.GetNovelByAuthor(authorId, 1, 10)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if len(novels) > 0 {
+				for _, novel := range novels {
+					if novelId == novel.NovelId {
+						continue
+					}
+					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
+						RecommendItemId: novel.NovelId,
+						Title:           novel.Title,
+						SubTitle:        novel.Authors,
+						ShowValue:       novel.Cover,
+						SkipType:        enums.SKIP_TYPE_FOR_NOVEL,
+						SkipValue:       utils.EMPTY,
+						ObjId:           strconv.FormatInt(novel.NovelId, 10),
+					})
+				}
+				recommendResp.Items = recommendItemResps
+			}
+
+			recommendResps = append(recommendResps, *recommendResp)
+		}
+	}
+	categoryIds := novel.CategoryIds
+	categories := novel.Categories
+	if len(categoryIds) > 0 {
+		categoryIdArray := strings.Split(categoryIds, utils.COMMA)
+		categoryArray := strings.Split(categories, utils.COMMA)
+		for i, categoryIdStr := range categoryIdArray {
+			category := categoryArray[i]
+			var recommendResp = new(resp.RecommendResp)
+			recommendResp.RecommendId = novelId
+			recommendResp.RecommendType = enums.RECOMMEND_TYPE_FOR_CATEGORY
+			recommendResp.Title = category
+			recommendResp.ShowType = enums.SHOW_TYPE_FOR_NONE
+			recommendResp.IsShowTitle = true
+			recommendResp.OptType = enums.OPT_TYPE_FOR_JUMP
+			recommendResp.OptValue = categoryIdStr
+			recommendResp.SeqNo = i
+			categoryId, err := strconv.ParseInt(categoryIdStr, 10, 64)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			var recommendItemResps []resp.RecommendItemResp
+			novels, err := e.NovelDb.GetNovelByCategory(categoryId, 1, 10)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if len(novels) > 0 {
+				for _, novel := range novels {
+					if novelId == novel.NovelId {
+						continue
+					}
+					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
+						RecommendItemId: novel.NovelId,
+						Title:           novel.Title,
+						SubTitle:        novel.Authors,
+						ShowValue:       novel.Cover,
+						SkipType:        enums.SKIP_TYPE_FOR_NOVEL,
+						SkipValue:       utils.EMPTY,
+						ObjId:           strconv.FormatInt(novel.NovelId, 10),
+					})
+				}
+				recommendResp.Items = recommendItemResps
+			}
+			recommendResps = append(recommendResps, *recommendResp)
 		}
 	}
 	return response.ReturnOK(recommendResps)

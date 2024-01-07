@@ -30,4 +30,5 @@ func (e *RecommendController) Router(iWebRoutes web.IWebRoutes) {
 	}
 	iWebRoutes.GET("/recommend/:position", recommendHandler.Recommend)
 	iWebRoutes.GET("/recommend/comic", recommendHandler.RecommendComic)
+	iWebRoutes.GET("/recommend/novel", recommendHandler.RecommendNovel)
 }
