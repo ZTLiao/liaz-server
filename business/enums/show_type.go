@@ -1,0 +1,8 @@
+package enums
+
+const (
+	SHOW_TYPE_FOR_NONE       = 0
+	SHOW_TYPE_FOR_BANNER     = 1
+	SHOW_TYPE_FOR_TWO_GRID   = 2
+	SHOW_TYPE_FOR_THREE_GRID = 3
+)

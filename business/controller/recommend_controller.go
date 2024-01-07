@@ -20,6 +20,8 @@ func (e *RecommendController) Router(iWebRoutes web.IWebRoutes) {
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var sysConfHandler = basicHandler.NewSysConfHandler(basicStorage.NewSysConfDb(db), basicStorage.NewSysConfCache(redis))
 	var recommendHandler = &businessHandler.RecommendHandler{
+		ComicDb:         businessStorage.NewComicDb(db),
+		NovelDb:         businessStorage.NewNovelDb(db),
 		RecommendDb:     businessStorage.NewRecommendDb(db),
 		RecommendItemDb: businessStorage.NewRecommendItemDb(db),
 		RecommendCache:  businessStorage.NewRecommendCache(redis),
@@ -27,4 +29,5 @@ func (e *RecommendController) Router(iWebRoutes web.IWebRoutes) {
 		SysConfHandler:  sysConfHandler,
 	}
 	iWebRoutes.GET("/recommend/:position", recommendHandler.Recommend)
+	iWebRoutes.GET("/recommend/comic", recommendHandler.RecommendComic)
 }

@@ -16,6 +16,8 @@ import (
 )
 
 type RecommendHandler struct {
+	ComicDb         *storage.ComicDb
+	NovelDb         *storage.NovelDb
 	RecommendDb     *storage.RecommendDb
 	RecommendItemDb *storage.RecommendItemDb
 	RecommendCache  *storage.RecommendCache
@@ -195,4 +197,43 @@ func (e *RecommendHandler) DelRecommendCache(recommendId int64) error {
 		return err
 	}
 	return nil
+}
+
+func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
+	comicIdStr := wc.Param("comicId")
+	if len(comicIdStr) == 0 {
+		return response.Success()
+	}
+	comicId, err := strconv.ParseInt(comicIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	comic, err := e.ComicDb.GetComicById(comicId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if comic == nil {
+		return response.Success()
+	}
+	var recommendResps []resp.RecommendResp
+	authorIds := comic.AuthorIds
+	authors := comic.Authors
+	if len(authorIds) != 0 {
+		authorIdArray := strings.Split(authorIds, utils.COMMA)
+		authorArray := strings.Split(authors, utils.COMMA)
+		for i, authorId := range authorIdArray {
+			author := authorArray[i]
+			var recommendResp = new(resp.RecommendResp)
+			recommendResp.RecommendId = comicId
+			recommendResp.RecommendType = enums.RECOMMEND_TYPE_FOR_AUTHOR
+			recommendResp.Title = author
+			recommendResp.ShowType = enums.SHOW_TYPE_FOR_NONE
+			recommendResp.IsShowTitle = true
+			recommendResp.OptType = enums.OPT_TYPE_FOR_JUMP
+			recommendResp.OptValue = authorId
+			recommendResp.SeqNo = i
+			// TODO
+		}
+	}
+	return response.ReturnOK(recommendResps)
 }
