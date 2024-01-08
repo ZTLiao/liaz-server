@@ -215,6 +215,7 @@ func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
 	if comic == nil {
 		return response.Success()
 	}
+	var comicIdMap = make(map[int64]int64, 0)
 	var recommendResps []resp.RecommendResp
 	authorIds := comic.AuthorIds
 	authors := comic.Authors
@@ -264,6 +265,9 @@ func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
 					if comicId == comic.ComicId {
 						continue
 					}
+					if _, ex := comicIdMap[comic.ComicId]; ex {
+						continue
+					}
 					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
 						RecommendItemId: comic.ComicId,
 						Title:           comic.Title,
@@ -273,6 +277,7 @@ func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
 						SkipValue:       utils.EMPTY,
 						ObjId:           strconv.FormatInt(comic.ComicId, 10),
 					})
+					comicIdMap[comic.ComicId] = comic.ComicId
 				}
 				recommendResp.Items = recommendItemResps
 			}
@@ -309,6 +314,9 @@ func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
 					if comicId == comic.ComicId {
 						continue
 					}
+					if _, ex := comicIdMap[comic.ComicId]; ex {
+						continue
+					}
 					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
 						RecommendItemId: comic.ComicId,
 						Title:           comic.Title,
@@ -318,6 +326,7 @@ func (e *RecommendHandler) RecommendComic(wc *web.WebContext) interface{} {
 						SkipValue:       utils.EMPTY,
 						ObjId:           strconv.FormatInt(comic.ComicId, 10),
 					})
+					comicIdMap[comic.ComicId] = comic.ComicId
 				}
 				recommendResp.Items = recommendItemResps
 			}
@@ -343,6 +352,7 @@ func (e *RecommendHandler) RecommendNovel(wc *web.WebContext) interface{} {
 	if novel == nil {
 		return response.Success()
 	}
+	var novelIdMap = make(map[int64]int64, 0)
 	var recommendResps []resp.RecommendResp
 	authorIds := novel.AuthorIds
 	authors := novel.Authors
@@ -392,6 +402,9 @@ func (e *RecommendHandler) RecommendNovel(wc *web.WebContext) interface{} {
 					if novelId == novel.NovelId {
 						continue
 					}
+					if _, ex := novelIdMap[novel.NovelId]; ex {
+						continue
+					}
 					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
 						RecommendItemId: novel.NovelId,
 						Title:           novel.Title,
@@ -401,6 +414,7 @@ func (e *RecommendHandler) RecommendNovel(wc *web.WebContext) interface{} {
 						SkipValue:       utils.EMPTY,
 						ObjId:           strconv.FormatInt(novel.NovelId, 10),
 					})
+					novelIdMap[novel.NovelId] = novel.NovelId
 				}
 				recommendResp.Items = recommendItemResps
 			}
@@ -438,6 +452,9 @@ func (e *RecommendHandler) RecommendNovel(wc *web.WebContext) interface{} {
 					if novelId == novel.NovelId {
 						continue
 					}
+					if _, ex := novelIdMap[novel.NovelId]; ex {
+						continue
+					}
 					recommendItemResps = append(recommendItemResps, resp.RecommendItemResp{
 						RecommendItemId: novel.NovelId,
 						Title:           novel.Title,
@@ -447,6 +464,7 @@ func (e *RecommendHandler) RecommendNovel(wc *web.WebContext) interface{} {
 						SkipValue:       utils.EMPTY,
 						ObjId:           strconv.FormatInt(novel.NovelId, 10),
 					})
+					novelIdMap[novel.NovelId] = novel.NovelId
 				}
 				recommendResp.Items = recommendItemResps
 			}
