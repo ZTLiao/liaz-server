@@ -29,6 +29,7 @@ func (e *ComicSubscribeHandler) Subscribe(wc *web.WebContext) interface{} {
 	if int8(isSubscribe) == constant.YES {
 		e.ComicSubscribeDb.SaveComicSubscribe(comicId, userId)
 		e.ComicSubscribeNumCache.Incr(comicId)
+		event.Bus.Publish(constant.COMIC_SUBSCRIBE_RANK_TOPIC, comicId)
 	} else {
 		e.ComicSubscribeDb.DelComicSubscribe(comicId, userId)
 		e.ComicSubscribeNumCache.Decr(comicId)

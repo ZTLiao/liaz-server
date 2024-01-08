@@ -6,4 +6,6 @@ const (
 	NOVEL_HIT_NUM       = "novel_hit_num"
 	NOVEL_SUBSCRIBE_NUM = "novel_subscribe_num"
 	SEARCH              = "search"
+	COMIC_RANK          = "comic_rank"
+	NOVEL_RANK          = "novel_rank"
 )

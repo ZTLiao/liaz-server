@@ -29,6 +29,7 @@ func (e *NovelSubscribeHandler) Subscribe(wc *web.WebContext) interface{} {
 	if int8(isSubscribe) == constant.YES {
 		e.NovelSubscribeDb.SaveNovelSubscribe(novelId, userId)
 		e.NovelSubscribeNumCache.Incr(novelId)
+		event.Bus.Publish(constant.NOVEL_SUBSCRIBE_RANK_TOPIC, novelId)
 	} else {
 		e.NovelSubscribeDb.DelNovelSubscribe(novelId, userId)
 		e.NovelSubscribeNumCache.Decr(novelId)

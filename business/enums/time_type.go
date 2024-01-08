@@ -1,0 +1,8 @@
+package enums
+
+const (
+	TIME_TYPE_FOR_DAY   = 0
+	TIME_TYPE_FOR_WEEK  = 1
+	TIME_TYPE_FOR_MONTH = 2
+	TIME_TYPE_FOR_TOTAL = 3
+)
