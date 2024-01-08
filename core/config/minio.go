@@ -26,6 +26,7 @@ func (e *Minio) Init() {
 	})
 	if err != nil {
 		fmt.Println(err.Error())
+		return
 	}
 	system.SetMinioClient(client)
 }

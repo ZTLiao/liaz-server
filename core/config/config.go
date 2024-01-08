@@ -11,6 +11,7 @@ type Config struct {
 	Security *Security `yaml:"security"`
 	Minio    *Minio    `yaml:"minio"`
 	Oauth2   *Oauth2   `yaml:"oauth2"`
+	Oss      *Oss      `yaml:"oss"`
 }
 
 var SystemConfig = new(Config)
@@ -37,6 +38,8 @@ func Setup() {
 	SystemConfig.Redis.Init()
 	//文件储存
 	SystemConfig.Minio.Init()
+	//阿里对象存储oss
+	SystemConfig.Oss.Init()
 	//oauth
 	SystemConfig.Oauth2.Init()
 	//http

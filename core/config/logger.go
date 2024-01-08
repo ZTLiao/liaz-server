@@ -49,6 +49,7 @@ func (e *Logger) Init() {
 				log.SetOutput(writer)
 			} else {
 				fmt.Println(err.Error())
+				return
 			}
 		} else {
 			log.SetOutput(os.Stdout)

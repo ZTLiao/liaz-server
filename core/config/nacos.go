@@ -66,6 +66,7 @@ func (e *Nacos) Init() {
 	port, err := strconv.Atoi(serverAddrArray[1])
 	if err != nil {
 		fmt.Println(err.Error())
+		return
 	}
 	sc := []constant.ServerConfig{
 		*constant.NewServerConfig(ipAddr, uint64(port), constant.WithContextPath("/nacos")),
@@ -110,6 +111,7 @@ func (e *Nacos) config() {
 		)
 		if err != nil {
 			fmt.Println(err.Error())
+			return
 		}
 		configYml += fmt.Sprintf("%s\n", content)
 	}
@@ -121,6 +123,7 @@ func (e *Nacos) config() {
 	)
 	if err != nil {
 		fmt.Println(err.Error())
+		return
 	}
 	configYml += fmt.Sprintf("%s\n", content)
 	//刷新全局配置
@@ -144,6 +147,7 @@ func (e *Nacos) listen() {
 		)
 		if err != nil {
 			fmt.Println(err.Error())
+			return
 		}
 	}
 }

@@ -33,7 +33,7 @@ func (e *MinioTemplate) CreateBucket(bucketName string) error {
 	return nil
 }
 
-func (e *MinioTemplate) ListObjects(bucketName string) []FileObjectInfo {
+func (e *MinioTemplate) ListObjects(bucketName string) ([]FileObjectInfo, error) {
 	objectInfos := e.minioClient.ListObjects(context.Background(), bucketName, minio.ListObjectsOptions{})
 	var fileInfos = make([]FileObjectInfo, 0)
 	for objectInfo := range objectInfos {
@@ -45,7 +45,7 @@ func (e *MinioTemplate) ListObjects(bucketName string) []FileObjectInfo {
 			Expires:      objectInfo.Expires,
 		})
 	}
-	return fileInfos
+	return fileInfos, nil
 }
 
 func (e *MinioTemplate) PutObject(bucketName string, objectName string, data []byte) (*FileObjectInfo, error) {

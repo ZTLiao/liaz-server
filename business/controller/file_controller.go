@@ -4,6 +4,7 @@ import (
 	basicHandler "basic/handler"
 	"basic/storage"
 	businessHandler "business/handler"
+	"core/constant"
 	"core/file"
 	"core/redis"
 	"core/system"
@@ -17,10 +18,9 @@ var _ web.IWebController = &FileController{}
 
 func (e *FileController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	minio := system.GetMinioClient()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var fileItemDb = storage.NewFileItemDb(db)
-	var fileTemplate = file.NewFileTemplate(minio)
+	var fileTemplate = file.NewFileTemplate(constant.MINIO)
 	var sysConfDb = storage.NewSysConfDb(db)
 	var sysConfCache = storage.NewSysConfCache(redis)
 	var fileHandler = &businessHandler.FileHandler{

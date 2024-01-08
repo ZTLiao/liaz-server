@@ -29,6 +29,7 @@ func (e *Database) Init() {
 	err = engine.Ping()
 	if err != nil {
 		fmt.Printf("connect ping failed: %v", err)
+		return
 	}
 	//最大空闲连接数
 	engine.SetMaxIdleConns(e.MaxIdleConns)

@@ -1,6 +1,7 @@
 package system
 
 import (
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/minio/minio-go/v7"
@@ -20,6 +21,7 @@ type Application struct {
 	redisClient   *redis.Client
 	minioClient   *minio.Client
 	oauth2Config  *oauth2.Config
+	ossClient     *oss.Client
 }
 
 func SetEnv(env string) {
@@ -110,6 +112,16 @@ func SetOauth2Config(config *oauth2.Config) {
 
 func GetOauth2Config() *oauth2.Config {
 	return application.oauth2Config
+}
+
+func SetOssClient(client *oss.Client) {
+	if application.ossClient == nil {
+		application.ossClient = client
+	}
+}
+
+func GetOssClient() *oss.Client {
+	return application.ossClient
 }
 
 var application = new(Application)
