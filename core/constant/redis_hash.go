@@ -1,5 +1,6 @@
 package constant
 
 const (
-	SYS_CONF string = "sys_conf"
+	SYS_CONF  = "sys_conf"
+	RECOMMEND = "recommend"
 )

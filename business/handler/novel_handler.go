@@ -28,6 +28,7 @@ type NovelHandler struct {
 	NovelSubscribeNumCache *businessStorage.NovelSubscribeNumCache
 	NovelHitNumCache       *businessStorage.NovelHitNumCache
 	NovelRankCache         *businessStorage.NovelRankCache
+	NovelDetailCache       *businessStorage.NovelDetailCache
 }
 
 func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
@@ -39,9 +40,19 @@ func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	novelDetail, err := e.GetNovelDetail(novelId)
+	novelDetail, err := e.NovelDetailCache.Get(novelId)
 	if err != nil {
 		wc.AbortWithError(err)
+	}
+	if novelDetail == nil {
+		novelDetail, err = e.GetNovelDetail(novelId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		err := e.NovelDetailCache.Set(novelId, novelDetail)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 	}
 	if novelDetail == nil {
 		return response.Success()

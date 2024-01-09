@@ -24,6 +24,7 @@ type ComicHandler struct {
 	BrowseDb               *storage.BrowseDb
 	ComicSubscribeNumCache *storage.ComicSubscribeNumCache
 	ComicHitNumCache       *storage.ComicHitNumCache
+	ComicDetailCache       *storage.ComicDetailCache
 }
 
 func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
@@ -35,9 +36,19 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	comicDetail, err := e.GetComicDetail(comicId)
+	comicDetail, err := e.ComicDetailCache.Get(comicId)
 	if err != nil {
 		wc.AbortWithError(err)
+	}
+	if comicDetail == nil {
+		comicDetail, err = e.GetComicDetail(comicId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		err := e.ComicDetailCache.Set(comicId, comicDetail)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 	}
 	if comicDetail == nil {
 		return response.Success()
