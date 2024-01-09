@@ -72,6 +72,7 @@ func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
 		ComicId: comicId,
 		UserId:  web.GetUserId(wc),
 	})
+	event.Bus.Publish(constant.COMIC_POPULAR_RANK_TOPIC, comicId)
 	return response.ReturnOK(comicDetail)
 }
 

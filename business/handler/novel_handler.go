@@ -27,6 +27,7 @@ type NovelHandler struct {
 	BrowseDb               *businessStorage.BrowseDb
 	NovelSubscribeNumCache *businessStorage.NovelSubscribeNumCache
 	NovelHitNumCache       *businessStorage.NovelHitNumCache
+	NovelRankCache         *businessStorage.NovelRankCache
 }
 
 func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
@@ -75,6 +76,7 @@ func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
 		NovelId: novelId,
 		UserId:  web.GetUserId(wc),
 	})
+	event.Bus.Publish(constant.NOVEL_POPULAR_RANK_TOPIC, novelId)
 	return response.ReturnOK(novelDetail)
 }
 

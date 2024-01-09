@@ -9,4 +9,6 @@ const (
 	NOVEL_SUBSCRIBE_TOPIC      = "novel_subscribe_topic"
 	COMIC_SUBSCRIBE_RANK_TOPIC = "comic_subscribe_rank_topic"
 	NOVEL_SUBSCRIBE_RANK_TOPIC = "novel_subscribe_rank_topic"
+	COMIC_POPULAR_RANK_TOPIC   = "comic_popular_rank_topic"
+	NOVEL_POPULAR_RANK_TOPIC   = "novel_popular_rank_topic"
 )

@@ -24,6 +24,7 @@ func (e *NovelController) Router(iWebRoutes web.IWebRoutes) {
 	var novelSubscribeDb = businessStorage.NewNovelSubscribeDb(db)
 	var novelHitNumCache = businessStorage.NewNovelHitNumCache(redis)
 	event.Bus.Subscribe(constant.NOVEL_HIT_TOPIC, listener.NewNovelHitListener(novelDb, novelSubscribeDb, novelHitNumCache))
+	event.Bus.Subscribe(constant.NOVEL_POPULAR_RANK_TOPIC, listener.NewNovelPopularRankListener(businessStorage.NewNovelRankCache(redis)))
 	var novelHandler = handler.NovelHandler{
 		NovelDb:                novelDb,
 		NovelVolumeDb:          businessStorage.NewNovelVolumeDb(db),
@@ -34,6 +35,7 @@ func (e *NovelController) Router(iWebRoutes web.IWebRoutes) {
 		BrowseDb:               businessStorage.NewBrowseDb(db),
 		NovelSubscribeNumCache: businessStorage.NewNovelSubscribeNumCache(redis),
 		NovelHitNumCache:       novelHitNumCache,
+		NovelRankCache:         businessStorage.NewNovelRankCache(redis),
 	}
 	iWebRoutes.GET("/novel/:novelId", novelHandler.NovelDetail)
 	iWebRoutes.GET("/novel/upgrade", novelHandler.NovelUpgrade)
