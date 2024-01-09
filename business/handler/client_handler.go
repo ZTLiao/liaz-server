@@ -15,12 +15,33 @@ import (
 	"strconv"
 )
 
+var (
+	client *resp.ClientInitResp
+)
+
 type ClientHandler struct {
 	SysConfHandler *basicHandler.SysConfHandler
 	SecurityConfig *config.Security
 }
 
 func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
+	var err error
+	var clientInitResp *resp.ClientInitResp
+	if client == nil {
+		clientInitResp, err = e.buildClientConfig()
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+	} else {
+		clientInitResp = client
+		go e.buildClientConfig()
+	}
+	//发布事件
+	event.Bus.Publish(constant.CLIENT_INIT_TOPIC, device.GetDeviceInfo(wc))
+	return response.ReturnOK(clientInitResp)
+}
+
+func (e *ClientHandler) buildClientConfig() (*resp.ClientInitResp, error) {
 	//获取加密密钥
 	var key = new(resp.KeyConfig)
 	//接口加签
@@ -38,13 +59,13 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 	//获取配置
 	appJson, err := e.buildAppConfig()
 	if err != nil {
-		wc.AbortWithError(err)
+		return nil, err
 	}
 	//加密
 	if e.SecurityConfig.Encrypt {
 		encryptPlain, err := utils.PriKeyEncrypt(string(appJson), e.SecurityConfig.PrivateKey)
 		if err != nil {
-			wc.AbortWithError(err)
+			return nil, err
 		}
 		appJson = []byte(encryptPlain)
 	}
@@ -52,9 +73,8 @@ func (e *ClientHandler) ClientInit(wc *web.WebContext) interface{} {
 		Key: key,
 		App: string(appJson),
 	}
-	//发布事件
-	event.Bus.Publish(constant.CLIENT_INIT_TOPIC, device.GetDeviceInfo(wc))
-	return response.ReturnOK(clientInitResp)
+	client = clientInitResp
+	return clientInitResp, nil
 }
 
 func (e *ClientHandler) buildAppConfig() ([]byte, error) {

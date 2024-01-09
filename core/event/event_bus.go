@@ -26,17 +26,19 @@ type EventBus struct {
 }
 
 func (e *EventBus) Publish(topic string, source interface{}) {
-	e.rm.RLock()
-	if chans, found := e.subscribers[topic]; found {
-		channels := append(ChannelSlice{}, chans...)
-		go func(event Event, channelSlices ChannelSlice) {
-			for _, ch := range channelSlices {
-				ch <- event
-			}
-		}(Event{Source: source, Topic: topic}, channels)
+	go func() {
+		e.rm.RLock()
+		if chans, found := e.subscribers[topic]; found {
+			channels := append(ChannelSlice{}, chans...)
+			go func(event Event, channelSlices ChannelSlice) {
+				for _, ch := range channelSlices {
+					ch <- event
+				}
+			}(Event{Source: source, Topic: topic}, channels)
 
-	}
-	e.rm.RUnlock()
+		}
+		e.rm.RUnlock()
+	}()
 }
 
 func (e *EventBus) Subscribe(topic string, listener Listener) {
