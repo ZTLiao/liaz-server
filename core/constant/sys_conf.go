@@ -7,4 +7,5 @@ const (
 	RECOMMEND_FOR_MY_SUBSCRIBE = "recommend_for_my_subscribe"
 	RECOMMEND_FOR_HOT          = "recommend_for_hot"
 	RECOMMEND_FOR_UPGRADE      = "recommend_for_upgrade"
+	SHARE_URL                  = "share_url"
 )

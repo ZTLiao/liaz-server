@@ -115,6 +115,9 @@ func (e *ClientHandler) buildAppConfig() ([]byte, error) {
 	if resourceAuthority, ex := confMap[constant.RESOURCE_AUTHORITY]; ex {
 		app.ResourceAuthority = resourceAuthority.(bool)
 	}
+	if shareUrl, ex := confMap[constant.SHARE_URL]; ex {
+		app.ShareUrl = shareUrl.(string)
+	}
 	//格式化
 	appJson, err := json.Marshal(app)
 	if err != nil {
