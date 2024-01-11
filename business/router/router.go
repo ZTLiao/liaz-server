@@ -37,6 +37,7 @@ func init() {
 			new(controller.NovelSubscribeController).Router(r)
 			new(controller.BookshelfController).Router(r)
 			new(controller.SearchController).Router(r)
+			new(controller.RankController).Router(r)
 		}
 	})
 }
