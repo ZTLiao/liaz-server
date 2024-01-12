@@ -32,7 +32,7 @@ func (e *ComicRankItemCache) RPush(rankType int64, timeType int64, dateTime stri
 	if err != nil {
 		return err
 	}
-	err = e.redis.Expire(e.RedisKey(rankType, timeType, dateTime), time.Second*constant.TIME_OF_HOUR)
+	err = e.redis.Expire(e.RedisKey(rankType, timeType, dateTime), time.Second*constant.TIME_OF_MINUTE*15)
 	if err != nil {
 		return err
 	}
