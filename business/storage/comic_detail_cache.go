@@ -51,14 +51,6 @@ func (e *ComicDetailCache) Del(comicId int64) error {
 	return e.redis.Del(e.RedisKey(comicId))
 }
 
-func (e *ComicDetailCache) TTL(comicId int64) (int64, error) {
-	duration, err := e.redis.TTL(e.RedisKey(comicId))
-	if err != nil {
-		return 0, nil
-	}
-	return int64(duration.Milliseconds()), nil
-}
-
 func (e *ComicDetailCache) IsExist(comicId int64) (bool, error) {
 	num, err := e.redis.Exists(e.RedisKey(comicId))
 	if err != nil {

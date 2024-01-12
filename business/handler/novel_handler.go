@@ -9,6 +9,7 @@ import (
 	"business/transfer"
 	"core/constant"
 	"core/event"
+	"core/redis"
 	"core/response"
 	"core/utils"
 	"core/web"
@@ -29,6 +30,7 @@ type NovelHandler struct {
 	NovelHitNumCache       *businessStorage.NovelHitNumCache
 	NovelRankCache         *businessStorage.NovelRankCache
 	NovelDetailCache       *businessStorage.NovelDetailCache
+	NovelUpgradeItemCache  *businessStorage.NovelUpgradeItemCache
 }
 
 func (e *NovelHandler) NovelDetail(wc *web.WebContext) interface{} {
@@ -237,34 +239,50 @@ func (e *NovelHandler) NovelUpgrade(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	novels, err := e.NovelDb.GetNovelUpgradePage(int32(pageNum), int32(pageSize))
+	isExist, err := e.NovelUpgradeItemCache.IsExist()
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	if len(novels) == 0 {
-		return response.Success()
-	}
-	var novelUpgrades = make([]resp.NovelUpgradeResp, 0)
-	for _, novel := range novels {
-		novelId := novel.NovelId
-		novelChapter, err := e.NovelChapterDb.UpgradeChapter(novelId)
+	if !isExist {
+		var redisLock = redis.NewRedisLock(e.NovelUpgradeItemCache.RedisKey())
+		if !redisLock.Lock() {
+			wc.AbortWithError(err)
+		}
+		defer redisLock.Unlock()
+		novels, err := e.NovelDb.GetNovelUpgradePage(int32(pageNum), int32(pageSize))
 		if err != nil {
 			wc.AbortWithError(err)
 		}
-		if novelChapter == nil {
-			continue
+		if len(novels) == 0 {
+			return response.Success()
 		}
-		var novelUpgrade = &resp.NovelUpgradeResp{
-			NovelChapterId: novelChapter.NovelChapterId,
-			NovelId:        novelId,
-			Title:          novel.Title,
-			Cover:          novel.Cover,
-			Categories:     strings.Split(novel.Categories, utils.COMMA),
-			Authors:        strings.Split(novel.Authors, utils.COMMA),
-			UpgradeChapter: novelChapter.ChapterName,
-			Updated:        novel.EndTime,
+		for _, novel := range novels {
+			novelId := novel.NovelId
+			novelChapter, err := e.NovelChapterDb.UpgradeChapter(novelId)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if novelChapter == nil {
+				continue
+			}
+			var novelUpgrade = resp.NovelUpgradeResp{
+				NovelChapterId: novelChapter.NovelChapterId,
+				NovelId:        novelId,
+				Title:          novel.Title,
+				Cover:          novel.Cover,
+				Categories:     strings.Split(novel.Categories, utils.COMMA),
+				Authors:        strings.Split(novel.Authors, utils.COMMA),
+				UpgradeChapter: novelChapter.ChapterName,
+				Updated:        novel.EndTime,
+			}
+			e.NovelUpgradeItemCache.LPush(novelUpgrade)
 		}
-		novelUpgrades = append(novelUpgrades, *novelUpgrade)
+	}
+	startIndex := (pageNum - 1) * pageSize
+	stopIndex := startIndex + pageSize - 1
+	novelUpgrades, err := e.NovelUpgradeItemCache.LRange(startIndex, stopIndex)
+	if err != nil {
+		wc.AbortWithError(err)
 	}
 	return response.ReturnOK(novelUpgrades)
 }

@@ -214,3 +214,27 @@ func (e *RedisUtil) ZRevRangeWithScores(key string, start int64, stop int64) ([]
 	}
 	return res, err
 }
+
+func (e *RedisUtil) LPush(key string, values ...string) (int64, error) {
+	res, err := e.db.LPush(context.TODO(), key, values).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
+func (e *RedisUtil) LPop(key string) (string, error) {
+	res, err := e.db.LPop(context.TODO(), key).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
+func (e *RedisUtil) LRange(key string, start int64, stop int64) ([]string, error) {
+	res, err := e.db.LRange(context.TODO(), key, start, stop).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}

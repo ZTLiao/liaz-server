@@ -4,7 +4,6 @@ import (
 	"business/model"
 	"business/transfer"
 	"core/utils"
-	"strings"
 
 	"github.com/go-xorm/xorm"
 )
@@ -160,18 +159,7 @@ func (e *AssetDb) GetAssetByIds(assetIds []int64) ([]model.Asset, error) {
 		return nil, nil
 	}
 	var assets []model.Asset
-	var builder strings.Builder
-	var params = make([]interface{}, 0)
-	builder.WriteString("asset_id in (")
-	for i, length := 0, len(assetIds); i < length; i++ {
-		builder.WriteString(utils.QUESTION)
-		params = append(params, assetIds[i])
-		if i != length-1 {
-			builder.WriteString(utils.COMMA)
-		}
-	}
-	builder.WriteString(")")
-	err := e.db.Where(builder.String(), params...).Find(&assets)
+	err := e.db.Where(utils.In("asset_id", assetIds)).Find(&assets)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"business/model"
 	"core/constant"
 	"core/types"
+	"core/utils"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -97,4 +98,20 @@ func (e *NovelDb) GetNovelByCategoryId(categoryId int64) ([]model.Novel, error) 
 		return nil, err
 	}
 	return novels, nil
+}
+
+func (e *NovelDb) GetNovelMapByIds(novelIds []int64) (map[int64]model.Novel, error) {
+	var novels []model.Novel
+	err := e.db.Where(utils.In("novel_id", novelIds)).Find(&novels)
+	if err != nil {
+		return nil, err
+	}
+	if len(novels) == 0 {
+		return nil, nil
+	}
+	var novelMap = make(map[int64]model.Novel, 0)
+	for _, v := range novels {
+		novelMap[v.NovelId] = v
+	}
+	return novelMap, nil
 }

@@ -75,12 +75,12 @@ func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize in
 	if !redisLock.Lock() {
 		return nil, errors.New(http.StatusInternalServerError, constant.UPLOAD_ERROR)
 	}
+	defer redisLock.Unlock()
 	fileInfo, err := e.fileTemplate.PutObject(bucketName, timestamp, data)
 	if err != nil {
 		return nil, err
 	}
 	if fileInfo == nil {
-		redisLock.Unlock()
 		return nil, errors.New(http.StatusInternalServerError, constant.UPLOAD_ERROR)
 	}
 	var now = types.Time(time.Now())
@@ -95,7 +95,6 @@ func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize in
 	fileItem.CreatedAt = now
 	fileItem.UpdatedAt = now
 	e.fileItemDb.SaveFileItem(&fileItem)
-	redisLock.Unlock()
 	return &fileItem, nil
 }
 

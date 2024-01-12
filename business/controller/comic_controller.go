@@ -33,6 +33,7 @@ func (e *ComicController) Router(iWebRoutes web.IWebRoutes) {
 		ComicSubscribeNumCache: storage.NewComicSubscribeNumCache(redis),
 		ComicHitNumCache:       comicHitNumCache,
 		ComicDetailCache:       storage.NewComicDetailCache(redis),
+		ComicUpgradeItemCache:  storage.NewComicUpgradeItemCache(redis),
 	}
 	iWebRoutes.GET("/comic/:comicId", comicHandler.ComicDetail)
 	iWebRoutes.GET("/comic/upgrade", comicHandler.ComicUpgrade)

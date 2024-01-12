@@ -4,6 +4,7 @@ import (
 	"business/model"
 	"core/constant"
 	"core/types"
+	"core/utils"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -97,4 +98,20 @@ func (e *ComicDb) GetComicByCategoryId(categoryId int64) ([]model.Comic, error) 
 		return nil, err
 	}
 	return comics, nil
+}
+
+func (e *ComicDb) GetComicMapByIds(comicIds []int64) (map[int64]model.Comic, error) {
+	var comics []model.Comic
+	err := e.db.Where(utils.In("comic_id", comicIds)).Find(&comics)
+	if err != nil {
+		return nil, err
+	}
+	if len(comics) == 0 {
+		return nil, nil
+	}
+	var comicMap = make(map[int64]model.Comic, 0)
+	for _, v := range comics {
+		comicMap[v.ComicId] = v
+	}
+	return comicMap, nil
 }

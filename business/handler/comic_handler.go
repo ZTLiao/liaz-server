@@ -8,6 +8,7 @@ import (
 	"business/transfer"
 	"core/constant"
 	"core/event"
+	"core/redis"
 	"core/response"
 	"core/utils"
 	"core/web"
@@ -25,6 +26,7 @@ type ComicHandler struct {
 	ComicSubscribeNumCache *storage.ComicSubscribeNumCache
 	ComicHitNumCache       *storage.ComicHitNumCache
 	ComicDetailCache       *storage.ComicDetailCache
+	ComicUpgradeItemCache  *storage.ComicUpgradeItemCache
 }
 
 func (e *ComicHandler) ComicDetail(wc *web.WebContext) interface{} {
@@ -209,34 +211,50 @@ func (e *ComicHandler) ComicUpgrade(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	comics, err := e.ComicDb.GetComicUpgradePage(int32(pageNum), int32(pageSize))
+	isExist, err := e.ComicUpgradeItemCache.IsExist()
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	if len(comics) == 0 {
-		return response.Success()
-	}
-	var comicUpgrades = make([]resp.ComicUpgradeResp, 0)
-	for _, comic := range comics {
-		comicId := comic.ComicId
-		comicChapter, err := e.ComicChapterDb.UpgradeChapter(comicId)
+	if !isExist {
+		var redisLock = redis.NewRedisLock(e.ComicUpgradeItemCache.RedisKey())
+		if !redisLock.Lock() {
+			wc.AbortWithError(err)
+		}
+		defer redisLock.Unlock()
+		comics, err := e.ComicDb.GetComicUpgradePage(1, 300)
 		if err != nil {
 			wc.AbortWithError(err)
 		}
-		if comicChapter == nil {
-			continue
+		if len(comics) == 0 {
+			return response.Success()
 		}
-		var comicUpgrade = &resp.ComicUpgradeResp{
-			ComicChapterId: comicChapter.ComicChapterId,
-			ComicId:        comicId,
-			Title:          comic.Title,
-			Cover:          comic.Cover,
-			Categories:     strings.Split(comic.Categories, utils.COMMA),
-			Authors:        strings.Split(comic.Authors, utils.COMMA),
-			UpgradeChapter: comicChapter.ChapterName,
-			Updated:        comic.EndTime,
+		for _, comic := range comics {
+			comicId := comic.ComicId
+			comicChapter, err := e.ComicChapterDb.UpgradeChapter(comicId)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+			if comicChapter == nil {
+				continue
+			}
+			var comicUpgrade = resp.ComicUpgradeResp{
+				ComicChapterId: comicChapter.ComicChapterId,
+				ComicId:        comicId,
+				Title:          comic.Title,
+				Cover:          comic.Cover,
+				Categories:     strings.Split(comic.Categories, utils.COMMA),
+				Authors:        strings.Split(comic.Authors, utils.COMMA),
+				UpgradeChapter: comicChapter.ChapterName,
+				Updated:        comic.EndTime,
+			}
+			e.ComicUpgradeItemCache.LPush(comicUpgrade)
 		}
-		comicUpgrades = append(comicUpgrades, *comicUpgrade)
+	}
+	startIndex := (pageNum - 1) * pageSize
+	stopIndex := startIndex + pageSize - 1
+	comicUpgrades, err := e.ComicUpgradeItemCache.LRange(startIndex, stopIndex)
+	if err != nil {
+		wc.AbortWithError(err)
 	}
 	return response.ReturnOK(comicUpgrades)
 }

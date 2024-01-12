@@ -37,6 +37,7 @@ func (e *NovelController) Router(iWebRoutes web.IWebRoutes) {
 		NovelHitNumCache:       novelHitNumCache,
 		NovelRankCache:         businessStorage.NewNovelRankCache(redis),
 		NovelDetailCache:       businessStorage.NewNovelDetailCache(redis),
+		NovelUpgradeItemCache:  businessStorage.NewNovelUpgradeItemCache(redis),
 	}
 	iWebRoutes.GET("/novel/:novelId", novelHandler.NovelDetail)
 	iWebRoutes.GET("/novel/upgrade", novelHandler.NovelUpgrade)
