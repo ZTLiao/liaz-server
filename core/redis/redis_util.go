@@ -223,6 +223,14 @@ func (e *RedisUtil) LPush(key string, values ...string) (int64, error) {
 	return res, err
 }
 
+func (e *RedisUtil) RPush(key string, values ...string) (int64, error) {
+	res, err := e.db.RPush(context.TODO(), key, values).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
 func (e *RedisUtil) LPop(key string) (string, error) {
 	res, err := e.db.LPop(context.TODO(), key).Result()
 	if err != nil {

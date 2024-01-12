@@ -5,6 +5,7 @@ import (
 	"core/constant"
 	"core/types"
 	"core/utils"
+	"strings"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -101,8 +102,22 @@ func (e *ComicDb) GetComicByCategoryId(categoryId int64) ([]model.Comic, error) 
 }
 
 func (e *ComicDb) GetComicMapByIds(comicIds []int64) (map[int64]model.Comic, error) {
+	if len(comicIds) == 0 {
+		return nil, nil
+	}
 	var comics []model.Comic
-	err := e.db.Where(utils.In("comic_id", comicIds)).Find(&comics)
+	var builder strings.Builder
+	var params = make([]interface{}, 0)
+	builder.WriteString("comic_id in (")
+	for i, length := 0, len(comicIds); i < length; i++ {
+		builder.WriteString(utils.QUESTION)
+		params = append(params, comicIds[i])
+		if i != length-1 {
+			builder.WriteString(utils.COMMA)
+		}
+	}
+	builder.WriteString(")")
+	err := e.db.Where(builder.String(), params...).Find(&comics)
 	if err != nil {
 		return nil, err
 	}

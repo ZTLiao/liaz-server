@@ -21,14 +21,14 @@ func (e *ComicRankItemCache) RedisKey(rankType int64, timeType int64, dateTime s
 	return e.redis.GetKey(constant.COMIC_RANK_ITEM, strconv.FormatInt(rankType, 10), strconv.FormatInt(timeType, 10), dateTime)
 }
 
-func (e *ComicRankItemCache) LPush(rankType int64, timeType int64, dateTime string, item resp.RankItemResp) error {
+func (e *ComicRankItemCache) RPush(rankType int64, timeType int64, dateTime string, item resp.RankItemResp) error {
 	var items = make([]string, 0)
 	data, err := json.Marshal(item)
 	if err != nil {
 		return err
 	}
 	items = append(items, string(data))
-	_, err = e.redis.LPush(e.RedisKey(rankType, timeType, dateTime), items...)
+	_, err = e.redis.RPush(e.RedisKey(rankType, timeType, dateTime), items...)
 	if err != nil {
 		return err
 	}

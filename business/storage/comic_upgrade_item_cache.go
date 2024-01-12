@@ -20,14 +20,14 @@ func (e *ComicUpgradeItemCache) RedisKey() string {
 	return e.redis.GetKey(constant.COMIC_UPGRADE_ITEM)
 }
 
-func (e *ComicUpgradeItemCache) LPush(item resp.ComicUpgradeResp) error {
+func (e *ComicUpgradeItemCache) RPush(item resp.ComicUpgradeResp) error {
 	var items = make([]string, 0)
 	data, err := json.Marshal(item)
 	if err != nil {
 		return err
 	}
 	items = append(items, string(data))
-	_, err = e.redis.LPush(e.RedisKey(), items...)
+	_, err = e.redis.RPush(e.RedisKey(), items...)
 	if err != nil {
 		return err
 	}

@@ -100,6 +100,9 @@ func (e *RankHandler) ComicRank(rankType int64, timeType int64, dateTime string,
 		for k := range rankMap {
 			comicIds = append(comicIds, k)
 		}
+		if len(comicIds) == 0 {
+			return nil, nil
+		}
 		comicMap, err := e.ComicDb.GetComicMapByIds(comicIds)
 		if err != nil {
 			return nil, err
@@ -122,7 +125,7 @@ func (e *RankHandler) ComicRank(rankType int64, timeType int64, dateTime string,
 			return rankItems[i].Score < rankItems[j].Score
 		})
 		for _, v := range rankItems {
-			e.ComicRankItemCache.LPush(rankType, timeType, dateTime, v)
+			e.ComicRankItemCache.RPush(rankType, timeType, dateTime, v)
 		}
 	}
 	rankItems, err := e.ComicRankItemCache.LRange(rankType, timeType, dateTime, startIndex, stopIndex)
@@ -151,6 +154,9 @@ func (e *RankHandler) NovelRank(rankType int64, timeType int64, dateTime string,
 		for k := range rankMap {
 			novelIds = append(novelIds, k)
 		}
+		if len(novelIds) == 0 {
+			return nil, nil
+		}
 		novelMap, err := e.NovelDb.GetNovelMapByIds(novelIds)
 		if err != nil {
 			return nil, err
@@ -173,7 +179,7 @@ func (e *RankHandler) NovelRank(rankType int64, timeType int64, dateTime string,
 			return rankItems[i].Score < rankItems[j].Score
 		})
 		for _, v := range rankItems {
-			e.NovelRankItemCache.LPush(rankType, timeType, dateTime, v)
+			e.NovelRankItemCache.RPush(rankType, timeType, dateTime, v)
 		}
 	}
 	rankItems, err := e.NovelRankItemCache.LRange(rankType, timeType, dateTime, startIndex, stopIndex)

@@ -61,7 +61,7 @@ func (e *ComicChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 			b.chapter_name
 		from comic_subscribe as cs 
 		left join comic as c on c.comic_id = cs.comic_id
-		left join browse as b on b.obj_id = c.comic_id and b.asset_type = 1
+		left join browse as b on b.obj_id = c.comic_id and b.user_id = cs.user_id and b.asset_type = 1
 		where 
 			cs.user_id = ?
 		group by c.comic_id

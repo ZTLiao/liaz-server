@@ -9,6 +9,7 @@ import (
 	"business/transfer"
 	"core/constant"
 	"core/event"
+	"core/logger"
 	"core/redis"
 	"core/response"
 	"core/utils"
@@ -243,48 +244,69 @@ func (e *NovelHandler) NovelUpgrade(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
+	var novelUpgrades []resp.NovelUpgradeResp
 	if !isExist {
-		var redisLock = redis.NewRedisLock(e.NovelUpgradeItemCache.RedisKey())
-		if !redisLock.Lock() {
-			wc.AbortWithError(err)
-		}
-		defer redisLock.Unlock()
-		novels, err := e.NovelDb.GetNovelUpgradePage(int32(pageNum), int32(pageSize))
+		novelUpgrades, err = e.getNovelUpgradeItem(int32(pageNum), int32(pageSize))
 		if err != nil {
 			wc.AbortWithError(err)
 		}
-		if len(novels) == 0 {
-			return response.Success()
-		}
-		for _, novel := range novels {
-			novelId := novel.NovelId
-			novelChapter, err := e.NovelChapterDb.UpgradeChapter(novelId)
+		go func() {
+			var redisLock = redis.NewRedisLock(e.NovelUpgradeItemCache.RedisKey())
+			if !redisLock.Lock() {
+				return
+			}
+			defer redisLock.Unlock()
+			novelUpgrades, err := e.getNovelUpgradeItem(1, 300)
 			if err != nil {
-				wc.AbortWithError(err)
+				logger.Error(err.Error())
+				return
 			}
-			if novelChapter == nil {
-				continue
+			for _, v := range novelUpgrades {
+				e.NovelUpgradeItemCache.RPush(v)
 			}
-			var novelUpgrade = resp.NovelUpgradeResp{
-				NovelChapterId: novelChapter.NovelChapterId,
-				NovelId:        novelId,
-				Title:          novel.Title,
-				Cover:          novel.Cover,
-				Categories:     strings.Split(novel.Categories, utils.COMMA),
-				Authors:        strings.Split(novel.Authors, utils.COMMA),
-				UpgradeChapter: novelChapter.ChapterName,
-				Updated:        novel.EndTime,
-			}
-			e.NovelUpgradeItemCache.LPush(novelUpgrade)
+		}()
+	} else {
+		startIndex := (pageNum - 1) * pageSize
+		stopIndex := startIndex + pageSize - 1
+		novelUpgrades, err = e.NovelUpgradeItemCache.LRange(startIndex, stopIndex)
+		if err != nil {
+			wc.AbortWithError(err)
 		}
-	}
-	startIndex := (pageNum - 1) * pageSize
-	stopIndex := startIndex + pageSize - 1
-	novelUpgrades, err := e.NovelUpgradeItemCache.LRange(startIndex, stopIndex)
-	if err != nil {
-		wc.AbortWithError(err)
 	}
 	return response.ReturnOK(novelUpgrades)
+}
+
+func (e *NovelHandler) getNovelUpgradeItem(pageNum int32, pageSize int32) ([]resp.NovelUpgradeResp, error) {
+	novels, err := e.NovelDb.GetNovelUpgradePage(1, 300)
+	if err != nil {
+		return nil, err
+	}
+	if len(novels) == 0 {
+		return nil, nil
+	}
+	var novelUpgrades = make([]resp.NovelUpgradeResp, 0)
+	for _, novel := range novels {
+		novelId := novel.NovelId
+		novelChapter, err := e.NovelChapterDb.UpgradeChapter(novelId)
+		if err != nil {
+			return nil, err
+		}
+		if novelChapter == nil {
+			continue
+		}
+		var novelUpgrade = resp.NovelUpgradeResp{
+			NovelChapterId: novelChapter.NovelChapterId,
+			NovelId:        novelId,
+			Title:          novel.Title,
+			Cover:          novel.Cover,
+			Categories:     strings.Split(novel.Categories, utils.COMMA),
+			Authors:        strings.Split(novel.Authors, utils.COMMA),
+			UpgradeChapter: novelChapter.ChapterName,
+			Updated:        novel.EndTime,
+		}
+		novelUpgrades = append(novelUpgrades, novelUpgrade)
+	}
+	return novelUpgrades, nil
 }
 
 func (e *NovelHandler) GetNovelByCategory(wc *web.WebContext) interface{} {

@@ -5,6 +5,7 @@ import (
 	"core/constant"
 	"core/types"
 	"core/utils"
+	"strings"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -101,8 +102,22 @@ func (e *NovelDb) GetNovelByCategoryId(categoryId int64) ([]model.Novel, error) 
 }
 
 func (e *NovelDb) GetNovelMapByIds(novelIds []int64) (map[int64]model.Novel, error) {
+	if len(novelIds) == 0 {
+		return nil, nil
+	}
 	var novels []model.Novel
-	err := e.db.Where(utils.In("novel_id", novelIds)).Find(&novels)
+	var builder strings.Builder
+	var params = make([]interface{}, 0)
+	builder.WriteString("novel_id in (")
+	for i, length := 0, len(novelIds); i < length; i++ {
+		builder.WriteString(utils.QUESTION)
+		params = append(params, novelIds[i])
+		if i != length-1 {
+			builder.WriteString(utils.COMMA)
+		}
+	}
+	builder.WriteString(")")
+	err := e.db.Where(builder.String(), params...).Find(&novels)
 	if err != nil {
 		return nil, err
 	}
