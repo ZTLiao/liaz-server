@@ -122,7 +122,7 @@ func (e *RankHandler) ComicRank(rankType int64, timeType int64, dateTime string,
 			})
 		}
 		sort.Slice(rankItems, func(i, j int) bool {
-			return rankItems[i].Score < rankItems[j].Score
+			return rankItems[i].Score > rankItems[j].Score
 		})
 		for _, v := range rankItems {
 			e.ComicRankItemCache.RPush(rankType, timeType, dateTime, v)
@@ -176,7 +176,7 @@ func (e *RankHandler) NovelRank(rankType int64, timeType int64, dateTime string,
 			})
 		}
 		sort.Slice(rankItems, func(i, j int) bool {
-			return rankItems[i].Score < rankItems[j].Score
+			return rankItems[i].Score > rankItems[j].Score
 		})
 		for _, v := range rankItems {
 			e.NovelRankItemCache.RPush(rankType, timeType, dateTime, v)

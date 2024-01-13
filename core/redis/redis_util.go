@@ -207,6 +207,14 @@ func (e *RedisUtil) ZScore(key string, member string) (float64, error) {
 	return res, err
 }
 
+func (e *RedisUtil) ZRangeWithScores(key string, start int64, stop int64) ([]redis.Z, error) {
+	res, err := e.db.ZRangeWithScores(context.TODO(), key, start, stop).Result()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return res, err
+}
+
 func (e *RedisUtil) ZRevRangeWithScores(key string, start int64, stop int64) ([]redis.Z, error) {
 	res, err := e.db.ZRevRangeWithScores(context.TODO(), key, start, stop).Result()
 	if err != nil {
