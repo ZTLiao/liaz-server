@@ -11,4 +11,8 @@ const (
 	USERNAME_EXISTS            = "账号已存在"
 	USERNAME_NOT_EXISTS        = "账号不存在"
 	USERNAME_OR_PASSWORD_ERROR = "账号或密码错误"
+	EMAIL_EMPTY                = "邮箱不允许为空"
+	VERIFY_CODE_EMPTY          = "验证码不允许为空"
+	NEW_PASSWORD_EMPTY         = "新密码不允许为空"
+	SERVER_ERROR               = "网络异常，请稍后重试～～"
 )

@@ -12,6 +12,7 @@ type Config struct {
 	Minio    *Minio    `yaml:"minio"`
 	Oauth2   *Oauth2   `yaml:"oauth2"`
 	Oss      *Oss      `yaml:"oss"`
+	Email    *Email    `yaml:"email"`
 }
 
 var SystemConfig = new(Config)

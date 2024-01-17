@@ -7,4 +7,5 @@ const (
 	OAUTH2_TOKEN = "oauth2_token"
 	COMIC_DETAIL = "comic_detail"
 	NOVEL_DETAIL = "novel_detail"
+	VERIFY_CODE  = "verify_code"
 )
