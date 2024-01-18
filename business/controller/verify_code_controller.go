@@ -24,4 +24,5 @@ func (e *VerifyCodeController) Router(iWebRoutes web.IWebRoutes) {
 		VerifyCodeCache:    storage.NewVerifyCodeCache(redis),
 	}
 	iWebRoutes.POST("/verify/code/email", verifyCodeHandler.SendVerifyCodeForEmail)
+	iWebRoutes.POST("/verify/code/check", verifyCodeHandler.CheckVerifyCode)
 }

@@ -74,3 +74,28 @@ func (e *AccountDb) GetAccountById(userId int64) (*model.Account, error) {
 	}
 	return &account, nil
 }
+
+func (e *AccountDb) GetAccountByUsername(username string) (*model.Account, error) {
+	var accounts []model.Account
+	err := e.db.Where("(username = ? or phone = ? or email = ?) and status = ?", username, username, username, enums.ACCOUNT_STATUS_OF_ENABLE).Find(&accounts)
+	if err != nil {
+		return nil, err
+	}
+	if len(accounts) != 1 {
+		return nil, nil
+	}
+	return &accounts[0], nil
+}
+
+func (e *AccountDb) ResetPassword(userId int64, password string) error {
+	var now = types.Time(time.Now())
+	var account = new(model.Account)
+	account.UserId = userId
+	account.Password = password
+	account.UpdatedAt = now
+	_, err := e.db.ID(userId).Cols("password", "updatedAt").Update(account)
+	if err != nil {
+		return err
+	}
+	return nil
+}

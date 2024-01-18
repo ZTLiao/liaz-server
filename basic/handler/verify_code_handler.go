@@ -44,3 +44,16 @@ func (e *VerifyCodeHandler) SendVerifyCodeForEmail(wc *web.WebContext) interface
 	}
 	return response.Success()
 }
+
+func (e *VerifyCodeHandler) CheckVerifyCode(wc *web.WebContext) interface{} {
+	username := wc.PostForm("username")
+	verifyCode := wc.PostForm("verifyCode")
+	cacheCode, err := e.VerifyCodeCache.Get(username)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if len(cacheCode) == 0 {
+		return response.ReturnOK(false)
+	}
+	return response.ReturnOK(verifyCode == cacheCode)
+}
