@@ -26,6 +26,13 @@ func (e *AccountHandler) ResetPassword(wc *web.WebContext) interface{} {
 	if len(newPassword) == 0 {
 		return response.Fail(constant.NEW_PASSWORD_EMPTY)
 	}
+	cacheCode, err := e.VerifyCodeCache.Get(username)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if verifyCode != cacheCode {
+		return response.Fail(constant.VERIFY_CODE_ERROR)
+	}
 	account, err := e.AccountDb.GetAccountByUsername(username)
 	if err != nil {
 		wc.AbortWithError(err)

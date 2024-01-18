@@ -14,5 +14,6 @@ const (
 	EMAIL_EMPTY                = "邮箱不允许为空"
 	VERIFY_CODE_EMPTY          = "验证码不允许为空"
 	NEW_PASSWORD_EMPTY         = "新密码不允许为空"
-	SERVER_ERROR               = "网络异常，请稍后重试～～"
+	SERVER_ERROR               = "网络异常，请稍后重试~~"
+	VERIFY_CODE_ERROR          = "验证码验证失败"
 )

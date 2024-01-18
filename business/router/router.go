@@ -34,6 +34,7 @@ func init() {
 			new(controller.SearchController).Router(r)
 			new(controller.RankController).Router(r)
 			new(controller.VerifyCodeController).Router(r)
+			new(controller.AccountController).Router(r)
 		}
 	})
 }
