@@ -1,22 +1,17 @@
 package router
 
 import (
-	"basic/middleware"
-	"basic/storage"
 	"business/controller"
-	"core/config"
-	"core/redis"
 	"core/response"
-	"core/system"
 	"core/web"
 )
 
 func init() {
 	web.AddRouter(func(wrg *web.WebRouterGroup) {
-		security := config.SystemConfig.Security
-		var redis = redis.NewRedisUtil(system.GetRedisClient())
-		wrg.Use(middleware.SignatureHandler(security))
-		wrg.Use(middleware.SecurityHandler(security, storage.NewOAuth2TokenCache(redis)))
+		//security := config.SystemConfig.Security
+		//var redis = redis.NewRedisUtil(system.GetRedisClient())
+		//wrg.Use(middleware.SignatureHandler(security))
+		//wrg.Use(middleware.SecurityHandler(security, storage.NewOAuth2TokenCache(redis)))
 		wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
 			return response.Success()
 		})
@@ -38,6 +33,7 @@ func init() {
 			new(controller.BookshelfController).Router(r)
 			new(controller.SearchController).Router(r)
 			new(controller.RankController).Router(r)
+			new(controller.VerifyCodeController).Router(r)
 		}
 	})
 }

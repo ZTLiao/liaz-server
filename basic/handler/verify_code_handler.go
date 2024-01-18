@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"basic/device"
+	"basic/enums"
 	"basic/storage"
 	"core/config"
 	"core/constant"
@@ -20,15 +22,15 @@ type VerifyCodeHandler struct {
 
 func (e *VerifyCodeHandler) SendVerifyCodeForEmail(wc *web.WebContext) interface{} {
 	emailTo := wc.PostForm("email")
-	email := e.Email
-	if email == nil {
+	if e.Email == nil {
 		return response.Fail(constant.SERVER_ERROR)
 	}
-	subject := email.Subject[constant.VERIFY_CODE_TEMPLATE]
-	template := email.Template[constant.VERIFY_CODE_TEMPLATE]
+	subject := e.Email.Subject[constant.VERIFY_CODE_TEMPLATE]
+	template := e.Email.Template[constant.VERIFY_CODE_TEMPLATE]
 	randomNumber := strconv.FormatInt(int64(utils.RandomForSix()), 10)
 	body := fmt.Sprintf(template, randomNumber)
-	err := utils.SendMail(email.Username, email.Password, email.Host, email.Port, email.Nickname, emailTo, subject, body)
+	wc.Info("username : %v, host : %v, port : %v, nickname : %v, emailTo : %v, subject : %v, body : %v", e.Email.Username, e.Email.Host, e.Email.Port, e.Email.Nickname, emailTo, subject, body)
+	err := utils.SendMail(e.Email.Username, e.Email.Password, e.Email.Host, e.Email.Port, e.Email.Nickname, emailTo, subject, body)
 	var resCode = http.StatusOK
 	var resMsg string
 	if err != nil {
@@ -36,6 +38,7 @@ func (e *VerifyCodeHandler) SendVerifyCodeForEmail(wc *web.WebContext) interface
 		resMsg = err.Error()
 	}
 	wc.Info("resCode : %v, resMsg : %v", resCode, resMsg)
+	e.VerifyCodeRecordDb.InsertVerifyCodeRecord(emailTo, enums.SEND_TYPE_FOR_EMAIL, randomNumber, strconv.FormatInt(int64(resCode), 10), resMsg, device.GetDeviceInfo(wc))
 	if resCode == http.StatusOK {
 		e.VerifyCodeCache.Set(emailTo, randomNumber)
 	}

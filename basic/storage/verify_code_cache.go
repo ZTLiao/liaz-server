@@ -18,7 +18,7 @@ func (e *VerifyCodeCache) RedisKey(username string) string {
 }
 
 func (e *VerifyCodeCache) Set(username string, verifyCode string) error {
-	return e.redis.Set(e.RedisKey(username), verifyCode, constant.TIME_OF_MINUTE)
+	return e.redis.Set(e.RedisKey(username), verifyCode, constant.TIME_OF_MINUTE*5)
 }
 
 func (e *VerifyCodeCache) Get(username string) (string, error) {
