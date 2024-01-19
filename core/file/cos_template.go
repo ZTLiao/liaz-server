@@ -1,7 +1,9 @@
 package file
 
 import (
+	"bytes"
 	"context"
+	"core/utils"
 	"time"
 
 	"github.com/tencentyun/cos-go-sdk-v5"
@@ -30,14 +32,42 @@ func (e *CosTemplate) ListObjects(folderName string) ([]FileObjectInfo, error) {
 		Prefix:  folderName,
 		MaxKeys: 3,
 	}
-	e.cosClient.Bucket.Get(context.Background(), opt)
-	return nil, nil
+	v, _, err := e.cosClient.Bucket.Get(context.Background(), opt)
+	if err != nil {
+		return nil, err
+	}
+	var fileInfos = make([]FileObjectInfo, 0)
+	for _, c := range v.Contents {
+		fileInfos = append(fileInfos, FileObjectInfo{
+			Name:        c.Key,
+			ContentType: c.ETag,
+			Size:        c.Size,
+		})
+	}
+	return fileInfos, nil
 }
 
 func (e *CosTemplate) PutObject(folderName string, objectName string, data []byte) (*FileObjectInfo, error) {
-	return nil, nil
+	if len(folderName) > 0 {
+		objectName = folderName + utils.SLASH + objectName
+	}
+	_, err := e.cosClient.Object.Put(context.Background(), objectName, bytes.NewBuffer(data), nil)
+	if err != nil {
+		return nil, err
+	}
+	return &FileObjectInfo{
+		Name: objectName,
+		Size: int64(len(data)),
+	}, nil
 }
 
 func (e *CosTemplate) PresignedGetObject(folderName string, objectName string, headers map[string]string, expires time.Duration) (string, error) {
-	return "", nil
+	if len(folderName) > 0 {
+		objectName = folderName + utils.SLASH + objectName
+	}
+	objectUrl := e.cosClient.Object.GetObjectURL(objectName)
+	if objectUrl == nil {
+		return "", nil
+	}
+	return objectUrl.RequestURI(), nil
 }
