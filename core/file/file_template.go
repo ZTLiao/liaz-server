@@ -1,6 +1,7 @@
 package file
 
 import (
+	"core/config"
 	"core/constant"
 	"core/system"
 	"time"
@@ -10,7 +11,7 @@ type FileTemplate interface {
 	CreateBucket(string) error
 	ListObjects(string) ([]FileObjectInfo, error)
 	PutObject(string, string, []byte) (*FileObjectInfo, error)
-	PresignedGetObject(bucketName string, objectName string, headers map[string]string, expires time.Duration) (string, error)
+	PresignedGetObject(string, string, map[string]string, time.Duration) (string, error)
 }
 
 type FileObjectInfo struct {
@@ -25,6 +26,8 @@ func NewFileTemplate(storage string) FileTemplate {
 	var fileTemplate FileTemplate
 	if storage == constant.MINIO {
 		fileTemplate = NewMinioTemplate(system.GetMinioClient())
+	} else if storage == constant.OSS {
+		fileTemplate = NewOssTemplate(config.SystemConfig.Oss.BucketName, system.GetOssClient())
 	}
 	return fileTemplate
 }

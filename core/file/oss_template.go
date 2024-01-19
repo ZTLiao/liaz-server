@@ -9,13 +9,17 @@ import (
 )
 
 type OssTemplate struct {
-	ossClient *oss.Client
+	bucketName string
+	ossClient  *oss.Client
 }
 
 var _ FileTemplate = &OssTemplate{}
 
-func NewOssTemplate(ossClient *oss.Client) *OssTemplate {
-	return &OssTemplate{ossClient}
+func NewOssTemplate(bucketName string, ossClient *oss.Client) *OssTemplate {
+	return &OssTemplate{
+		bucketName: bucketName,
+		ossClient:  ossClient,
+	}
 }
 
 func (e *OssTemplate) CreateBucket(bucketName string) error {
@@ -61,11 +65,13 @@ func (e *OssTemplate) ListObjects(bucketName string) ([]FileObjectInfo, error) {
 	return fileInfos, nil
 }
 
-func (e *OssTemplate) PutObject(bucketName string, objectName string, data []byte) (*FileObjectInfo, error) {
-	e.CreateBucket(bucketName)
-	bucket, err := e.ossClient.Bucket(bucketName)
+func (e *OssTemplate) PutObject(folderName string, objectName string, data []byte) (*FileObjectInfo, error) {
+	bucket, err := e.ossClient.Bucket(e.bucketName)
 	if err != nil {
 		return nil, err
+	}
+	if len(folderName) > 0 {
+		objectName = folderName + utils.SLASH + objectName
 	}
 	err = bucket.PutObject(objectName, bytes.NewBuffer(data))
 	if err != nil {
@@ -77,10 +83,13 @@ func (e *OssTemplate) PutObject(bucketName string, objectName string, data []byt
 	}, nil
 }
 
-func (e *OssTemplate) PresignedGetObject(bucketName string, objectName string, headers map[string]string, expires time.Duration) (string, error) {
-	bucket, err := e.ossClient.Bucket(bucketName)
+func (e *OssTemplate) PresignedGetObject(folderName string, objectName string, headers map[string]string, expires time.Duration) (string, error) {
+	bucket, err := e.ossClient.Bucket(e.bucketName)
 	if err != nil {
 		return "", err
+	}
+	if len(folderName) > 0 {
+		objectName = folderName + utils.SLASH + objectName
 	}
 	url, err := bucket.SignURL(objectName, oss.HTTPGet, int64(expires.Seconds()))
 	if err != nil {

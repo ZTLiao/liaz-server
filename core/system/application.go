@@ -8,6 +8,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"github.com/tencentyun/cos-go-sdk-v5"
 	"golang.org/x/oauth2"
 )
 
@@ -22,6 +23,7 @@ type Application struct {
 	minioClient   *minio.Client
 	oauth2Config  *oauth2.Config
 	ossClient     *oss.Client
+	cosClient     *cos.Client
 }
 
 func SetEnv(env string) {
@@ -122,6 +124,16 @@ func SetOssClient(client *oss.Client) {
 
 func GetOssClient() *oss.Client {
 	return application.ossClient
+}
+
+func SetCosClient(client *cos.Client) {
+	if application.cosClient == nil {
+		application.cosClient = client
+	}
+}
+
+func GetCosClient() *cos.Client {
+	return application.cosClient
 }
 
 var application = new(Application)
