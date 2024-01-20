@@ -19,4 +19,5 @@ func (e *UserController) Router(iWebRoutes web.IWebRoutes) {
 		AccountDb: storage.NewAccountDb(db),
 	}
 	iWebRoutes.GET("/user/get", userHandler.GetUser)
+	iWebRoutes.POST("/user/update", userHandler.UpdateUser)
 }

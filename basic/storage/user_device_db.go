@@ -26,7 +26,8 @@ func (e *UserDeviceDb) SaveOrUpdateUserDevice(userId int64, deviceId string) err
 	userDevice.UserId = userId
 	userDevice.DeviceId = deviceId
 	userDevice.IsUsed = constant.NO
-	e.db.Where("user_id = ? and device_id != ?", userId, deviceId).Cols("is_used").Update(userDevice)
+	userDevice.UpdatedAt = now
+	e.db.Where("user_id = ? and device_id != ?", userId, deviceId).Cols("is_used", "updated_at").Update(userDevice)
 	count, err := e.db.Where("user_id = ? and device_id = ?", userId, deviceId).Count(userDevice)
 	if err != nil {
 		return err

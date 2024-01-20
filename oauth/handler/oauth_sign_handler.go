@@ -56,11 +56,20 @@ func (e *OAuthSignHandler) SignIn(wc *web.WebContext) interface{} {
 	//设备信息
 	deviceInfo := device.GetDeviceInfo(wc)
 	//更新用户IP地址
-	e.UserDb.UpdateLocation(userId, deviceInfo.ClientIp)
+	err = e.UserDb.UpdateLocation(userId, deviceInfo.ClientIp)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	//更新设备信息
-	e.UserDeviceDb.SaveOrUpdateUserDevice(userId, deviceInfo.DeviceId)
+	err = e.UserDeviceDb.SaveOrUpdateUserDevice(userId, deviceInfo.DeviceId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	//更新token
-	e.OAuth2TokenCache.Set(userId, token.AccessToken)
+	err = e.OAuth2TokenCache.Set(userId, token.AccessToken)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
 	//保存登录记录
 	record, _ := e.AccountLoginRecordDb.InsertAccountLoginRecord(userId, deviceInfo)
 	//发布事件

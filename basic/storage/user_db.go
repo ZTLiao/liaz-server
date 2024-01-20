@@ -80,3 +80,16 @@ func (e *UserDb) GetUserById(userId int64) (*model.User, error) {
 	}
 	return &user, nil
 }
+
+func (e *UserDb) UpdateUser(userId int64, nickname string, phone string, email string, gender int8, description string) error {
+	var now = types.Time(time.Now())
+	_, err := e.db.ID(userId).Cols("nickname", "phone", "email", "gender", "description").Update(&model.User{
+		Nickname:    nickname,
+		Phone:       phone,
+		Email:       email,
+		Gender:      gender,
+		Description: description,
+		UpdatedAt:   now,
+	})
+	return err
+}

@@ -99,3 +99,13 @@ func (e *AccountDb) ResetPassword(userId int64, password string) error {
 	}
 	return nil
 }
+
+func (e *AccountDb) UpdatePhoneAndEmail(userId int64, phone string, email string) error {
+	var now = types.Time(time.Now())
+	_, err := e.db.ID(userId).Cols("phone", "email").Update(&model.Account{
+		Phone:     phone,
+		Email:     email,
+		UpdatedAt: now,
+	})
+	return err
+}
