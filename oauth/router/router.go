@@ -31,12 +31,13 @@ func init() {
 		redisConfig := config.SystemConfig.Redis
 		oauth2Config := config.SystemConfig.Oauth2
 		manager := manage.NewDefaultManager()
-		manager.MapTokenStorage(oredis.NewRedisStore(&redis.Options{
+		redisTokenStore := oredis.NewRedisStore(&redis.Options{
 			Addr:         fmt.Sprintf("%s:%s", redisConfig.Host, redisConfig.Port),
 			Password:     redisConfig.Password,
 			DB:           redisConfig.Db,
 			MinIdleConns: redisConfig.MinIdleConns,
-		}))
+		})
+		manager.MapTokenStorage(redisTokenStore)
 		clientStore := store.NewClientStore()
 		clientStore.Set(oauth2Config.ClientId, &models.Client{
 			ID:     oauth2Config.ClientId,

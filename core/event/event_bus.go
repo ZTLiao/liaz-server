@@ -3,7 +3,6 @@ package event
 import (
 	"core/logger"
 	"fmt"
-	"runtime/debug"
 	"sync"
 )
 
@@ -55,9 +54,8 @@ func (e *EventBus) Subscribe(topic string, listener Listener) {
 			func() {
 				defer func() {
 					if r := recover(); r != nil {
-						debug.PrintStack()
 						err := fmt.Sprintf("%s", r)
-						logger.Error(err)
+						logger.Error("panic error : %v", err)
 					}
 				}()
 				listener.OnListen(event)

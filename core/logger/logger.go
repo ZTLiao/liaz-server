@@ -1,6 +1,9 @@
 package logger
 
-import "core/system"
+import (
+	"core/system"
+	"runtime/debug"
+)
 
 func Trace(format string, args ...interface{}) {
 	system.GetLogger().Tracef(format, args...)
@@ -19,6 +22,10 @@ func Warn(format string, args ...interface{}) {
 }
 
 func Error(format string, args ...interface{}) {
+	stack := debug.Stack()
+	if len(stack) != 0 {
+		system.GetLogger().Errorf("%v", string(stack))
+	}
 	system.GetLogger().Errorf(format, args...)
 }
 

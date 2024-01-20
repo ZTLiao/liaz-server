@@ -3,6 +3,7 @@ package constant
 const (
 	CLIENT_INIT_TOPIC          = "client_init_topic"
 	USER_LOGIN_TOPIC           = "user_login_topic"
+	USER_LOGOUT_TOPIC          = "user_logout_topic"
 	COMIC_HIT_TOPIC            = "comic_hit_topic"
 	NOVEL_HIT_TOPIC            = "novel_hit_topic"
 	COMIC_SUBSCRIBE_TOPIC      = "comic_subscribe_topic"

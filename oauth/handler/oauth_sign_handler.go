@@ -10,12 +10,15 @@ import (
 	"core/event"
 	"core/response"
 	"core/types"
+	"core/utils"
 	"core/web"
 	"net/http"
 	oauthEnums "oauth/enums"
 	"oauth/resp"
 	"strconv"
+	"strings"
 
+	"github.com/go-oauth2/redis/v4"
 	"golang.org/x/oauth2"
 )
 
@@ -26,6 +29,7 @@ type OAuthSignHandler struct {
 	UserDeviceDb         *storage.UserDeviceDb
 	UserDb               *storage.UserDb
 	OAuth2TokenCache     *storage.OAuth2TokenCache
+	RedisTokenStore      *redis.TokenStore
 }
 
 func (e *OAuthSignHandler) SignIn(wc *web.WebContext) interface{} {
@@ -121,4 +125,54 @@ func (e *OAuthSignHandler) SignUp(wc *web.WebContext) interface{} {
 		wc.AbortWithError(err)
 	}
 	return e.SignIn(wc)
+}
+
+func (e *OAuthSignHandler) SignOut(wc *web.WebContext) interface{} {
+	clientToken := wc.GetHeader(constant.AUTHORIZATION)
+	if len(clientToken) == 0 {
+		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
+	}
+	tokenArray := strings.Split(clientToken, utils.SPACE)
+	tokenType := tokenArray[0]
+	if tokenType != constant.TOKEN_TYPE {
+		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
+	}
+	clientToken = tokenArray[1]
+	userIdStr := wc.GetHeader(constant.X_USER_ID)
+	if len(userIdStr) == 0 {
+		return response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED)
+	}
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	serverToken, err := e.OAuth2TokenCache.Get(userId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if clientToken != serverToken {
+		return response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED)
+	}
+	err = e.OAuth2TokenCache.Del(userId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	token, err := e.RedisTokenStore.GetByAccess(context.Background(), clientToken)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if token == nil {
+		return response.Success()
+	}
+	accessToken := token.GetAccess()
+	refreshToken := token.GetRefresh()
+	err = e.RedisTokenStore.RemoveByAccess(context.Background(), accessToken)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	err = e.RedisTokenStore.RemoveByRefresh(context.Background(), refreshToken)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.Success()
 }
