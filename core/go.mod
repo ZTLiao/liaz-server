@@ -14,9 +14,11 @@ require (
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.45
 	github.com/wenzhenxi/gorsa v0.0.0-20230530123828-0320cce15d81
 	golang.org/x/oauth2 v0.15.0
 	golang.org/x/text v0.14.0
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -69,7 +71,6 @@ require (
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/tencentyun/cos-go-sdk-v5 v0.7.45 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
@@ -87,7 +88,6 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
