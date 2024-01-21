@@ -40,6 +40,7 @@ func init() {
 			new(controller.RankController).Router(r)
 			new(controller.VerifyCodeController).Router(r)
 			new(controller.AccountController).Router(r)
+			new(controller.CrashRecordController).Router(r)
 		}
 	})
 }
