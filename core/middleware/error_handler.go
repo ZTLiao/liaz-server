@@ -6,6 +6,7 @@ import (
 	"core/response"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,7 @@ func ErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
+				debug.PrintStack()
 				err := fmt.Sprintf("%s", r)
 				logger.Error("panic error : %v", err)
 				c.JSON(http.StatusOK, response.ReturnError(http.StatusInternalServerError, err))

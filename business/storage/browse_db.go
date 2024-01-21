@@ -62,3 +62,12 @@ func (e *BrowseDb) GetBrowseByObjId(userId int64, assetType int, objId int64) (*
 	}
 	return &browse, nil
 }
+
+func (e *BrowseDb) GetBrowsePage(userId int64, pageNum int32, pageSize int32) ([]model.Browse, error) {
+	var browses []model.Browse
+	err := e.db.Where("user_id = ?", userId).OrderBy("updated_at desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&browses)
+	if err != nil {
+		return nil, err
+	}
+	return browses, nil
+}

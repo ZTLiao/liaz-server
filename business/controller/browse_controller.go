@@ -21,4 +21,5 @@ func (e *BrowseController) Router(iWebRoutes web.IWebRoutes) {
 		NovelSubscribeDb: storage.NewNovelSubscribeDb(db),
 	}
 	iWebRoutes.POST("/browse/history", browseHandler.BrowseHistory)
+	iWebRoutes.GET("/browse/record", browseHandler.BrowseRecord)
 }

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"business/model"
+	"core/constant"
 	"core/types"
 	"time"
 
@@ -49,7 +50,7 @@ func (e *RecommendDb) SaveOrUpdateRecommend(recommend *model.Recommend) error {
 		}
 	} else {
 		recommend.UpdatedAt = now
-		_, err := e.db.ID(recommendId).Update(recommend)
+		_, err := e.db.ID(recommendId).Cols("title", "position", "recommend_type", "show_type", "show_title", "opt_type", "opt_value", "seq_no", "status", "updated_at").Update(recommend)
 		if err != nil {
 			return err
 		}
@@ -67,7 +68,7 @@ func (e *RecommendDb) DelRecommend(recommendId int64) error {
 
 func (e *RecommendDb) GetRecommendByPosition(position int8) ([]model.Recommend, error) {
 	var recommends []model.Recommend
-	err := e.db.Where("position = ?", position).OrderBy("seq_no asc").Find(&recommends)
+	err := e.db.Where("position = ? and status = ?", position, constant.PASS).OrderBy("seq_no asc").Find(&recommends)
 	if err != nil {
 		return nil, err
 	}

@@ -62,3 +62,23 @@ func (e *BrowseHandler) BrowseHistory(wc *web.WebContext) interface{} {
 	}
 	return response.Success()
 }
+
+func (e *BrowseHandler) BrowseRecord(wc *web.WebContext) interface{} {
+	userId := web.GetUserId(wc)
+	if userId == 0 {
+		return response.Success()
+	}
+	pageNum, err := strconv.ParseInt(wc.DefaultQuery("pageNum", "1"), 10, 32)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	pageSize, err := strconv.ParseInt(wc.DefaultQuery("pageSize", "10"), 10, 32)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	browses, err := e.BrowseDb.GetBrowsePage(userId, int32(pageNum), int32(pageSize))
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(browses)
+}
