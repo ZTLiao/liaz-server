@@ -71,6 +71,7 @@ func (e *UserHandler) UpdateUser(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
+	avatar := wc.PostForm("avatar")
 	nickname := wc.PostForm("nickname")
 	if len(nickname) == 0 {
 		return response.Fail(constant.NICKNAME_EMPTY)
@@ -86,7 +87,7 @@ func (e *UserHandler) UpdateUser(wc *web.WebContext) interface{} {
 		}
 	}
 	description := wc.PostForm("description")
-	err = e.UserDb.UpdateUser(userId, nickname, phone, email, int8(gender), description)
+	err = e.UserDb.UpdateUser(userId, avatar, nickname, phone, email, int8(gender), description)
 	if err != nil {
 		wc.AbortWithError(err)
 	}
