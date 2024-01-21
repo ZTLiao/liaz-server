@@ -21,4 +21,5 @@ func (e *AccountController) Router(iWebRoutes web.IWebRoutes) {
 		VerifyCodeCache: storage.NewVerifyCodeCache(redis),
 	}
 	iWebRoutes.POST("/account/reset/password", accountHandler.ResetPassword)
+	iWebRoutes.POST("/account/set/password", accountHandler.SetPassword)
 }

@@ -87,7 +87,7 @@ func (e *AccountDb) GetAccountByUsername(username string) (*model.Account, error
 	return &accounts[0], nil
 }
 
-func (e *AccountDb) ResetPassword(userId int64, password string) error {
+func (e *AccountDb) SetPassword(userId int64, password string) error {
 	var now = types.Time(time.Now())
 	var account = new(model.Account)
 	account.UserId = userId

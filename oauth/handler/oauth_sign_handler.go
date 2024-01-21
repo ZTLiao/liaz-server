@@ -138,14 +138,7 @@ func (e *OAuthSignHandler) SignOut(wc *web.WebContext) interface{} {
 		return response.ReturnError(http.StatusForbidden, constant.ILLEGAL_REQUEST)
 	}
 	clientToken = tokenArray[1]
-	userIdStr := wc.GetHeader(constant.X_USER_ID)
-	if len(userIdStr) == 0 {
-		return response.ReturnError(http.StatusUnauthorized, constant.UNAUTHORIZED)
-	}
-	userId, err := strconv.ParseInt(userIdStr, 10, 64)
-	if err != nil {
-		wc.AbortWithError(err)
-	}
+	userId := web.GetUserId(wc)
 	serverToken, err := e.OAuth2TokenCache.Get(userId)
 	if err != nil {
 		wc.AbortWithError(err)

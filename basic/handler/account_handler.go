@@ -41,7 +41,23 @@ func (e *AccountHandler) ResetPassword(wc *web.WebContext) interface{} {
 		return response.Fail(constant.USERNAME_NOT_EXISTS)
 	}
 	userId := account.UserId
-	err = e.AccountDb.ResetPassword(userId, newPassword)
+	err = e.AccountDb.SetPassword(userId, newPassword)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.Success()
+}
+
+func (e *AccountHandler) SetPassword(wc *web.WebContext) interface{} {
+	password := wc.PostForm("password")
+	if len(password) == 0 {
+		return response.Fail(constant.PASSWORD_EMPTY)
+	}
+	userId := web.GetUserId(wc)
+	if userId == 0 {
+		return response.Fail(constant.USERNAME_NOT_EXISTS)
+	}
+	err := e.AccountDb.SetPassword(userId, password)
 	if err != nil {
 		wc.AbortWithError(err)
 	}
