@@ -41,6 +41,7 @@ func init() {
 			new(controller.VerifyCodeController).Router(r)
 			new(controller.AccountController).Router(r)
 			new(controller.CrashRecordController).Router(r)
+			new(controller.MessageBoardController).Router(r)
 		}
 	})
 }

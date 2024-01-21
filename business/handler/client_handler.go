@@ -118,6 +118,9 @@ func (e *ClientHandler) buildAppConfig() ([]byte, error) {
 	if shareUrl, ex := confMap[constant.SHARE_URL]; ex {
 		app.ShareUrl = shareUrl.(string)
 	}
+	if downloadApp, ex := confMap[constant.DOWNLOAD_APP]; ex {
+		app.DownloadApp = downloadApp.(string)
+	}
 	//格式化
 	appJson, err := json.Marshal(app)
 	if err != nil {

@@ -14,4 +14,5 @@ type AppConfig struct {
 	FileUrl           string `json:"fileUrl"`
 	ResourceAuthority bool   `json:"resourceAuthority"`
 	ShareUrl          string `json:"shareUrl"`
+	DownloadApp       string `json:"downloadApp"`
 }
