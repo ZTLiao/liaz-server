@@ -19,7 +19,7 @@ func (e *AdminSysConfController) Router(iWebRoutes web.IWebRoutes) {
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var sysConfDb = storage.NewSysConfDb(db)
 	var sysConfCache = storage.NewSysConfCache(redis)
-	var adminSysConfHandler = &adminHandler.AdminSysConfHandler{
+	var adminSysConfHandler = adminHandler.AdminSysConfHandler{
 		SysConfHandler: basicHandler.NewSysConfHandler(sysConfDb, sysConfCache),
 	}
 	iWebRoutes.GET("/sys/conf", adminSysConfHandler.GetAdminSysConf)

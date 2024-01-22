@@ -23,7 +23,7 @@ func (e *FileController) Router(iWebRoutes web.IWebRoutes) {
 	var fileTemplate = file.NewFileTemplate(constant.MINIO)
 	var sysConfDb = storage.NewSysConfDb(db)
 	var sysConfCache = storage.NewSysConfCache(redis)
-	var fileHandler = &businessHandler.FileHandler{
+	var fileHandler = businessHandler.FileHandler{
 		FileItemHandler: basicHandler.NewFileItemHandler(fileItemDb, fileTemplate),
 		SysConfHandler:  basicHandler.NewSysConfHandler(sysConfDb, sysConfCache),
 	}

@@ -14,7 +14,7 @@ var _ web.IWebController = &BookshelfController{}
 
 func (e *BookshelfController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var bookshelfHandler = &handler.BookshelfHandler{
+	var bookshelfHandler = handler.BookshelfHandler{
 		ComicChapterDb: storage.NewComicChapterDb(db),
 		NovelChapterDb: storage.NewNovelChapterDb(db),
 	}

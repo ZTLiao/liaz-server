@@ -24,7 +24,7 @@ func (e *ClientController) Router(iWebRoutes web.IWebRoutes) {
 	var sysConfHandler = basicHandler.NewSysConfHandler(storage.NewSysConfDb(db), storage.NewSysConfCache(redis))
 	//事件订阅
 	event.Bus.Subscribe(constant.CLIENT_INIT_TOPIC, listener.NewClientInitListener(storage.NewDeviceDb(db), storage.NewClientInitRecordDb(db)))
-	var clientHandler = &handler.ClientHandler{
+	var clientHandler = handler.ClientHandler{
 		SysConfHandler: sysConfHandler,
 		SecurityConfig: config.SystemConfig.Security,
 	}

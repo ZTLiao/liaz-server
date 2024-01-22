@@ -14,7 +14,7 @@ var _ web.IWebController = &UserController{}
 
 func (e *UserController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var userHandler = &handler.UserHandler{
+	var userHandler = handler.UserHandler{
 		UserDb:    storage.NewUserDb(db),
 		AccountDb: storage.NewAccountDb(db),
 	}

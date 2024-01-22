@@ -14,7 +14,7 @@ var _ web.IWebController = &CategorySearchController{}
 
 func (e *CategorySearchController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var categorySearchHandler = &handler.CategorySearchHandler{
+	var categorySearchHandler = handler.CategorySearchHandler{
 		AssetDb: storage.NewAssetDb(db),
 	}
 	iWebRoutes.GET("/category/search", categorySearchHandler.GetContent)

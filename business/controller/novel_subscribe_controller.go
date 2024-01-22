@@ -22,7 +22,7 @@ func (e *NovelSubscribeController) Router(iWebRoutes web.IWebRoutes) {
 	var novelSubscribeNumCache = storage.NewNovelSubscribeNumCache(redis)
 	event.Bus.Subscribe(constant.NOVEL_SUBSCRIBE_TOPIC, listener.NewNovelSubscribeListener(storage.NewNovelDb(db), novelSubscribeNumCache))
 	event.Bus.Subscribe(constant.NOVEL_SUBSCRIBE_RANK_TOPIC, listener.NewNovelSubscribeRankListener(storage.NewNovelRankCache(redis)))
-	var novelSubscribeHandler = &handler.NovelSubscribeHandler{
+	var novelSubscribeHandler = handler.NovelSubscribeHandler{
 		NovelSubscribeDb:       storage.NewNovelSubscribeDb(db),
 		NovelSubscribeNumCache: novelSubscribeNumCache,
 	}

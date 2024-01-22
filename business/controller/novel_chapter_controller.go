@@ -15,7 +15,7 @@ var _ web.IWebController = &NovelChapterController{}
 
 func (e *NovelChapterController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var novelChapterHandler = &handler.NovelChapterHandler{
+	var novelChapterHandler = handler.NovelChapterHandler{
 		NovelDb:            businessStorage.NewNovelDb(db),
 		NovelChapterDb:     businessStorage.NewNovelChapterDb(db),
 		NovelChapterItemDb: businessStorage.NewNovelChapterItemDb(db),

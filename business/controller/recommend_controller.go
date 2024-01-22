@@ -19,7 +19,7 @@ func (e *RecommendController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var sysConfHandler = basicHandler.NewSysConfHandler(basicStorage.NewSysConfDb(db), basicStorage.NewSysConfCache(redis))
-	var recommendHandler = &businessHandler.RecommendHandler{
+	var recommendHandler = businessHandler.RecommendHandler{
 		ComicDb:         businessStorage.NewComicDb(db),
 		NovelDb:         businessStorage.NewNovelDb(db),
 		RecommendDb:     businessStorage.NewRecommendDb(db),

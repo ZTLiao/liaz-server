@@ -16,7 +16,7 @@ var _ web.IWebController = &AdminMenuController{}
 func (e *AdminMenuController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
-	var adminMenuHandler = &handler.AdminMenuHandler{
+	var adminMenuHandler = handler.AdminMenuHandler{
 		AdminMenuDb:     storage.NewAdminMenuDb(db),
 		AdminRoleMenuDb: storage.NewAdminRoleMenuDb(db),
 		AdminUserCache:  storage.NewAdminUserCache(redis),

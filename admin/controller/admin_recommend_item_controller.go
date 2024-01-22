@@ -22,7 +22,7 @@ func (e *AdminRecommendItemController) Router(iWebRoutes web.IWebRoutes) {
 		RecommendItemDb: storage.NewRecommendItemDb(db),
 		RecommendCache:  storage.NewRecommendCache(redis),
 	}
-	var adminRecommendItemHandler = &adminHandler.AdminRecommendItemHandler{
+	var adminRecommendItemHandler = adminHandler.AdminRecommendItemHandler{
 		RecommendItemDb:  storage.NewRecommendItemDb(db),
 		RecommendHandler: recommendHandler,
 	}

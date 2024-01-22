@@ -15,7 +15,7 @@ var _ web.IWebController = &AdminLogoutController{}
 
 func (e *AdminLogoutController) Router(iWebRoutes web.IWebRoutes) {
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
-	var adminLogoutHandler = &handler.AdminLogoutHandler{
+	var adminLogoutHandler = handler.AdminLogoutHandler{
 		AdminUserCache:   storage.NewAdminUserCache(redis),
 		AccessTokenCache: storage.NewAccessTokenCache(redis),
 	}

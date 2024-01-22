@@ -14,7 +14,7 @@ var _ web.IWebController = &CategoryController{}
 
 func (e *CategoryController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var categoryHandler = &handler.CategoryHandler{
+	var categoryHandler = handler.CategoryHandler{
 		CategoryDb: storage.NewCategoryDb(db),
 	}
 	iWebRoutes.GET("/category", categoryHandler.GetCategory)

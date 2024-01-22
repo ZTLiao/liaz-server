@@ -14,7 +14,7 @@ var _ web.IWebController = &AdminRoleController{}
 
 func (e *AdminRoleController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var adminRoleHandler = &handler.AdminRoleHandler{
+	var adminRoleHandler = handler.AdminRoleHandler{
 		AdminRoleDb:     storage.NewAdminRoleDb(db),
 		AdminRoleMenuDb: storage.NewAdminRoleMenuDb(db),
 	}

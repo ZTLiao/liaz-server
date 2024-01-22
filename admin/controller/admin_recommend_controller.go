@@ -14,7 +14,7 @@ var _ web.IWebController = &AdminRecommendController{}
 
 func (e *AdminRecommendController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
-	var adminRecommendHandler = &handler.AdminRecommendHandler{
+	var adminRecommendHandler = handler.AdminRecommendHandler{
 		RecommendDb: storage.NewRecommendDb(db),
 	}
 	iWebRoutes.GET("/recommend/page", adminRecommendHandler.GetRecommendPage)
