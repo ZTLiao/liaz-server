@@ -2,8 +2,10 @@ package handler
 
 import (
 	basicHandler "basic/handler"
+	"business/resp"
 	"core/constant"
 	"core/response"
+	"core/utils"
 	"core/web"
 	"io"
 	"time"
@@ -38,7 +40,7 @@ func (e *FileHandler) Upload(wc *web.WebContext) interface{} {
 	return response.ReturnOK(fileItem.Path)
 }
 
-func (e *FileHandler) PresignedGetObject(wc *web.WebContext) interface{} {
+func (e *FileHandler) GetObject(wc *web.WebContext) interface{} {
 	bucketName := wc.Param("bucketName")
 	objectName := wc.Param("objectName")
 	expireTime, err := e.SysConfHandler.GetIntValueByKey(constant.RESOURCE_EXPIRE_TIME)
@@ -55,4 +57,27 @@ func (e *FileHandler) PresignedGetObject(wc *web.WebContext) interface{} {
 		wc.AbortWithError(err)
 	}
 	return response.ReturnOK(requestURI)
+}
+
+func (e *FileHandler) PresignedGetObject(wc *web.WebContext) interface{} {
+	bucketName := wc.Param("bucketName")
+	objectName := wc.Param("objectName")
+	expireTime, err := e.SysConfHandler.GetIntValueByKey(constant.RESOURCE_EXPIRE_TIME)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	expires := time.Second * 60 * 60 * time.Duration(expireTime)
+	if expires == 0 {
+		return response.Success()
+	}
+	var headers = make(map[string]string)
+	requestURI, err := e.FileItemHandler.PresignedGetObject(bucketName, objectName, headers, expires)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	return response.ReturnOK(resp.FileResp{
+		Path:       utils.SLASH + bucketName + utils.SLASH + objectName,
+		ExpireTime: time.Now().UnixMilli() + int64(expires),
+		RequestUri: requestURI,
+	})
 }

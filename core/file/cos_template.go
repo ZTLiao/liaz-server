@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"core/utils"
+	"net/http"
 	"time"
 
 	"github.com/tencentyun/cos-go-sdk-v5"
@@ -65,9 +66,13 @@ func (e *CosTemplate) PresignedGetObject(folderName string, objectName string, h
 	if len(folderName) > 0 {
 		objectName = folderName + utils.SLASH + objectName
 	}
-	objectUrl := e.cosClient.Object.GetObjectURL(objectName)
-	if objectUrl == nil {
+	credential := e.cosClient.GetCredential()
+	presignedUrl, err := e.cosClient.Object.GetPresignedURL(context.Background(), http.MethodGet, objectName, credential.SecretID, credential.SecretKey, expires, nil)
+	if err != nil {
+		return "", err
+	}
+	if presignedUrl == nil {
 		return "", nil
 	}
-	return objectUrl.RequestURI(), nil
+	return presignedUrl.String(), nil
 }

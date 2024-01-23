@@ -11,7 +11,7 @@ import (
 
 type Minio struct {
 	Endpoint        string `yaml:"endpoint"`
-	AccessKeyID     string `yaml:"accessKeyID"`
+	AccessKeyID     string `yaml:"accessKeyId"`
 	SecretAccessKey string `yaml:"secretAccessKey"`
 	Secure          bool   `yaml:"secure"`
 }

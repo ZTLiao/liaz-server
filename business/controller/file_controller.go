@@ -28,5 +28,6 @@ func (e *FileController) Router(iWebRoutes web.IWebRoutes) {
 		SysConfHandler:  basicHandler.NewSysConfHandler(sysConfDb, sysConfCache),
 	}
 	iWebRoutes.POST("/file/upload", fileHandler.Upload)
-	iWebRoutes.GET("/file/:bucketName/:objectName", fileHandler.PresignedGetObject)
+	iWebRoutes.GET("/file/:bucketName/:objectName", fileHandler.GetObject)
+	iWebRoutes.GET("/file/temporary/:bucketName/:objectName", fileHandler.PresignedGetObject)
 }
