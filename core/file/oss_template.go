@@ -2,6 +2,7 @@ package file
 
 import (
 	"bytes"
+	"core/config"
 	"core/utils"
 	"time"
 
@@ -9,16 +10,16 @@ import (
 )
 
 type OssTemplate struct {
-	bucketName string
-	ossClient  *oss.Client
+	oss       *config.Oss
+	ossClient *oss.Client
 }
 
 var _ FileTemplate = &OssTemplate{}
 
-func NewOssTemplate(bucketName string, ossClient *oss.Client) *OssTemplate {
+func NewOssTemplate(oss *config.Oss, ossClient *oss.Client) *OssTemplate {
 	return &OssTemplate{
-		bucketName: bucketName,
-		ossClient:  ossClient,
+		oss:       oss,
+		ossClient: ossClient,
 	}
 }
 
@@ -66,7 +67,7 @@ func (e *OssTemplate) ListObjects(bucketName string) ([]FileObjectInfo, error) {
 }
 
 func (e *OssTemplate) PutObject(folderName string, objectName string, data []byte) (*FileObjectInfo, error) {
-	bucket, err := e.ossClient.Bucket(e.bucketName)
+	bucket, err := e.ossClient.Bucket(e.oss.BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (e *OssTemplate) PutObject(folderName string, objectName string, data []byt
 }
 
 func (e *OssTemplate) PresignedGetObject(folderName string, objectName string, headers map[string]string, expires time.Duration) (string, error) {
-	bucket, err := e.ossClient.Bucket(e.bucketName)
+	bucket, err := e.ossClient.Bucket(e.oss.BucketName)
 	if err != nil {
 		return "", err
 	}

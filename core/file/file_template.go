@@ -27,9 +27,9 @@ func NewFileTemplate(storage string) FileTemplate {
 	if storage == constant.MINIO {
 		fileTemplate = NewMinioTemplate(system.GetMinioClient())
 	} else if storage == constant.OSS {
-		fileTemplate = NewOssTemplate(config.SystemConfig.Oss.BucketName, system.GetOssClient())
+		fileTemplate = NewOssTemplate(config.SystemConfig.Oss, system.GetOssClient())
 	} else if storage == constant.COS {
-		fileTemplate = NewCosTemplate(system.GetCosClient())
+		fileTemplate = NewCosTemplate(config.SystemConfig.Cos, system.GetCosClient())
 	}
 	return fileTemplate
 }

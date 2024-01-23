@@ -13,6 +13,7 @@ type Config struct {
 	Oauth2   *Oauth2   `yaml:"oauth2"`
 	Oss      *Oss      `yaml:"oss"`
 	Email    *Email    `yaml:"email"`
+	Cos      *Cos      `yaml:"cos"`
 }
 
 var SystemConfig = new(Config)
@@ -39,8 +40,10 @@ func Setup() {
 	SystemConfig.Redis.Init()
 	//文件储存
 	SystemConfig.Minio.Init()
-	//阿里对象存储oss
+	//阿里云对象存储oss
 	SystemConfig.Oss.Init()
+	//腾讯云对象存储cos
+	SystemConfig.Cos.Init()
 	//oauth
 	SystemConfig.Oauth2.Init()
 	//http

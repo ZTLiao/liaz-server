@@ -3,6 +3,7 @@ package file
 import (
 	"bytes"
 	"context"
+	"core/config"
 	"core/utils"
 	"net/http"
 	"time"
@@ -11,13 +12,17 @@ import (
 )
 
 type CosTemplate struct {
+	cos       *config.Cos
 	cosClient *cos.Client
 }
 
 var _ FileTemplate = &CosTemplate{}
 
-func NewCosTemplate(cosClient *cos.Client) *CosTemplate {
-	return &CosTemplate{cosClient}
+func NewCosTemplate(cos *config.Cos, cosClient *cos.Client) *CosTemplate {
+	return &CosTemplate{
+		cos:       cos,
+		cosClient: cosClient,
+	}
 }
 
 func (e *CosTemplate) CreateBucket(bucketName string) error {
@@ -66,8 +71,7 @@ func (e *CosTemplate) PresignedGetObject(folderName string, objectName string, h
 	if len(folderName) > 0 {
 		objectName = folderName + utils.SLASH + objectName
 	}
-	credential := e.cosClient.GetCredential()
-	presignedUrl, err := e.cosClient.Object.GetPresignedURL(context.Background(), http.MethodGet, objectName, credential.SecretID, credential.SecretKey, expires, nil)
+	presignedUrl, err := e.cosClient.Object.GetPresignedURL(context.Background(), http.MethodGet, objectName, e.cos.SecretId, e.cos.SecretKey, expires, nil)
 	if err != nil {
 		return "", err
 	}
