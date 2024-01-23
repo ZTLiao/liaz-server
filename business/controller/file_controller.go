@@ -20,7 +20,7 @@ func (e *FileController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var fileItemDb = storage.NewFileItemDb(db)
-	var fileTemplate = file.NewFileTemplate(constant.MINIO)
+	var fileTemplate = file.NewFileTemplate(constant.COS)
 	var sysConfDb = storage.NewSysConfDb(db)
 	var sysConfCache = storage.NewSysConfCache(redis)
 	var fileHandler = businessHandler.FileHandler{
