@@ -11,7 +11,7 @@ type FileItem struct {
 	ObjectName string     `json:"objectName" xorm:"object_name"`
 	Size       int64      `json:"size" xorm:"size"`
 	Path       string     `json:"path" xorm:"path"`
-	UnqiueId   string     `json:"unqiueId" xorm:"unqiue_id"`
+	UniqueId   string     `json:"uniqueId" xorm:"unique_id"`
 	Suffix     string     `json:"suffix" xorm:"suffix"`
 	FileType   string     `json:"fileType" xorm:"file_type"`
 	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestampz created"`

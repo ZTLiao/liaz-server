@@ -89,7 +89,7 @@ func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize in
 	fileItem.ObjectName = fileName
 	fileItem.Size = fileSize
 	fileItem.Path = utils.SLASH + bucketName + utils.SLASH + timestamp
-	fileItem.UnqiueId = timestamp
+	fileItem.UniqueId = timestamp
 	fileItem.Suffix = suffix
 	fileItem.FileType = fileType
 	fileItem.CreatedAt = now
