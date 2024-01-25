@@ -13,8 +13,8 @@ type Account struct {
 	Password  string     `json:"password" xorm:"password"`
 	Flag      int8       `json:"flag" xorm:"flag"`
 	Status    int8       `json:"status" xorm:"status"`
-	CreatedAt types.Time `json:"createdAt" xorm:"created_at timestampz created"`
-	UpdatedAt types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
+	CreatedAt types.Time `json:"createdAt" xorm:"created_at timestamp created"`
+	UpdatedAt types.Time `json:"updatedAt" xorm:"updated_at timestamp updated"`
 }
 
 var _ model.BaseModel = &Account{}

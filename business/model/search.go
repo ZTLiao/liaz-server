@@ -12,7 +12,7 @@ type Search struct {
 	UserId    int64      `json:"userId" xorm:"user_id"`
 	Result    string     `json:"result" xorm:"result"`
 	Status    int8       `json:"status" xorm:"status"`
-	CreatedAt types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	CreatedAt types.Time `json:"createdAt" xorm:"created_at timestamp created"`
 }
 
 var _ model.BaseModel = &Search{}

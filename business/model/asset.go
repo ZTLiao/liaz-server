@@ -16,8 +16,8 @@ type Asset struct {
 	AuthorIds      string     `json:"authorIds" xorm:"author_ids"`
 	ChapterId      int64      `json:"chapterId"  xorm:"chapter_id"`
 	ObjId          int64      `json:"objId" xorm:"obj_id"`
-	CreatedAt      types.Time `json:"createdAt" xorm:"created_at timestampz created"`
-	UpdatedAt      types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
+	CreatedAt      types.Time `json:"createdAt" xorm:"created_at timestamp created"`
+	UpdatedAt      types.Time `json:"updatedAt" xorm:"updated_at timestamp updated"`
 }
 
 var _ model.BaseModel = &Asset{}

@@ -24,7 +24,7 @@ type VerifyCodeRecord struct {
 	IpRegion   string     `json:"ipRegion" xorm:"ip_region"`
 	ResCode    string     `json:"resCode" xorm:"res_code"`
 	ResMsg     string     `json:"resMsg" xorm:"res_msg"`
-	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestamp created"`
 }
 
 var _ model.BaseModel = &VerifyCodeRecord{}

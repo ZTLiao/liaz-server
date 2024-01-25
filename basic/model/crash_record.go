@@ -21,7 +21,7 @@ type CrashRecord struct {
 	NetType    string     `json:"netType" xorm:"net_type"`
 	ClientIp   string     `json:"clientIp" xorm:"client_ip"`
 	IpRegion   string     `json:"ipRegion" xorm:"ip_region"`
-	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestamp created"`
 }
 
 var _ model.BaseModel = &CrashRecord{}

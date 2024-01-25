@@ -14,8 +14,8 @@ type AdminMenu struct {
 	Status      int8       `json:"status" xorm:"status"`
 	ShowOrder   int        `json:"showOrder" xorm:"show_order"`
 	Description string     `json:"description" xorm:"description"`
-	CreatedAt   types.Time `json:"createdAt" xorm:"created_at timestampz created"`
-	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
+	CreatedAt   types.Time `json:"createdAt" xorm:"created_at timestamp created"`
+	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at timestamp updated"`
 }
 
 var _ model.BaseModel = &AdminMenu{}

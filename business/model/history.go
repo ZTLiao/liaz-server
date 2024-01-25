@@ -17,7 +17,7 @@ type History struct {
 	ChapterName string     `json:"chapterName" xorm:"chapter_name"`
 	Path        string     `json:"path" xorm:"path"`
 	StopIndex   int        `json:"stopIndex" xorm:"stop_index"`
-	CreatedAt   types.Time `json:"createdAt" xorm:"created_at timestampz created"`
+	CreatedAt   types.Time `json:"createdAt" xorm:"created_at timestamp created"`
 }
 
 var _ model.BaseModel = &History{}

@@ -14,8 +14,8 @@ type FileItem struct {
 	UniqueId   string     `json:"uniqueId" xorm:"unique_id"`
 	Suffix     string     `json:"suffix" xorm:"suffix"`
 	FileType   string     `json:"fileType" xorm:"file_type"`
-	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestampz created"`
-	UpdatedAt  types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
+	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestamp created"`
+	UpdatedAt  types.Time `json:"updatedAt" xorm:"updated_at timestamp updated"`
 }
 
 var _ model.BaseModel = &FileItem{}

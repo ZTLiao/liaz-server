@@ -16,8 +16,8 @@ type Browse struct {
 	ChapterName string     `json:"chapterName" xorm:"chapter_name"`
 	Path        string     `json:"path" xorm:"path"`
 	StopIndex   int        `json:"stopIndex" xorm:"stop_index"`
-	CreatedAt   types.Time `json:"createdAt" xorm:"created_at timestampz created"`
-	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at timestampz updated"`
+	CreatedAt   types.Time `json:"createdAt" xorm:"created_at timestamp created"`
+	UpdatedAt   types.Time `json:"updatedAt" xorm:"updated_at timestamp updated"`
 }
 
 var _ model.BaseModel = &Browse{}
