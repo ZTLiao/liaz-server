@@ -42,8 +42,8 @@ var (
 		PROD: {
 			Username:           "nacos",
 			Password:           "nacos",
-			ServerAddr:         "127.0.0.1:8848",
-			Namespace:          "5f49cd28-4eb2-4b0b-a467-bab25f4c9535",
+			ServerAddr:         "172.17.0.1:8848",
+			Namespace:          "b8a5a983-8632-40f4-9e83-6783a4b1680c",
 			SharedDataIds:      "application.yaml,database.yaml",
 			RefreshableDataIds: "application.yaml",
 		},

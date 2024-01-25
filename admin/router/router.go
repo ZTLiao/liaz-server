@@ -22,9 +22,10 @@ func init() {
 		db := system.GetXormEngine()
 		redis := redis.NewRedisUtil(system.GetRedisClient())
 		wrg.Use(AdminSecurityHandler(config.SystemConfig.Security, db, redis))
-		wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
+		var success = func(wc *web.WebContext) interface{} {
 			return response.Success()
-		})
+		}
+		wrg.Group("/").GET("/", success).HEAD("/", success)
 		r := wrg.Group("/admin")
 		{
 			new(controller.AdminLoginController).Router(r)

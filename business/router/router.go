@@ -17,9 +17,10 @@ func init() {
 		var redis = redis.NewRedisUtil(system.GetRedisClient())
 		wrg.Use(middleware.SignatureHandler(security))
 		wrg.Use(middleware.SecurityHandler(security, storage.NewOAuth2TokenCache(redis)))
-		wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
+		var success = func(wc *web.WebContext) interface{} {
 			return response.Success()
-		})
+		}
+		wrg.Group("/").GET("/", success).HEAD("/", success)
 		r := wrg.Group("/api")
 		{
 			new(controller.ClientController).Router(r)

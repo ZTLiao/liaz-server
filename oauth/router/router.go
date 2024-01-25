@@ -68,9 +68,10 @@ func init() {
 			srv.HandleTokenRequest(c.Writer, c.Request)
 		})
 		wrg.Use(middleware.SignatureHandler(config.SystemConfig.Security))
-		wrg.Group("/").GET("/", func(wc *web.WebContext) interface{} {
+		var success = func(wc *web.WebContext) interface{} {
 			return response.Success()
-		})
+		}
+		wrg.Group("/").GET("/", success).HEAD("/", success)
 		r := wrg.Group("/oauth")
 		{
 			new(controller.OAuthSignContoller).Router(r)
