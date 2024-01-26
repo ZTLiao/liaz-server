@@ -10,6 +10,10 @@ import (
 type Time time.Time
 
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
+	if len(data) == 2 {
+		*t = Time(time.Time{})
+		return
+	}
 	if strings.Contains(string(data), utils.DASHED) {
 		now, err := time.ParseInLocation(`"`+utils.NORM_DATETIME_MS_PATTERN+`"`, string(data), time.Local)
 		*t = Time(now)
