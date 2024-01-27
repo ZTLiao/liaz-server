@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"business/enums"
 	"business/model"
 	"core/types"
 	"time"
@@ -54,4 +55,13 @@ func (e *AppVersionDb) DelAppVersion(versionId int64) error {
 		return err
 	}
 	return nil
+}
+
+func (e *AppVersionDb) GetLatest(os string, channel string) (*model.AppVersion, error) {
+	var appVersion model.AppVersion
+	_, err := e.db.Where("os = ? and channel = ? and status in (?, ?, ?)", os, channel, enums.APP_VERSION_FOR_ONLINE, enums.APP_VERSION_FOR_SUGGEST, enums.APP_VERSION_FOR_FORCE).OrderBy("created_at desc").Limit(1, 0).Get(&appVersion)
+	if err != nil {
+		return nil, err
+	}
+	return &appVersion, nil
 }
