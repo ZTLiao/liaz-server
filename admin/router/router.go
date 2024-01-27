@@ -41,6 +41,7 @@ func init() {
 			new(controller.AdminRecommendItemController).Router(r)
 			new(controller.AdminCategoryController).Router(r)
 			new(controller.AdminAuthorController).Router(r)
+			new(controller.AdminAppVersionController).Router(r)
 		}
 	})
 }

@@ -125,7 +125,9 @@ func (e *RankHandler) ComicRank(rankType int64, timeType int64, dateTime string,
 			return rankItems[i].Score > rankItems[j].Score
 		})
 		for _, v := range rankItems {
-			e.ComicRankItemCache.RPush(rankType, timeType, dateTime, v)
+			if v.ObjId != 0 {
+				e.ComicRankItemCache.RPush(rankType, timeType, dateTime, v)
+			}
 		}
 	}
 	rankItems, err := e.ComicRankItemCache.LRange(rankType, timeType, dateTime, startIndex, stopIndex)

@@ -8,7 +8,7 @@ import (
 type AppVersion struct {
 	VersionId    int64      `json:"versionId" xorm:"version_id pk autoincr BIGINT"`
 	Os           string     `json:"os" xorm:"os"`
-	Version      string     `json:"version" xorm:"version"`
+	AppVersion   string     `json:"appVersion" xorm:"app_version"`
 	Channel      string     `json:"channel" xorm:"channel"`
 	Description  string     `json:"description" xorm:"description"`
 	DownloadLink string     `json:"downloadLink" xorm:"download_link"`

@@ -126,7 +126,9 @@ func (e *ComicDb) GetComicMapByIds(comicIds []int64) (map[int64]model.Comic, err
 	}
 	var comicMap = make(map[int64]model.Comic, 0)
 	for _, v := range comics {
-		comicMap[v.ComicId] = v
+		if v.ComicId != 0 {
+			comicMap[v.ComicId] = v
+		}
 	}
 	return comicMap, nil
 }

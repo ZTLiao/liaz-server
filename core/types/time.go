@@ -14,8 +14,12 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 		*t = Time(time.Time{})
 		return
 	}
-	if strings.Contains(string(data), utils.DASHED) {
+	if strings.Contains(string(data), utils.DASHED) && strings.Contains(string(data), utils.DOT) {
 		now, err := time.ParseInLocation(`"`+utils.NORM_DATETIME_MS_PATTERN+`"`, string(data), time.Local)
+		*t = Time(now)
+		return err
+	} else if strings.Contains(string(data), utils.DASHED) {
+		now, err := time.ParseInLocation(`"`+utils.NORM_DATETIME_PATTERN+`"`, string(data), time.Local)
 		*t = Time(now)
 		return err
 	} else {
