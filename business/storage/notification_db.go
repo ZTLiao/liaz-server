@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"business/enums"
 	"business/model"
 	"core/types"
 	"time"
@@ -54,4 +55,13 @@ func (e *NotificationDb) DelNotification(versionId int64) error {
 		return err
 	}
 	return nil
+}
+
+func (e *NotificationDb) GetLatest() (*model.Notification, error) {
+	var notification model.Notification
+	_, err := e.db.Where("status = ?", enums.NOTIFICATION_STATUS_FOR_PUBLISH).OrderBy("created_at desc").Limit(1, 0).Get(&notification)
+	if err != nil {
+		return nil, err
+	}
+	return &notification, nil
 }
