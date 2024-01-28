@@ -37,6 +37,9 @@ func (e *FileItemDb) GetFileItem(fileId int64) (*model.FileItem, error) {
 	if err != nil {
 		return nil, err
 	}
+	if fileItem.FileId == 0 {
+		return nil, nil
+	}
 	return &fileItem, nil
 }
 

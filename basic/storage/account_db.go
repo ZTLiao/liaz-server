@@ -72,6 +72,9 @@ func (e *AccountDb) GetAccountById(userId int64) (*model.Account, error) {
 	if err != nil {
 		return nil, err
 	}
+	if account.UserId == 0 {
+		return nil, nil
+	}
 	return &account, nil
 }
 

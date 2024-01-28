@@ -25,6 +25,9 @@ func (e *NovelChapterDb) UpgradeChapter(novelId int64) (*model.NovelChapter, err
 	if err != nil {
 		return nil, err
 	}
+	if novelChapter.NovelChapterId == 0 {
+		return nil, nil
+	}
 	return &novelChapter, nil
 }
 
@@ -42,6 +45,9 @@ func (e *NovelChapterDb) GetNovelChapterById(novelChapterId int64) (*model.Novel
 	_, err := e.db.ID(novelChapterId).Get(&novelChapter)
 	if err != nil {
 		return nil, err
+	}
+	if novelChapter.NovelChapterId == 0 {
+		return nil, nil
 	}
 	return &novelChapter, nil
 }

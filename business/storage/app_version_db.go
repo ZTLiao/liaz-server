@@ -63,5 +63,8 @@ func (e *AppVersionDb) GetLatest(os string, channel string) (*model.AppVersion, 
 	if err != nil {
 		return nil, err
 	}
+	if appVersion.VersionId == 0 {
+		return nil, nil
+	}
 	return &appVersion, nil
 }

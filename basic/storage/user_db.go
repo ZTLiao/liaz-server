@@ -78,6 +78,9 @@ func (e *UserDb) GetUserById(userId int64) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	if user.UserId == 0 {
+		return nil, nil
+	}
 	return &user, nil
 }
 

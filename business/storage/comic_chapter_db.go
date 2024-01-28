@@ -25,6 +25,9 @@ func (e *ComicChapterDb) UpgradeChapter(comicId int64) (*model.ComicChapter, err
 	if err != nil {
 		return nil, err
 	}
+	if comicChapter.ComicChapterId == 0 {
+		return nil, nil
+	}
 	return &comicChapter, nil
 }
 
@@ -42,6 +45,9 @@ func (e *ComicChapterDb) GetComicChapterById(comicChapterId int64) (*model.Comic
 	_, err := e.db.ID(comicChapterId).Get(&comicChapter)
 	if err != nil {
 		return nil, err
+	}
+	if comicChapter.ComicChapterId == 0 {
+		return nil, nil
 	}
 	return &comicChapter, nil
 }

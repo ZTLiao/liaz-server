@@ -84,5 +84,8 @@ func (e *RecommendDb) GetRecommendById(recommendId int64) (*model.Recommend, err
 	if err != nil {
 		return nil, err
 	}
+	if recommend.RecommendId == 0 {
+		return nil, nil
+	}
 	return &recommend, nil
 }

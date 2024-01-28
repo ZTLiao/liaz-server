@@ -34,6 +34,9 @@ func (e *SysConfDb) GetSysConf(confId int64) (*model.SysConf, error) {
 	if err != nil {
 		return nil, err
 	}
+	if sysConf.ConfId == 0 {
+		return nil, nil
+	}
 	return &sysConf, nil
 }
 

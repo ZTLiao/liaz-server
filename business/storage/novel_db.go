@@ -34,6 +34,9 @@ func (e *NovelDb) GetNovelById(novelId int64) (*model.Novel, error) {
 	if err != nil {
 		return nil, err
 	}
+	if novel.NovelId == 0 {
+		return nil, nil
+	}
 	return &novel, nil
 }
 

@@ -20,5 +20,8 @@ func (e *NovelVolumeDb) GetNovelVolumeById(novelVolumeId int64) (*model.NovelVol
 	if err != nil {
 		return nil, err
 	}
+	if novelVolume.NovelVolumeId == 0 {
+		return nil, nil
+	}
 	return &novelVolume, nil
 }

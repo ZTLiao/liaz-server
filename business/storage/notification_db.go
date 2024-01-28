@@ -63,5 +63,8 @@ func (e *NotificationDb) GetLatest() (*model.Notification, error) {
 	if err != nil {
 		return nil, err
 	}
+	if notification.NotificationId == 0 {
+		return nil, nil
+	}
 	return &notification, nil
 }

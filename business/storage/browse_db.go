@@ -60,6 +60,9 @@ func (e *BrowseDb) GetBrowseByObjId(userId int64, assetType int, objId int64) (*
 	if err != nil {
 		return nil, err
 	}
+	if browse.BrowseId == 0 {
+		return nil, nil
+	}
 	return &browse, nil
 }
 
