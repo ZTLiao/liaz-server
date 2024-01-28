@@ -216,6 +216,7 @@ func (e *NovelHandler) GetNovelDetail(novelId int64) (*resp.NovelDetailResp, err
 			novelVolumes = append(novelVolumes, resp.NovelVolumeResp{
 				NovelVolumeId: k,
 				VolumeName:    volumeName,
+				Flag:          novel.Flag,
 				SeqNo:         seqNo,
 				Chapters:      v,
 			})

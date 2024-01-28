@@ -4,6 +4,7 @@ import (
 	"core/constant"
 	"core/redis"
 	"strconv"
+	"time"
 )
 
 type SearchCache struct {
@@ -23,6 +24,7 @@ func (e *SearchCache) Incr(assetId int64) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	e.redis.Expire(e.RedisKey(), time.Duration(constant.TIME_OF_WEEK)*time.Second)
 	return int64(score), nil
 }
 
