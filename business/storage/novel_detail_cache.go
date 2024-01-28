@@ -28,7 +28,7 @@ func (e *NovelDetailCache) Set(novelId int64, novelDetail *resp.NovelDetailResp)
 	if err != nil {
 		return err
 	}
-	return e.redis.Set(e.RedisKey(novelId), data, constant.TIME_OF_WEEK)
+	return e.redis.Set(e.RedisKey(novelId), data, constant.TIME_OF_HALF_DAY)
 }
 
 func (e *NovelDetailCache) Get(novelId int64) (*resp.NovelDetailResp, error) {
