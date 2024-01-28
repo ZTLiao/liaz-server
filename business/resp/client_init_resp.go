@@ -11,8 +11,9 @@ type KeyConfig struct {
 }
 
 type AppConfig struct {
-	FileUrl           string `json:"fileUrl"`
-	ResourceAuthority bool   `json:"resourceAuthority"`
-	ShareUrl          string `json:"shareUrl"`
-	DownloadApp       string `json:"downloadApp"`
+	FileUrl           string                 `json:"fileUrl"`
+	ResourceAuthority bool                   `json:"resourceAuthority"`
+	ShareUrl          string                 `json:"shareUrl"`
+	DownloadApp       string                 `json:"downloadApp"`
+	Splash            map[string]interface{} `json:"splash"`
 }

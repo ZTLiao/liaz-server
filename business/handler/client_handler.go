@@ -121,6 +121,9 @@ func (e *ClientHandler) buildAppConfig() ([]byte, error) {
 	if downloadApp, ex := confMap[constant.DOWNLOAD_APP]; ex {
 		app.DownloadApp = downloadApp.(string)
 	}
+	if splash, ex := confMap[constant.SPLASH]; ex {
+		app.Splash = splash.(map[string]interface{})
+	}
 	//格式化
 	appJson, err := json.Marshal(app)
 	if err != nil {

@@ -9,4 +9,5 @@ const (
 	RECOMMEND_FOR_UPGRADE      = "recommend_for_upgrade"
 	SHARE_URL                  = "share_url"
 	DOWNLOAD_APP               = "download_app"
+	SPLASH                     = "splash"
 )
