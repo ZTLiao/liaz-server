@@ -178,10 +178,7 @@ func (e *NovelHandler) GetNovelDetail(novelId int64) (*resp.NovelDetailResp, err
 				})
 				for _, item := range items {
 					path := item.Path
-					fileType, err := e.FileItemDb.GetFileTypeByPath(path)
-					if err != nil {
-						return nil, err
-					}
+					fileType := constant.TEXT_PLAIN
 					paths = append(paths, path)
 					types = append(types, fileType)
 				}
