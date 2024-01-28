@@ -20,6 +20,7 @@ import (
 
 type ComicHandler struct {
 	ComicDb                *storage.ComicDb
+	ComicVolumeDb          *storage.ComicVolumeDb
 	ComicChapterDb         *storage.ComicChapterDb
 	ComicChapterItemDb     *storage.ComicChapterItemDb
 	ComicSubscribeDb       *storage.ComicSubscribeDb
@@ -157,11 +158,11 @@ func (e *ComicHandler) GetComicDetail(comicId int64) (*resp.ComicDetailResp, err
 			items = append(items, comicChapterItem)
 			chapterItemMap[comicChapterId] = items
 		}
-		var chapterMap = make(map[int8][]resp.ComicChapterResp, 0)
+		var chapterMap = make(map[int64][]resp.ComicChapterResp, 0)
 		for _, comicChapter := range comicChapters {
 			comicChapterId := comicChapter.ComicChapterId
-			chapterType := comicChapter.ChapterType
-			chapters, ex := chapterMap[chapterType]
+			comicVolumeId := comicChapter.ComicVolumeId
+			chapters, ex := chapterMap[comicVolumeId]
 			if !ex {
 				chapters = make([]resp.ComicChapterResp, 0)
 			}
@@ -188,17 +189,34 @@ func (e *ComicHandler) GetComicDetail(comicId int64) (*resp.ComicDetailResp, err
 				Paths:          paths,
 			}
 			chapters = append(chapters, chapter)
-			chapterMap[chapterType] = chapters
+			chapterMap[comicVolumeId] = chapters
 		}
-		var chapterTypes = make([]resp.ComicChapterTypeResp, 0)
+		var comicVolumes = make([]resp.ComicVolumeResp, 0)
 		for k, v := range chapterMap {
-			chapterTypes = append(chapterTypes, resp.ComicChapterTypeResp{
-				ChapterType: k,
-				Flag:        comic.Flag,
-				Chapters:    v,
+			var volumeName string
+			var seqNo int64
+			if k != 0 {
+				comicVolume, err := e.ComicVolumeDb.GetComicVolumeById(k)
+				if err != nil {
+					return nil, err
+				}
+				if comicVolume != nil {
+					volumeName = comicVolume.VolumeName
+					seqNo = comicVolume.SeqNo
+				}
+			}
+			comicVolumes = append(comicVolumes, resp.ComicVolumeResp{
+				ComicVolumeId: k,
+				VolumeName:    volumeName,
+				Flag:          comic.Flag,
+				SeqNo:         seqNo,
+				Chapters:      v,
 			})
 		}
-		comicDetail.ChapterTypes = chapterTypes
+		sort.Slice(comicVolumes, func(i, j int) bool {
+			return comicVolumes[i].SeqNo > comicVolumes[j].SeqNo
+		})
+		comicDetail.Volumes = comicVolumes
 	}
 	return comicDetail, nil
 }
@@ -345,13 +363,13 @@ func (e *ComicHandler) ComicCatalogue(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	chatperTypes := comicDetail.ChapterTypes
-	if len(chatperTypes) == 0 {
+	volumes := comicDetail.Volumes
+	if len(volumes) == 0 {
 		return response.Success()
 	}
 	var chapters []resp.ComicChapterResp
-	for _, v := range chatperTypes {
-		if v.ChapterType == comicChapter.ChapterType {
+	for _, v := range volumes {
+		if v.ComicVolumeId == comicChapter.ComicVolumeId {
 			chapters = v.Chapters
 			break
 		}

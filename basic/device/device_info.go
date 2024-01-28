@@ -3,6 +3,7 @@ package device
 import (
 	"core/constant"
 	"core/web"
+	"net/url"
 )
 
 type DeviceInfo struct {
@@ -25,7 +26,10 @@ func GetDeviceInfo(wc *web.WebContext) *DeviceInfo {
 	deviceInfo.DeviceId = wc.GetHeader(constant.X_DEVICE_ID)
 	deviceInfo.Os = wc.GetHeader(constant.X_OS)
 	deviceInfo.OsVersion = wc.GetHeader(constant.X_OS_VERSION)
-	deviceInfo.IspType = wc.GetHeader(constant.X_ISP_TYPE)
+	ispType := wc.GetHeader(constant.X_ISP_TYPE)
+	if len(ispType) != 0 {
+		deviceInfo.IspType, _ = url.QueryUnescape(ispType)
+	}
 	deviceInfo.NetType = wc.GetHeader(constant.X_NET_TYPE)
 	deviceInfo.App = wc.GetHeader(constant.X_APP)
 	deviceInfo.AppVersion = wc.GetHeader(constant.X_APP_VERSION)

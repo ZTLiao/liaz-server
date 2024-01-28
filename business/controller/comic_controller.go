@@ -26,6 +26,7 @@ func (e *ComicController) Router(iWebRoutes web.IWebRoutes) {
 	event.Bus.Subscribe(constant.COMIC_POPULAR_RANK_TOPIC, listener.NewComicPopularRankListener(storage.NewComicRankCache(redis)))
 	var comicHandler = handler.ComicHandler{
 		ComicDb:                comicDb,
+		ComicVolumeDb:          storage.NewComicVolumeDb(db),
 		ComicChapterDb:         storage.NewComicChapterDb(db),
 		ComicChapterItemDb:     storage.NewComicChapterItemDb(db),
 		ComicSubscribeDb:       comicSubscribeDb,

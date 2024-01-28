@@ -14,7 +14,7 @@ func NewComicVolumeDb(db *xorm.Engine) *ComicVolumeDb {
 	return &ComicVolumeDb{db}
 }
 
-func (e *ComicVolumeDb) GetNovelVolumeById(comicVolumeId int64) (*model.ComicVolume, error) {
+func (e *ComicVolumeDb) GetComicVolumeById(comicVolumeId int64) (*model.ComicVolume, error) {
 	var comicVolume model.ComicVolume
 	_, err := e.db.ID(comicVolumeId).Get(&comicVolume)
 	if err != nil {

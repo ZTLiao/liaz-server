@@ -7,6 +7,7 @@ import (
 
 type ComicChapter struct {
 	ComicChapterId int64      `json:"comicChapterId" xorm:"comic_chapter_id pk autoincr BIGINT"`
+	ComicVolumeId  int64      `json:"comicVolumeId" xorm:"comic_volume_id"`
 	ComicId        int64      `json:"comicId" xorm:"comic_id"`
 	ChapterName    string     `json:"chapterName" xorm:"chapter_name"`
 	ChapterType    int8       `json:"chapterType" xorm:"chapter_type"`
