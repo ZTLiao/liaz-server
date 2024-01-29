@@ -124,6 +124,9 @@ func (e *ClientHandler) buildAppConfig() ([]byte, error) {
 	if splash, ex := confMap[constant.SPLASH]; ex {
 		app.Splash = splash.(map[string]interface{})
 	}
+	if emptyPage, ex := confMap[constant.EMPTY_PAGE]; ex {
+		app.EmptyPage = emptyPage.(string)
+	}
 	//格式化
 	appJson, err := json.Marshal(app)
 	if err != nil {

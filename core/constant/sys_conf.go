@@ -10,4 +10,5 @@ const (
 	SHARE_URL                  = "share_url"
 	DOWNLOAD_APP               = "download_app"
 	SPLASH                     = "splash"
+	EMPTY_PAGE                 = "empty_page"
 )

@@ -16,4 +16,5 @@ type AppConfig struct {
 	ShareUrl          string                 `json:"shareUrl"`
 	DownloadApp       string                 `json:"downloadApp"`
 	Splash            map[string]interface{} `json:"splash"`
+	EmptyPage         string                 `json:"emptyPage"`
 }
