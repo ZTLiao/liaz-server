@@ -275,7 +275,7 @@ func (e *NovelHandler) NovelUpgrade(wc *web.WebContext) interface{} {
 }
 
 func (e *NovelHandler) getNovelUpgradeItem(pageNum int32, pageSize int32) ([]resp.NovelUpgradeResp, error) {
-	novels, err := e.NovelDb.GetNovelUpgradePage(1, 300)
+	novels, err := e.NovelDb.GetNovelUpgradePage(pageNum, pageSize)
 	if err != nil {
 		return nil, err
 	}

@@ -31,7 +31,7 @@ func (e *NovelUpgradeItemCache) RPush(item resp.NovelUpgradeResp) error {
 	if err != nil {
 		return err
 	}
-	err = e.redis.Expire(e.RedisKey(), time.Second*constant.TIME_OF_HOUR)
+	err = e.redis.Expire(e.RedisKey(), time.Second*constant.TIME_OF_HALF_HOUR)
 	if err != nil {
 		return err
 	}
