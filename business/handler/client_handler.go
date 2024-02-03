@@ -127,6 +127,9 @@ func (e *ClientHandler) buildAppConfig() ([]byte, error) {
 	if emptyPage, ex := confMap[constant.EMPTY_PAGE]; ex {
 		app.EmptyPage = emptyPage.(string)
 	}
+	if adsFlag, ex := confMap[constant.ADS_FLAG]; ex {
+		app.AdsFlag, _ = strconv.ParseInt(adsFlag.(string), 10, 64)
+	}
 	//格式化
 	appJson, err := json.Marshal(app)
 	if err != nil {

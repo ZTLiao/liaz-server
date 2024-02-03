@@ -11,4 +11,5 @@ const (
 	DOWNLOAD_APP               = "download_app"
 	SPLASH                     = "splash"
 	EMPTY_PAGE                 = "empty_page"
+	ADS_FLAG                   = "ads_flag"
 )
