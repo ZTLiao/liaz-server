@@ -23,7 +23,7 @@ func (e *AssetDb) GetAssetByCategoryId(assetType int8, categoryId int64, pageNum
 	if assetType != 0 {
 		session = session.And("asset_type = ?", assetType)
 	}
-	err := session.Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&assets)
+	err := session.Limit(int(pageSize), int((pageNum-1)*pageSize)).OrderBy("updated_at desc").Find(&assets)
 	if err != nil {
 		return nil, err
 	}
