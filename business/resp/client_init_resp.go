@@ -18,4 +18,5 @@ type AppConfig struct {
 	Splash            map[string]interface{} `json:"splash"`
 	EmptyPage         string                 `json:"emptyPage"`
 	AdsFlag           int64                  `json:"adsFlag"`
+	Advert            map[string]interface{} `json:"advert"`
 }

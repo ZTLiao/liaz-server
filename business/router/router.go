@@ -45,6 +45,7 @@ func init() {
 			new(controller.MessageBoardController).Router(r)
 			new(controller.AppVersionController).Router(r)
 			new(controller.NotificationController).Router(r)
+			new(controller.AdvertRecordController).Router(r)
 		}
 	})
 }
