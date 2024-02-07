@@ -5,6 +5,7 @@ import (
 	"business/model"
 	"business/transfer"
 	"core/constant"
+	"core/utils"
 	"strconv"
 	"strings"
 
@@ -85,4 +86,53 @@ func (e *NovelChapterDb) GetBookshelf(userId int64, sortType int32, pageNum int3
 		return nil, err
 	}
 	return novelChapters, nil
+}
+
+func (e *NovelChapterDb) GetUpgradeChapters(novelIds []int64) (map[int64]model.NovelChapter, error) {
+	var novelChapters []model.NovelChapter
+	var builder strings.Builder
+	var params = make([]interface{}, 0)
+	builder.WriteString(
+		`
+		select 
+			nc1.novel_id,
+			nc1.novel_chapter_id,
+			nc1.chapter_name 
+		from novel_chapter as nc1 inner join (
+			select 
+				nc.novel_id, 
+				max(nc.novel_chapter_id) as novel_chapter_id 
+			from novel_chapter as nc 
+			where nc.status = ?
+		`)
+	params = append(params, constant.PASS)
+	builder.WriteString("and nc.novel_id in (")
+	for i, length := 0, len(novelIds); i < length; i++ {
+		builder.WriteString(utils.QUESTION)
+		params = append(params, novelIds[i])
+		if i != length-1 {
+			builder.WriteString(utils.COMMA)
+		}
+	}
+	builder.WriteString(") group by nc.novel_id")
+	builder.WriteString(`
+			) as nc2
+		on nc1.novel_id = nc2.novel_id
+		and nc1.novel_chapter_id = nc2.novel_chapter_id
+		order by nc1.created_at desc, nc1.seq_no desc
+		`)
+	err := e.db.Where(builder.String(), params...).Find(&novelChapters)
+	if err != nil {
+		return nil, err
+	}
+	if len(novelChapters) == 0 {
+		return nil, nil
+	}
+	var novelChapterMap = make(map[int64]model.NovelChapter, 0)
+	for _, v := range novelChapters {
+		if v.NovelId != 0 {
+			novelChapterMap[v.NovelId] = v
+		}
+	}
+	return novelChapterMap, nil
 }
