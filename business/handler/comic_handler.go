@@ -274,16 +274,21 @@ func (e *ComicHandler) getComicUpgradeItem(pageNum int32, pageSize int32) ([]res
 	if len(comics) == 0 {
 		return nil, nil
 	}
+	var comicIds = make([]int64, 0)
+	for _, comic := range comics {
+		comicIds = append(comicIds, comic.ComicId)
+	}
+	comicChapterMap, err := e.ComicChapterDb.GetUpgradeChapters(comicIds)
+	if err != nil {
+		return nil, err
+	}
 	var comicUpgrades = make([]resp.ComicUpgradeResp, 0)
 	for _, comic := range comics {
 		comicId := comic.ComicId
-		comicChapter, err := e.ComicChapterDb.UpgradeChapter(comicId)
-		if err != nil {
-			return nil, err
-		}
-		if comicChapter == nil {
+		if comicChapterMap == nil {
 			continue
 		}
+		comicChapter := comicChapterMap[comicId]
 		var comicUpgrade = resp.ComicUpgradeResp{
 			ComicChapterId: comicChapter.ComicChapterId,
 			ComicId:        comicId,

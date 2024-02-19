@@ -282,16 +282,21 @@ func (e *NovelHandler) getNovelUpgradeItem(pageNum int32, pageSize int32) ([]res
 	if len(novels) == 0 {
 		return nil, nil
 	}
+	var novelIds = make([]int64, 0)
+	for _, novel := range novels {
+		novelIds = append(novelIds, novel.NovelId)
+	}
+	novelChapterMap, err := e.NovelChapterDb.GetUpgradeChapters(novelIds)
+	if err != nil {
+		return nil, err
+	}
 	var novelUpgrades = make([]resp.NovelUpgradeResp, 0)
 	for _, novel := range novels {
 		novelId := novel.NovelId
-		novelChapter, err := e.NovelChapterDb.UpgradeChapter(novelId)
-		if err != nil {
-			return nil, err
-		}
-		if novelChapter == nil {
+		if novelChapterMap == nil {
 			continue
 		}
+		novelChapter := novelChapterMap[novelId]
 		var novelUpgrade = resp.NovelUpgradeResp{
 			NovelChapterId: novelChapter.NovelChapterId,
 			NovelId:        novelId,

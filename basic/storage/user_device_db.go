@@ -3,6 +3,7 @@ package storage
 import (
 	"basic/model"
 	"core/constant"
+	"core/logger"
 	"core/types"
 	"time"
 
@@ -27,11 +28,15 @@ func (e *UserDeviceDb) SaveOrUpdateUserDevice(userId int64, deviceId string) err
 	userDevice.DeviceId = deviceId
 	userDevice.IsUsed = constant.NO
 	userDevice.UpdatedAt = now
-	e.db.Where("user_id = ? and device_id != ?", userId, deviceId).Cols("is_used", "updated_at").Update(userDevice)
-	count, err := e.db.Where("user_id = ? and device_id = ?", userId, deviceId).Count(userDevice)
+	_, err := e.db.Where("user_id = ? and device_id != ?", userId, deviceId).Cols("is_used", "updated_at").Update(userDevice)
 	if err != nil {
 		return err
 	}
+	count, err := e.db.Where("user_id = ? and device_id = ?", userId, deviceId).Count(&model.UserDevice{})
+	if err != nil {
+		return err
+	}
+	logger.Info("userId : %v, deviceId : %v, count : %v", userId, deviceId, count)
 	userDevice.IsUsed = constant.YES
 	if count == 0 {
 		userDevice.CreatedAt = now

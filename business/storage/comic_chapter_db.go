@@ -121,7 +121,7 @@ func (e *ComicChapterDb) GetUpgradeChapters(comicIds []int64) (map[int64]model.C
 		and cc1.comic_chapter_id = cc2.comic_chapter_id
 		order by cc1.created_at desc, cc1.seq_no desc
 		`)
-	err := e.db.Where(builder.String(), params...).Find(&comicChapters)
+	err := e.db.SQL(builder.String(), params...).Find(&comicChapters)
 	if err != nil {
 		return nil, err
 	}
