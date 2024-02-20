@@ -17,6 +17,10 @@ func (e *AdminFileHandler) Upload(wc *web.WebContext) interface{} {
 	return e.FileItemHandler.UploadFile(wc)
 }
 
+func (e *AdminFileHandler) UploadBatch(wc *web.WebContext) interface{} {
+	return e.FileItemHandler.UploadBatchFile(wc)
+}
+
 func (e *AdminFileHandler) PresignedGetObject(wc *web.WebContext) interface{} {
 	bucketName := wc.Param("bucketName")
 	objectName := wc.Param("objectName")

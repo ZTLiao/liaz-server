@@ -28,5 +28,6 @@ func (e *AdminFileController) Router(iWebRoutes web.IWebRoutes) {
 		SysConfHandler:  basicHandler.NewSysConfHandler(sysConfDb, sysConfCache),
 	}
 	iWebRoutes.POST("/upload/:bucketName", adminFileHandler.Upload)
+	iWebRoutes.POST("/upload/batch/:bucketName", adminFileHandler.UploadBatch)
 	iWebRoutes.GET("/file/:bucketName/:objectName", adminFileHandler.PresignedGetObject)
 }

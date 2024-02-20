@@ -54,6 +54,41 @@ func (e *FileItemHandler) UploadFile(wc *web.WebContext) interface{} {
 	return response.ReturnOK(fileItem)
 }
 
+func (e *FileItemHandler) UploadBatchFile(wc *web.WebContext) interface{} {
+	var bucketName = wc.Param("bucketName")
+	if len(bucketName) == 0 {
+		return response.Success()
+	}
+	form, err := wc.MultipartForm()
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	var paths = make([]string, 0)
+	files := form.File["files"]
+	for _, fileHeader := range files {
+		fileName := fileHeader.Filename
+		fileSize := fileHeader.Size
+		file, err := fileHeader.Open()
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		defer file.Close()
+		data, err := io.ReadAll(file)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		fileItem, err := e.Upload(bucketName, fileName, fileSize, data)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		path := fileItem.Path
+		if len(path) != 0 {
+			paths = append(paths, path)
+		}
+	}
+	return response.ReturnOK(paths)
+}
+
 func (e *FileItemHandler) Upload(bucketName string, fileName string, fileSize int64, data []byte) (*model.FileItem, error) {
 	//获取后缀
 	var suffix string

@@ -107,6 +107,10 @@ func (e *WebContext) FormFile(key string) (multipart.File, *multipart.FileHeader
 	return e.context.Request.FormFile(key)
 }
 
+func (e *WebContext) MultipartForm() (*multipart.Form, error) {
+	return e.context.MultipartForm()
+}
+
 func GetUserId(wc *WebContext) int64 {
 	userIdStr := wc.GetHeader(constant.X_USER_ID)
 	if len(userIdStr) == 0 {
