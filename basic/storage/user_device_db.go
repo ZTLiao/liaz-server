@@ -46,7 +46,7 @@ func (e *UserDeviceDb) SaveOrUpdateUserDevice(userId int64, deviceId string) err
 		}
 	} else {
 		userDevice.UpdatedAt = now
-		_, err := e.db.Update(userDevice)
+		_, err := e.db.Where("user_id = ? and device_id = ?", userId, deviceId).Cols("is_used", "updated_at").Update(userDevice)
 		if err != nil {
 			return err
 		}
