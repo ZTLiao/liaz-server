@@ -181,7 +181,9 @@ func (e *RankHandler) NovelRank(rankType int64, timeType int64, dateTime string,
 			return rankItems[i].Score > rankItems[j].Score
 		})
 		for _, v := range rankItems {
-			e.NovelRankItemCache.RPush(rankType, timeType, dateTime, v)
+			if v.ObjId != 0 {
+				e.NovelRankItemCache.RPush(rankType, timeType, dateTime, v)
+			}
 		}
 	}
 	rankItems, err := e.NovelRankItemCache.LRange(rankType, timeType, dateTime, startIndex, stopIndex)
