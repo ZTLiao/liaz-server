@@ -129,7 +129,9 @@ func (e *NovelDb) GetNovelMapByIds(novelIds []int64) (map[int64]model.Novel, err
 	}
 	var novelMap = make(map[int64]model.Novel, 0)
 	for _, v := range novels {
-		novelMap[v.NovelId] = v
+		if v.NovelId != 0 {
+			novelMap[v.NovelId] = v
+		}
 	}
 	return novelMap, nil
 }
