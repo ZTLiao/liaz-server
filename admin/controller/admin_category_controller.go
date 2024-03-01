@@ -18,7 +18,7 @@ func (e *AdminCategoryController) Router(iWebRoutes web.IWebRoutes) {
 		CategoryDb: storage.NewCategoryDb(db),
 	}
 	iWebRoutes.GET("/category/page", adminCategoryHandler.GetCategoryPage)
-	iWebRoutes.GET("/cateogry", adminCategoryHandler.GetCategoryList)
+	iWebRoutes.GET("/category", adminCategoryHandler.GetCategoryList)
 	iWebRoutes.POST("/category", adminCategoryHandler.SaveCategory)
 	iWebRoutes.PUT("/category", adminCategoryHandler.UpdateCategory)
 	iWebRoutes.DELETE("/category/:categoryId", adminCategoryHandler.DelCategory)

@@ -18,7 +18,7 @@ func (e *AdminCategoryGroupController) Router(iWebRoutes web.IWebRoutes) {
 		CategoryGroupDb: storage.NewCategoryGroupDb(db),
 	}
 	iWebRoutes.GET("/category/group/page", adminCategoryGroupHandler.GetCategoryGroupPage)
-	iWebRoutes.GET("/cateogry/group", adminCategoryGroupHandler.GetCategoryGroupList)
+	iWebRoutes.GET("/category/group", adminCategoryGroupHandler.GetCategoryGroupList)
 	iWebRoutes.POST("/category/group", adminCategoryGroupHandler.SaveCategoryGroup)
 	iWebRoutes.PUT("/category/group", adminCategoryGroupHandler.UpdateCategoryGroup)
 	iWebRoutes.DELETE("/category/group/:categoryGroupId", adminCategoryGroupHandler.DelCategoryGroup)
