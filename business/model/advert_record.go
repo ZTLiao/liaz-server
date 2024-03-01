@@ -6,7 +6,7 @@ import (
 )
 
 type AdvertRecord struct {
-	Id         int64      `json:"id" xorm:"id pk BIGINT"`
+	Id         int64      `json:"id" xorm:"id pk autoincr BIGINT"`
 	AdvertType string     `json:"advertType" xorm:"advert_type"`
 	Content    string     `json:"content" xorm:"content"`
 	DeviceId   string     `json:"deviceId" xorm:"device_id"`

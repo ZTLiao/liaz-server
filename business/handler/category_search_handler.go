@@ -1,18 +1,21 @@
 package handler
 
 import (
+	basicStorage "basic/storage"
 	"business/resp"
-	"business/storage"
+	businessStorage "business/storage"
 	"core/response"
 	"core/web"
 	"strconv"
 )
 
 type CategorySearchHandler struct {
-	AssetDb *storage.AssetDb
+	CategoryGroupDb *basicStorage.CategoryGroupDb
+	CategoryDb      *basicStorage.CategoryDb
+	AssetDb         *businessStorage.AssetDb
 }
 
-func (e *CategorySearchHandler) GetContent(wc *web.WebContext) interface{} {
+func (e *CategorySearchHandler) GetCategorySearch(wc *web.WebContext) interface{} {
 	assetTypeStr := wc.Query("assetType")
 	if len(assetTypeStr) == 0 {
 		return response.Success()
@@ -37,7 +40,29 @@ func (e *CategorySearchHandler) GetContent(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	assets, err := e.AssetDb.GetAssetByCategoryId(int8(assetType), categoryId, int32(pageNum), int32(pageSize))
+	categoryGroup, err := e.CategoryGroupDb.GetCategoryGroupById(categoryId)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if categoryGroup == nil {
+		return response.Success()
+	}
+	groupCode := categoryGroup.GroupCode
+	if len(groupCode) == 0 {
+		return response.Success()
+	}
+	categories, err := e.CategoryDb.GetCategoryByGroupCode(groupCode)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	if len(categories) == 0 {
+		return response.Success()
+	}
+	var categoryIds = make([]int64, 0)
+	for _, v := range categories {
+		categoryIds = append(categoryIds, v.CategoryId)
+	}
+	assets, err := e.AssetDb.GetAssetByCategoryIds(int8(assetType), categoryIds, int32(pageNum), int32(pageSize))
 	if err != nil {
 		wc.AbortWithError(err)
 	}

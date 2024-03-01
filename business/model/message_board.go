@@ -6,7 +6,7 @@ import (
 )
 
 type MessageBoard struct {
-	MessageBoardId int64      `json:"messageBoardId" xorm:"message_board_id pk BIGINT"`
+	MessageBoardId int64      `json:"messageBoardId" xorm:"message_board_id pk autoincr BIGINT"`
 	Content        string     `json:"content" xorm:"content"`
 	DeviceId       string     `json:"deviceId" xorm:"device_id"`
 	Os             string     `json:"os" xorm:"os"`

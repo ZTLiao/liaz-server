@@ -6,7 +6,7 @@ import (
 )
 
 type AccountLoginRecord struct {
-	Id         int64      `json:"id" xorm:"id pk BIGINT"`
+	Id         int64      `json:"id" xorm:"id pk autoincr BIGINT"`
 	UserId     int64      `json:"userId" xorm:"user_id"`
 	DeviceId   string     `json:"deviceId" xorm:"device_id"`
 	Os         string     `json:"os" xorm:"os"`

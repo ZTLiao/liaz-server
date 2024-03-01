@@ -6,7 +6,7 @@ import (
 )
 
 type User struct {
-	UserId      int64      `json:"userId" xorm:"user_id pk BIGINT"`
+	UserId      int64      `json:"userId" xorm:"user_id pk autoincr BIGINT"`
 	Nickname    string     `json:"nickname" xorm:"nickname"`
 	Phone       string     `json:"phone" xorm:"phone"`
 	Email       string     `json:"email" xorm:"email"`

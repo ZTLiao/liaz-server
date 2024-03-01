@@ -6,7 +6,7 @@ import (
 )
 
 type VerifyCodeRecord struct {
-	Id         int64      `json:"id" xorm:"id pk BIGINT"`
+	Id         int64      `json:"id" xorm:"id pk autoincr BIGINT"`
 	Username   string     `json:"username" xorm:"username"`
 	SendType   int8       `json:"sendType" xorm:"send_type"`
 	VerifyCode string     `json:"verifyCode" xorm:"verify_code"`

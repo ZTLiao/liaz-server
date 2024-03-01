@@ -6,7 +6,7 @@ import (
 )
 
 type Region struct {
-	RegionId   int64      `json:"regionId" xorm:"region_id"`
+	RegionId   int64      `json:"regionId" xorm:"region_id pk autoincr BIGINT"`
 	RegionName string     `json:"regionName" xorm:"region_name"`
 	SeqNo      int32      `json:"seqNo" xorm:"seq_no"`
 	Status     int8       `json:"status" xorm:"status"`

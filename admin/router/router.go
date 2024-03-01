@@ -43,6 +43,7 @@ func init() {
 			new(controller.AdminAuthorController).Router(r)
 			new(controller.AdminAppVersionController).Router(r)
 			new(controller.AdminNotificationController).Router(r)
+			new(controller.AdminCategoryGroupController).Router(r)
 		}
 	})
 }

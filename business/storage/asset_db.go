@@ -30,6 +30,32 @@ func (e *AssetDb) GetAssetByCategoryId(assetType int8, categoryId int64, pageNum
 	return assets, nil
 }
 
+func (e *AssetDb) GetAssetByCategoryIds(assetType int8, categoryIds []int64, pageNum int32, pageSize int32) ([]model.Asset, error) {
+	var assets []model.Asset
+	var builder strings.Builder
+	var params = make([]interface{}, 0)
+	builder.WriteString("(")
+	for i, length := 0, len(categoryIds); i < length; i++ {
+		builder.WriteString("find_in_set(?, category_ids)")
+		params = append(params, categoryIds[i])
+		if i != length-1 {
+			builder.WriteString(utils.SPACE)
+			builder.WriteString("or")
+			builder.WriteString(utils.SPACE)
+		}
+	}
+	builder.WriteString(")")
+	if assetType != 0 {
+		builder.WriteString(" and asset_type = ? ")
+		params = append(params, assetType)
+	}
+	err := e.db.Where(builder.String(), params...).Limit(int(pageSize), int((pageNum-1)*pageSize)).OrderBy("updated_at desc").Find(&assets)
+	if err != nil {
+		return nil, err
+	}
+	return assets, nil
+}
+
 func (e *AssetDb) GetAssetForUpgrade(limit int64) ([]model.Asset, error) {
 	var assets []model.Asset
 	err := e.db.SQL(

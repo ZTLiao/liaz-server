@@ -74,3 +74,12 @@ func (e *CategoryDb) GetValidCategory() ([]model.Category, error) {
 	}
 	return categories, nil
 }
+
+func (e *CategoryDb) GetCategoryByGroupCode(groupCode string) ([]model.Category, error) {
+	var categories []model.Category
+	err := e.db.Where("status = ? and group_code = ?", constant.YES, groupCode).Find(&categories)
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
+}

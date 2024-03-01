@@ -6,7 +6,7 @@ import (
 )
 
 type CrashRecord struct {
-	Id         int64      `json:"id" xorm:"id pk BIGINT"`
+	Id         int64      `json:"id" xorm:"id pk autoincr BIGINT"`
 	Err        string     `json:"err" xorm:"err"`
 	StackTrace string     `json:"stackTrace" xorm:"stack_trace"`
 	DeviceId   string     `json:"deviceId" xorm:"device_id"`

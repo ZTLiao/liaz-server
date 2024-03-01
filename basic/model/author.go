@@ -6,7 +6,7 @@ import (
 )
 
 type Author struct {
-	AuthorId   int64      `json:"authorId" xorm:"author_id"`
+	AuthorId   int64      `json:"authorId" xorm:"author_id pk autoincr BIGINT"`
 	AuthorName string     `json:"authorName" xorm:"author_name"`
 	SeqNo      int32      `json:"seqNo" xorm:"seq_no"`
 	Status     int8       `json:"status" xorm:"status"`

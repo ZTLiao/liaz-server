@@ -1,8 +1,9 @@
 package controller
 
 import (
+	basicStorage "basic/storage"
 	"business/handler"
-	"business/storage"
+	businessStorage "business/storage"
 	"core/system"
 	"core/web"
 )
@@ -15,7 +16,9 @@ var _ web.IWebController = &CategorySearchController{}
 func (e *CategorySearchController) Router(iWebRoutes web.IWebRoutes) {
 	db := system.GetXormEngine()
 	var categorySearchHandler = handler.CategorySearchHandler{
-		AssetDb: storage.NewAssetDb(db),
+		CategoryGroupDb: basicStorage.NewCategoryGroupDb(db),
+		CategoryDb:      basicStorage.NewCategoryDb(db),
+		AssetDb:         businessStorage.NewAssetDb(db),
 	}
-	iWebRoutes.GET("/category/search", categorySearchHandler.GetContent)
+	iWebRoutes.GET("/category/search", categorySearchHandler.GetCategorySearch)
 }

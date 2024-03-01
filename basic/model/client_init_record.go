@@ -6,7 +6,7 @@ import (
 )
 
 type ClientInitRecord struct {
-	Id         int64      `json:"id" xorm:"id pk BIGINT"`
+	Id         int64      `json:"id" xorm:"id pk autoincr BIGINT"`
 	DeviceId   string     `json:"deviceId" xorm:"device_id"`
 	Os         string     `json:"os" xorm:"os"`
 	OsVersion  string     `json:"osVersion" xorm:"os_version"`
