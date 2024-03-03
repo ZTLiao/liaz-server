@@ -16,4 +16,5 @@ const (
 	NEW_PASSWORD_EMPTY         = "新密码不允许为空"
 	SERVER_ERROR               = "网络异常，请稍后重试~~"
 	VERIFY_CODE_ERROR          = "验证码验证失败"
+	ADD_SEARCH_JOB_ERROR       = "已创建\"%s\"自动收录任务，请稍后到更新列表关注！"
 )

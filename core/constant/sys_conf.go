@@ -12,4 +12,6 @@ const (
 	SPLASH                     = "splash"
 	EMPTY_PAGE                 = "empty_page"
 	ADVERT                     = "advert"
+	COMIC_SPIDER               = "comic_spider"
+	NOVEL_SPIDER               = "novel_spider"
 )

@@ -62,3 +62,7 @@ func (e *ComicUpgradeItemCache) IsExist() (bool, error) {
 	}
 	return num > 0, nil
 }
+
+func (e *ComicUpgradeItemCache) Del() error {
+	return e.redis.Del(e.RedisKey())
+}

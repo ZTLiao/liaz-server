@@ -62,3 +62,7 @@ func (e *NovelUpgradeItemCache) IsExist() (bool, error) {
 	}
 	return num > 0, nil
 }
+
+func (e *NovelUpgradeItemCache) Del() error {
+	return e.redis.Del(e.RedisKey())
+}
