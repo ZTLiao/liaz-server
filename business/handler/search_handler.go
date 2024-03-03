@@ -84,12 +84,14 @@ func (e *SearchHandler) AutoAddSearchJob(key string) {
 		return
 	}
 	if len(comicSpider) != 0 {
-		url := fmt.Sprintf(comicSpider, searchKey)
-		_, err := http.Get(url)
-		if err != nil {
-			logger.Error(err.Error())
-			return
-		}
+		go func() {
+			url := fmt.Sprintf(comicSpider, searchKey)
+			_, err := http.Get(url)
+			if err != nil {
+				logger.Error(err.Error())
+				return
+			}
+		}()
 	}
 	novelSpider, err := e.SysConfHandler.GetConfValueByKey(constant.NOVEL_SPIDER)
 	if err != nil {
@@ -97,12 +99,14 @@ func (e *SearchHandler) AutoAddSearchJob(key string) {
 		return
 	}
 	if len(novelSpider) != 0 {
-		url := fmt.Sprintf(novelSpider, searchKey)
-		_, err := http.Get(url)
-		if err != nil {
-			logger.Error(err.Error())
-			return
-		}
+		go func() {
+			url := fmt.Sprintf(novelSpider, searchKey)
+			_, err := http.Get(url)
+			if err != nil {
+				logger.Error(err.Error())
+				return
+			}
+		}()
 	}
 	e.ComicUpgradeItemCache.Del()
 	e.NovelUpgradeItemCache.Del()
