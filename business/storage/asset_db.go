@@ -108,6 +108,8 @@ func (e *AssetDb) GetAssetForHot(limit int64) ([]model.Asset, error) {
 		left join novel_chapter as nc on nc.novel_chapter_id = a.chapter_id and a.asset_type = 2
 		left join comic as c on c.comic_id = cc.comic_id and c.status = 1
 		left join novel as n on n.novel_id = nc.novel_id and n.status = 1
+		where 
+			a.updated_at between date_sub(now(), interval 7 day) and now()
 		group by a.obj_id
 		order by (ifnull(c.hit_num, 0) + ifnull(n.hit_num, 0)) desc, a.updated_at desc 
 		limit ?
