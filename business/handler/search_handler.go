@@ -3,6 +3,7 @@ package handler
 import (
 	"basic/device"
 	basicHandler "basic/handler"
+	"business/enums"
 	"business/resp"
 	businessStorage "business/storage"
 	"core/constant"
@@ -48,22 +49,37 @@ func (e *SearchHandler) Search(wc *web.WebContext) interface{} {
 	var searchResps = make([]resp.SearchResp, 0)
 	var result string
 	if len(searchs) > 0 {
+		var comicIds = make([]int64, 0)
+		var novelIds = make([]int64, 0)
 		var assetIds = make([]string, 0)
 		for _, search := range searchs {
 			assetId := search.AssetId
+			objId := search.ObjId
+			assetType := search.AssetType
 			searchResps = append(searchResps, resp.SearchResp{
-				ObjId:          search.ObjId,
+				ObjId:          objId,
 				Title:          search.Title,
 				Cover:          search.Cover,
-				AssetType:      search.AssetType,
+				AssetType:      assetType,
 				Categories:     search.Categories,
 				Authors:        search.Authors,
 				UpgradeChapter: search.UpgradeChapter,
 			})
+			if enums.ASSET_TYPE_FOR_COMIC == assetType {
+				comicIds = append(comicIds, objId)
+			} else if enums.ASSET_TYPE_FOR_NOVEL == assetType {
+				novelIds = append(novelIds, objId)
+			}
 			assetIds = append(assetIds, strconv.FormatInt(assetId, 10))
 			e.SearchCache.Incr(assetId)
 		}
 		result = strings.Join(assetIds, utils.COMMA)
+		if len(comicIds) == 0 {
+			e.AutoAddComicSearchJob(key)
+		}
+		if len(novelIds) == 0 {
+			e.AutoAddNovelSearchJob(key)
+		}
 	} else {
 		go e.AutoAddSearchJob(key)
 	}
@@ -78,13 +94,11 @@ func (e *SearchHandler) Search(wc *web.WebContext) interface{} {
 }
 
 func (e *SearchHandler) AutoAddSearchJob(key string) {
-	defer func() {
-		if r := recover(); r != nil {
-			debug.PrintStack()
-			err := fmt.Sprintf("%s", r)
-			logger.Error("panic error : %v", err)
-		}
-	}()
+	e.AutoAddComicSearchJob(key)
+	e.AutoAddNovelSearchJob(key)
+}
+
+func (e *SearchHandler) AutoAddComicSearchJob(key string) {
 	searchKey := url.QueryEscape(key)
 	comicSpider, err := e.SysConfHandler.GetConfValueByKey(constant.COMIC_SPIDER)
 	if err != nil {
@@ -108,6 +122,11 @@ func (e *SearchHandler) AutoAddSearchJob(key string) {
 			}
 		}()
 	}
+	e.ComicUpgradeItemCache.Del()
+}
+
+func (e *SearchHandler) AutoAddNovelSearchJob(key string) {
+	searchKey := url.QueryEscape(key)
 	novelSpider, err := e.SysConfHandler.GetConfValueByKey(constant.NOVEL_SPIDER)
 	if err != nil {
 		logger.Error(err.Error())
@@ -130,7 +149,6 @@ func (e *SearchHandler) AutoAddSearchJob(key string) {
 			}
 		}()
 	}
-	e.ComicUpgradeItemCache.Del()
 	e.NovelUpgradeItemCache.Del()
 }
 
