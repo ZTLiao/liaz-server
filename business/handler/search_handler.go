@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"runtime/debug"
 	"sort"
 	"strconv"
 	"strings"
@@ -107,13 +106,6 @@ func (e *SearchHandler) AutoAddComicSearchJob(key string) {
 	}
 	if len(comicSpider) != 0 {
 		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					debug.PrintStack()
-					err := fmt.Sprintf("%s", r)
-					logger.Error("panic error : %v", err)
-				}
-			}()
 			url := fmt.Sprintf(comicSpider, searchKey)
 			_, err := http.Get(url)
 			if err != nil {
@@ -134,13 +126,6 @@ func (e *SearchHandler) AutoAddNovelSearchJob(key string) {
 	}
 	if len(novelSpider) != 0 {
 		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					debug.PrintStack()
-					err := fmt.Sprintf("%s", r)
-					logger.Error("panic error : %v", err)
-				}
-			}()
 			url := fmt.Sprintf(novelSpider, searchKey)
 			_, err := http.Get(url)
 			if err != nil {

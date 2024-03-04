@@ -20,10 +20,12 @@ func (e *SearchController) Router(iWebRoutes web.IWebRoutes) {
 	var redis = redis.NewRedisUtil(system.GetRedisClient())
 	var sysConfHandler = basicHandler.NewSysConfHandler(basicStorage.NewSysConfDb(db), basicStorage.NewSysConfCache(redis))
 	var searchHandler = handler.SearchHandler{
-		SysConfHandler: sysConfHandler,
-		SearchDb:       businessStorage.NewSearchDb(db),
-		AssetDb:        businessStorage.NewAssetDb(db),
-		SearchCache:    businessStorage.NewSearchCache(redis),
+		SysConfHandler:        sysConfHandler,
+		SearchDb:              businessStorage.NewSearchDb(db),
+		AssetDb:               businessStorage.NewAssetDb(db),
+		SearchCache:           businessStorage.NewSearchCache(redis),
+		ComicUpgradeItemCache: businessStorage.NewComicUpgradeItemCache(redis),
+		NovelUpgradeItemCache: businessStorage.NewNovelUpgradeItemCache(redis),
 	}
 	iWebRoutes.GET("/search", searchHandler.Search)
 	iWebRoutes.GET("/search/hot/rank", searchHandler.HotRank)
