@@ -12,4 +12,6 @@ const (
 	NOVEL_SUBSCRIBE_RANK_TOPIC = "novel_subscribe_rank_topic"
 	COMIC_POPULAR_RANK_TOPIC   = "comic_popular_rank_topic"
 	NOVEL_POPULAR_RANK_TOPIC   = "novel_popular_rank_topic"
+	COMIC_DISCUSS_RANK_TOPIC   = "comic_discuss_rank_topic"
+	NOVEL_DISCUSS_RANK_TOPIC   = "novel_discuss_rank_topic"
 )

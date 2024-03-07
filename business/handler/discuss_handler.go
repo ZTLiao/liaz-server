@@ -2,9 +2,11 @@ package handler
 
 import (
 	basicStorage "basic/storage"
+	"business/enums"
 	"business/resp"
 	businessStorage "business/storage"
 	"core/constant"
+	"core/event"
 	"core/response"
 	"core/utils"
 	"core/web"
@@ -63,6 +65,11 @@ func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
 		if err != nil {
 			wc.AbortWithError(err)
 		}
+	}
+	if objType == enums.ASSET_TYPE_FOR_COMIC {
+		event.Bus.Publish(constant.COMIC_DISCUSS_RANK_TOPIC, objId)
+	} else if objType == enums.ASSET_TYPE_FOR_NOVEL {
+		event.Bus.Publish(constant.NOVEL_DISCUSS_RANK_TOPIC, objId)
 	}
 	return response.Success()
 }
