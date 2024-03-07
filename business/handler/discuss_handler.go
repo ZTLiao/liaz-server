@@ -67,7 +67,7 @@ func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
 	return response.Success()
 }
 
-func (e *DiscussHandler) GetDiscussByObjId(wc *web.WebContext) interface{} {
+func (e *DiscussHandler) GetDiscussPage(wc *web.WebContext) interface{} {
 	pageNum, err := strconv.ParseInt(wc.DefaultQuery("pageNum", "1"), 10, 32)
 	if err != nil {
 		wc.AbortWithError(err)
@@ -96,10 +96,78 @@ func (e *DiscussHandler) GetDiscussByObjId(wc *web.WebContext) interface{} {
 	}
 	var discussResps = make([]resp.DiscussResp, 0)
 	for _, v := range discusses {
+		discussId := v.DiscussId
+		userId := v.UserId
+		user, err := e.UserDb.GetUserById(userId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		discussResources, err := e.DiscussResourceDb.GetDiscussResourceByDiscussId(discussId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		var paths = make([]string, 0)
+		if len(discussResources) != 0 {
+			for _, v := range discussResources {
+				paths = append(paths, v.Path)
+			}
+		}
+		parentId := v.ParentId
+		parent, err := e.GetParentDiscuss(parentId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		discussResps = append(discussResps, resp.DiscussResp{
-			DiscussId: v.DiscussId,
-			UserId:    v.UserId,
+			DiscussId: discussId,
+			UserId:    userId,
+			CreatedAt: v.CreatedAt,
+			Content:   v.Content,
+			Nickname:  user.Nickname,
+			Avatar:    user.Avatar,
+			Paths:     paths,
+			Parent:    parent,
 		})
 	}
 	return response.ReturnOK(discussResps)
+}
+
+func (e *DiscussHandler) GetParentDiscuss(discussId int64) (*resp.DiscussResp, error) {
+	if discussId == 0 {
+		return nil, nil
+	}
+	discuss, err := e.DiscussDb.GetDiscussById(discussId)
+	if err != nil {
+		return nil, err
+	}
+	userId := discuss.UserId
+	user, err := e.UserDb.GetUserById(userId)
+	if err != nil {
+		return nil, err
+	}
+	discussResources, err := e.DiscussResourceDb.GetDiscussResourceByDiscussId(discussId)
+	if err != nil {
+		return nil, err
+	}
+	var paths = make([]string, 0)
+	if len(discussResources) != 0 {
+		for _, v := range discussResources {
+			paths = append(paths, v.Path)
+		}
+	}
+	parentId := discuss.ParentId
+	parent, err := e.GetParentDiscuss(parentId)
+	if err != nil {
+		return nil, err
+	}
+	var discussResp = resp.DiscussResp{
+		DiscussId: discussId,
+		UserId:    userId,
+		CreatedAt: discuss.CreatedAt,
+		Content:   discuss.Content,
+		Nickname:  user.Nickname,
+		Avatar:    user.Avatar,
+		Paths:     paths,
+		Parent:    parent,
+	}
+	return &discussResp, nil
 }

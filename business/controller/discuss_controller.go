@@ -21,4 +21,5 @@ func (e *DiscussController) Router(iWebRoutes web.IWebRoutes) {
 		UserDb:            basicStorage.NewUserDb(db),
 	}
 	iWebRoutes.POST("/discuss", discussHandler.Discuss)
+	iWebRoutes.GET("/discuss/page", discussHandler.GetDiscussPage)
 }
