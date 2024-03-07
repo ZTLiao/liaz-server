@@ -23,9 +23,11 @@ func (e *DiscussController) Router(iWebRoutes web.IWebRoutes) {
 	event.Bus.Subscribe(constant.COMIC_DISCUSS_RANK_TOPIC, listener.NewComicDiscussRankListener(businessStorage.NewComicRankCache(redis)))
 	event.Bus.Subscribe(constant.NOVEL_DISCUSS_RANK_TOPIC, listener.NewNovelDiscussRankListener(businessStorage.NewNovelRankCache(redis)))
 	var discussHandler = handler.DiscussHandler{
-		DiscussDb:         businessStorage.NewDiscussDb(db),
-		DiscussResourceDb: businessStorage.NewDiscussResourceDb(db),
-		UserDb:            basicStorage.NewUserDb(db),
+		DiscussDb:            businessStorage.NewDiscussDb(db),
+		DiscussResourceDb:    businessStorage.NewDiscussResourceDb(db),
+		UserDb:               basicStorage.NewUserDb(db),
+		ComicDiscussNumCache: businessStorage.NewComicDiscussNumCache(redis),
+		NovelDiscussNumCache: businessStorage.NewNovelDiscussNumCache(redis),
 	}
 	iWebRoutes.POST("/discuss", discussHandler.Discuss)
 	iWebRoutes.GET("/discuss/page", discussHandler.GetDiscussPage)

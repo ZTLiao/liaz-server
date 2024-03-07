@@ -15,9 +15,11 @@ import (
 )
 
 type DiscussHandler struct {
-	DiscussDb         *businessStorage.DiscussDb
-	DiscussResourceDb *businessStorage.DiscussResourceDb
-	UserDb            *basicStorage.UserDb
+	DiscussDb            *businessStorage.DiscussDb
+	DiscussResourceDb    *businessStorage.DiscussResourceDb
+	UserDb               *basicStorage.UserDb
+	ComicDiscussNumCache *businessStorage.ComicDiscussNumCache
+	NovelDiscussNumCache *businessStorage.NovelDiscussNumCache
 }
 
 func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
@@ -67,8 +69,10 @@ func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
 		}
 	}
 	if objType == enums.ASSET_TYPE_FOR_COMIC {
+		e.ComicDiscussNumCache.Incr(objId)
 		event.Bus.Publish(constant.COMIC_DISCUSS_RANK_TOPIC, objId)
 	} else if objType == enums.ASSET_TYPE_FOR_NOVEL {
+		e.NovelDiscussNumCache.Incr(objId)
 		event.Bus.Publish(constant.NOVEL_DISCUSS_RANK_TOPIC, objId)
 	}
 	return response.Success()
