@@ -124,6 +124,7 @@ func (e *DiscussHandler) GetDiscussPage(wc *web.WebContext) interface{} {
 			Content:   v.Content,
 			Nickname:  user.Nickname,
 			Avatar:    user.Avatar,
+			Gender:    user.Gender,
 			Paths:     paths,
 			Parent:    parent,
 		})
@@ -166,6 +167,7 @@ func (e *DiscussHandler) GetParentDiscuss(discussId int64) (*resp.DiscussResp, e
 		Content:   discuss.Content,
 		Nickname:  user.Nickname,
 		Avatar:    user.Avatar,
+		Gender:    user.Gender,
 		Paths:     paths,
 		Parent:    parent,
 	}

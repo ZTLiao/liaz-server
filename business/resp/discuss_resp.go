@@ -7,6 +7,7 @@ type DiscussResp struct {
 	UserId    int64        `json:"userId"`
 	Nickname  string       `json:"nickname"`
 	Avatar    string       `json:"avatar"`
+	Gender    int8         `json:"gender"`
 	Content   string       `json:"content"`
 	CreatedAt types.Time   `json:"createdAt"`
 	Paths     []string     `json:"paths"`
