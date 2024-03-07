@@ -113,7 +113,8 @@ func (e *DiscussHandler) GetDiscussPage(wc *web.WebContext) interface{} {
 			}
 		}
 		parentId := v.ParentId
-		parent, err := e.GetParentDiscuss(parentId)
+		var parents = make([]resp.DiscussResp, 0)
+		err = e.BuildParentDiscuss(parentId, &parents)
 		if err != nil {
 			wc.AbortWithError(err)
 		}
@@ -126,28 +127,27 @@ func (e *DiscussHandler) GetDiscussPage(wc *web.WebContext) interface{} {
 			Avatar:    user.Avatar,
 			Gender:    user.Gender,
 			Paths:     paths,
-			Parent:    parent,
 		})
 	}
 	return response.ReturnOK(discussResps)
 }
 
-func (e *DiscussHandler) GetParentDiscuss(discussId int64) (*resp.DiscussResp, error) {
+func (e *DiscussHandler) BuildParentDiscuss(discussId int64, parents *[]resp.DiscussResp) error {
 	if discussId == 0 {
-		return nil, nil
+		return nil
 	}
 	discuss, err := e.DiscussDb.GetDiscussById(discussId)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	userId := discuss.UserId
 	user, err := e.UserDb.GetUserById(userId)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	discussResources, err := e.DiscussResourceDb.GetDiscussResourceByDiscussId(discussId)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var paths = make([]string, 0)
 	if len(discussResources) != 0 {
@@ -156,9 +156,9 @@ func (e *DiscussHandler) GetParentDiscuss(discussId int64) (*resp.DiscussResp, e
 		}
 	}
 	parentId := discuss.ParentId
-	parent, err := e.GetParentDiscuss(parentId)
+	err = e.BuildParentDiscuss(parentId, parents)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var discussResp = resp.DiscussResp{
 		DiscussId: discussId,
@@ -169,7 +169,7 @@ func (e *DiscussHandler) GetParentDiscuss(discussId int64) (*resp.DiscussResp, e
 		Avatar:    user.Avatar,
 		Gender:    user.Gender,
 		Paths:     paths,
-		Parent:    parent,
 	}
-	return &discussResp, nil
+	*parents = append(*parents, discussResp)
+	return nil
 }
