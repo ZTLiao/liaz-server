@@ -18,8 +18,8 @@ type DiscussHandler struct {
 	DiscussDb            *businessStorage.DiscussDb
 	DiscussResourceDb    *businessStorage.DiscussResourceDb
 	UserDb               *basicStorage.UserDb
-	ComicDiscussNumCache *businessStorage.ComicDiscussNumCache
-	NovelDiscussNumCache *businessStorage.NovelDiscussNumCache
+	DiscussNumCache      *businessStorage.DiscussNumCache
+	DiscussThumbNumCache *businessStorage.DiscussThumbNumCache
 }
 
 func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
@@ -68,11 +68,10 @@ func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
 			wc.AbortWithError(err)
 		}
 	}
+	e.DiscussNumCache.Incr(discussId)
 	if objType == enums.ASSET_TYPE_FOR_COMIC {
-		e.ComicDiscussNumCache.Incr(objId)
 		event.Bus.Publish(constant.COMIC_DISCUSS_RANK_TOPIC, objId)
 	} else if objType == enums.ASSET_TYPE_FOR_NOVEL {
-		e.NovelDiscussNumCache.Incr(objId)
 		event.Bus.Publish(constant.NOVEL_DISCUSS_RANK_TOPIC, objId)
 	}
 	return response.Success()
@@ -129,15 +128,25 @@ func (e *DiscussHandler) GetDiscussPage(wc *web.WebContext) interface{} {
 		if err != nil {
 			wc.AbortWithError(err)
 		}
+		discussNum, err := e.DiscussNumCache.Get(discussId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		thumbNum, err := e.DiscussThumbNumCache.Get(discussId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
 		discussResps = append(discussResps, resp.DiscussResp{
-			DiscussId: discussId,
-			UserId:    userId,
-			CreatedAt: v.CreatedAt,
-			Content:   v.Content,
-			Nickname:  user.Nickname,
-			Avatar:    user.Avatar,
-			Gender:    user.Gender,
-			Paths:     paths,
+			DiscussId:  discussId,
+			UserId:     userId,
+			CreatedAt:  v.CreatedAt,
+			Content:    v.Content,
+			Nickname:   user.Nickname,
+			Avatar:     user.Avatar,
+			Gender:     user.Gender,
+			DiscussNum: int(discussNum),
+			ThumbNum:   int(thumbNum),
+			Paths:      paths,
 		})
 	}
 	return response.ReturnOK(discussResps)
@@ -171,15 +180,25 @@ func (e *DiscussHandler) BuildParentDiscuss(discussId int64, parents *[]resp.Dis
 	if err != nil {
 		return err
 	}
+	discussNum, err := e.DiscussNumCache.Get(discussId)
+	if err != nil {
+		return err
+	}
+	thumbNum, err := e.DiscussThumbNumCache.Get(discussId)
+	if err != nil {
+		return err
+	}
 	var discussResp = resp.DiscussResp{
-		DiscussId: discussId,
-		UserId:    userId,
-		CreatedAt: discuss.CreatedAt,
-		Content:   discuss.Content,
-		Nickname:  user.Nickname,
-		Avatar:    user.Avatar,
-		Gender:    user.Gender,
-		Paths:     paths,
+		DiscussId:  discussId,
+		UserId:     userId,
+		CreatedAt:  discuss.CreatedAt,
+		Content:    discuss.Content,
+		Nickname:   user.Nickname,
+		Avatar:     user.Avatar,
+		Gender:     user.Gender,
+		DiscussNum: int(discussNum),
+		ThumbNum:   int(thumbNum),
+		Paths:      paths,
 	}
 	*parents = append(*parents, discussResp)
 	return nil

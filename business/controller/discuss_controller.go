@@ -26,8 +26,8 @@ func (e *DiscussController) Router(iWebRoutes web.IWebRoutes) {
 		DiscussDb:            businessStorage.NewDiscussDb(db),
 		DiscussResourceDb:    businessStorage.NewDiscussResourceDb(db),
 		UserDb:               basicStorage.NewUserDb(db),
-		ComicDiscussNumCache: businessStorage.NewComicDiscussNumCache(redis),
-		NovelDiscussNumCache: businessStorage.NewNovelDiscussNumCache(redis),
+		DiscussNumCache:      businessStorage.NewDiscussNumCache(redis),
+		DiscussThumbNumCache: businessStorage.NewDiscussThumbNumCache(redis),
 	}
 	iWebRoutes.POST("/discuss", discussHandler.Discuss)
 	iWebRoutes.GET("/discuss/page", discussHandler.GetDiscussPage)
