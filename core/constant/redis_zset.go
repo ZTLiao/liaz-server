@@ -10,4 +10,5 @@ const (
 	NOVEL_RANK          = "novel_rank"
 	COMIC_DISCUSS_NUM   = "comic_discuss_num"
 	NOVEL_DISCUSS_NUM   = "novel_discuss_num"
+	DISCUSS_THUMB_NUM   = "discuss_thumb_num"
 )

@@ -109,9 +109,13 @@ func (e *AssetDb) GetAssetForHot(limit int64) ([]model.Asset, error) {
 		left join comic as c on c.comic_id = cc.comic_id and c.status = 1
 		left join novel as n on n.novel_id = nc.novel_id and n.status = 1
 		where 
-			a.updated_at between date_sub(now(), interval 30 day) and now()
+		    (
+			c.updated_at between date_sub(now(), interval 30 day) and now()
+			or 
+			n.updated_at between date_sub(now(), interval 30 day) and now()
+			)
 		group by a.obj_id
-		order by (ifnull(c.hit_num, 0) + ifnull(n.hit_num, 0)) desc, a.updated_at desc 
+		order by (ifnull(c.hit_num, 0) + ifnull(n.hit_num, 0)) desc, c.updated_at desc, n.updated_at desc 
 		limit ?
 		`, limit).Find(&assets)
 	if err != nil {
