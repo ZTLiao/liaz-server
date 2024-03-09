@@ -2,6 +2,7 @@ package storage
 
 import (
 	"business/model"
+	"core/constant"
 	"core/types"
 	"time"
 
@@ -37,7 +38,7 @@ func (e *DiscussDb) Save(parentId int64, userId int64, objId int64, objType int8
 
 func (e *DiscussDb) GetDiscussPage(objId int64, objType int8, pageNum int32, pageSize int32) ([]model.Discuss, error) {
 	var discusses []model.Discuss
-	err := e.db.Where("obj_id = ? and obj_type = ?", objId, objType).Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&discusses)
+	err := e.db.Where("obj_id = ? and obj_type = ? and status = ?", objId, objType, constant.YES).OrderBy("created_at desc").Limit(int(pageSize), int((pageNum-1)*pageSize)).Find(&discusses)
 	if err != nil {
 		return nil, err
 	}

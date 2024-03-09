@@ -68,7 +68,9 @@ func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
 			wc.AbortWithError(err)
 		}
 	}
-	e.DiscussNumCache.Incr(discussId)
+	if parentId != 0 {
+		e.DiscussNumCache.Incr(parentId)
+	}
 	if objType == enums.ASSET_TYPE_FOR_COMIC {
 		event.Bus.Publish(constant.COMIC_DISCUSS_RANK_TOPIC, objId)
 	} else if objType == enums.ASSET_TYPE_FOR_NOVEL {
@@ -86,12 +88,12 @@ func (e *DiscussHandler) GetDiscussPage(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	objIdStr := wc.PostForm("objId")
+	objIdStr := wc.Query("objId")
 	objId, err := strconv.ParseInt(objIdStr, 10, 64)
 	if err != nil {
 		wc.AbortWithError(err)
 	}
-	objTypeStr := wc.PostForm("objType")
+	objTypeStr := wc.Query("objType")
 	objType, err := strconv.ParseInt(objTypeStr, 10, 8)
 	if err != nil {
 		wc.AbortWithError(err)
