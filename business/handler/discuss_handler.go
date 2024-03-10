@@ -57,17 +57,6 @@ func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
 		}
 		resType = int8(value)
 	}
-	paths := wc.PostForm("paths")
-	if len(paths) == 0 {
-		return response.Success()
-	}
-	pathArray := strings.Split(paths, utils.COMMA)
-	for _, path := range pathArray {
-		err = e.DiscussResourceDb.Save(discussId, resType, path)
-		if err != nil {
-			wc.AbortWithError(err)
-		}
-	}
 	if parentId != 0 {
 		e.DiscussNumCache.Incr(parentId)
 	}
@@ -75,6 +64,16 @@ func (e *DiscussHandler) Discuss(wc *web.WebContext) interface{} {
 		event.Bus.Publish(constant.COMIC_DISCUSS_RANK_TOPIC, objId)
 	} else if objType == enums.ASSET_TYPE_FOR_NOVEL {
 		event.Bus.Publish(constant.NOVEL_DISCUSS_RANK_TOPIC, objId)
+	}
+	paths := wc.PostForm("paths")
+	if len(paths) != 0 {
+		pathArray := strings.Split(paths, utils.COMMA)
+		for _, path := range pathArray {
+			err = e.DiscussResourceDb.Save(discussId, resType, path)
+			if err != nil {
+				wc.AbortWithError(err)
+			}
+		}
 	}
 	return response.Success()
 }
@@ -149,6 +148,7 @@ func (e *DiscussHandler) GetDiscussPage(wc *web.WebContext) interface{} {
 			DiscussNum: int(discussNum),
 			ThumbNum:   int(thumbNum),
 			Paths:      paths,
+			Parents:    parents,
 		})
 	}
 	return response.ReturnOK(discussResps)
