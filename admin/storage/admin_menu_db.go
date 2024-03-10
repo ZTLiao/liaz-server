@@ -61,7 +61,7 @@ func (e *AdminMenuDb) SaveOrUpdateAdminMenu(adminMenu *model.AdminMenu) error {
 	name := adminMenu.Name
 	path := adminMenu.Path
 	if menuId == 0 {
-		count, err := e.db.Where("name = ? and path = ?", name, path).Count(adminMenu)
+		count, err := e.db.Where("name = ? and path = ?", name, path).Count(&model.AdminMenu{})
 		if err != nil {
 			return err
 		}

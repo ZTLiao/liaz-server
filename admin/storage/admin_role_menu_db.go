@@ -18,7 +18,7 @@ func NewAdminRoleMenuDb(db *xorm.Engine) *AdminRoleMenuDb {
 
 func (e *AdminRoleMenuDb) AddAdminRoleMenu(roleId int64, menuId int64) error {
 	var adminRoleMenu = new(model.AdminRoleMenu)
-	count, err := e.db.Where("role_id = ? and menu_id = ?", roleId, menuId).Count(adminRoleMenu)
+	count, err := e.db.Where("role_id = ? and menu_id = ?", roleId, menuId).Count(&model.AdminRoleMenu{})
 	if err != nil {
 		return err
 	}

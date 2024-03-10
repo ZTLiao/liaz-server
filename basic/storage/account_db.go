@@ -52,7 +52,7 @@ func (e *AccountDb) SignUpForUsername(username string, password string, flag int
 	account.Status = enums.ACCOUNT_STATUS_OF_ENABLE
 	account.CreatedAt = now
 	account.UpdatedAt = now
-	count, err := e.db.Where("username = ?", username).Count(account)
+	count, err := e.db.Where("username = ?", username).Count(&model.Account{})
 	if err != nil {
 		return 0, err
 	}

@@ -54,7 +54,7 @@ func (e *UserDb) SignUp(userId int64, nickname string, avatar string, gender int
 	user.Status = enums.USER_STATUS_OF_ENABLE
 	user.CreatedAt = now
 	user.UpdatedAt = now
-	count, err := e.db.Where("user_id = ?", userId).Count(user)
+	count, err := e.db.Where("user_id = ?", userId).Count(&model.User{})
 	if err != nil {
 		return err
 	}

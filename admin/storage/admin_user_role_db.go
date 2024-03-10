@@ -46,7 +46,7 @@ func (e *AdminUserRoleDb) DelAdminUserRole(adminId int64, roleId int64) error {
 
 func (e *AdminUserRoleDb) AddAdminUserRole(adminId int64, roleId int64) error {
 	var adminUserRole = new(model.AdminUserRole)
-	count, err := e.db.Where("admin_id = ? and role_id = ?", adminId, roleId).Count(adminUserRole)
+	count, err := e.db.Where("admin_id = ? and role_id = ?", adminId, roleId).Count(&model.AdminUserRole{})
 	if err != nil {
 		return err
 	}

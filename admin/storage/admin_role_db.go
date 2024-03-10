@@ -30,7 +30,7 @@ func (e *AdminRoleDb) SaveOrUpdateAdminRole(adminRole *model.AdminRole) error {
 	roleId := adminRole.RoleId
 	name := adminRole.Name
 	if roleId == 0 {
-		count, err := e.db.Where("name = ?", name).Count(adminRole)
+		count, err := e.db.Where("name = ?", name).Count(&model.AdminRole{})
 		if err != nil {
 			return err
 		}

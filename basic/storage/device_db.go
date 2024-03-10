@@ -19,7 +19,7 @@ func NewDeviceDb(db *xorm.Engine) *DeviceDb {
 func (e *DeviceDb) SaveOrUpdateDevice(device *model.Device) error {
 	var now = types.Time(time.Now())
 	deviceId := device.DeviceId
-	count, err := e.db.Where("device_id = ?", deviceId).Count(device)
+	count, err := e.db.Where("device_id = ?", deviceId).Count(&model.Device{})
 	if err != nil {
 		return err
 	}
