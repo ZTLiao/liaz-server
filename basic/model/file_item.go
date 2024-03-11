@@ -14,6 +14,7 @@ type FileItem struct {
 	UniqueId   string     `json:"uniqueId" xorm:"unique_id"`
 	Suffix     string     `json:"suffix" xorm:"suffix"`
 	FileType   string     `json:"fileType" xorm:"file_type"`
+	Status     int8       `json:"status" xorm:"status"`
 	CreatedAt  types.Time `json:"createdAt" xorm:"created_at timestamp created"`
 	UpdatedAt  types.Time `json:"updatedAt" xorm:"updated_at timestamp updated"`
 }
