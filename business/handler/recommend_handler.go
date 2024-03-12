@@ -178,7 +178,8 @@ func (e *RecommendHandler) GetRecommendItems(recommendId int64, recommendType in
 			var set = make(map[int]bool)
 			for i := 0; i < int(intValue); i++ {
 				index = rand.Intn(len(assets))
-				for ok := set[index]; ok; {
+				j, k := 0, 5
+				for ok := set[index]; ok && j < k; j++ {
 					index = rand.Intn(len(assets))
 				}
 				set[index] = true
