@@ -210,3 +210,30 @@ func (e *AssetDb) GetAssetByIds(assetIds []int64) ([]model.Asset, error) {
 	}
 	return assets, nil
 }
+
+func (e *AssetDb) GetAssetByObjId(objIds []int64, assetType int8) ([]model.Asset, error) {
+	if len(objIds) == 0 {
+		return nil, nil
+	}
+	var assets []model.Asset
+	var builder strings.Builder
+	var params = make([]interface{}, 0)
+	builder.WriteString("obj_id in (")
+	for i, length := 0, len(objIds); i < length; i++ {
+		builder.WriteString(utils.QUESTION)
+		params = append(params, objIds[i])
+		if i != length-1 {
+			builder.WriteString(utils.COMMA)
+		}
+	}
+	builder.WriteString(")")
+	if assetType != 0 {
+		builder.WriteString(" and asset_type = ? ")
+		params = append(params, assetType)
+	}
+	err := e.db.Where(builder.String(), params...).Find(&assets)
+	if err != nil {
+		return nil, err
+	}
+	return assets, nil
+}

@@ -27,6 +27,8 @@ func (e *RecommendController) Router(iWebRoutes web.IWebRoutes) {
 		RecommendCache:  businessStorage.NewRecommendCache(redis),
 		AssetDb:         businessStorage.NewAssetDb(db),
 		SysConfHandler:  sysConfHandler,
+		ComicRankCache:  businessStorage.NewComicRankCache(redis),
+		NovelRankCache:  businessStorage.NewNovelRankCache(redis),
 	}
 	iWebRoutes.GET("/recommend/:position", recommendHandler.Recommend)
 	iWebRoutes.GET("/recommend/comic", recommendHandler.RecommendComic)

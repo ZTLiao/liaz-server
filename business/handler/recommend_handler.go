@@ -10,9 +10,11 @@ import (
 	"core/response"
 	"core/utils"
 	"core/web"
+	"math/rand"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type RecommendHandler struct {
@@ -23,6 +25,8 @@ type RecommendHandler struct {
 	RecommendCache  *storage.RecommendCache
 	AssetDb         *storage.AssetDb
 	SysConfHandler  *handler.SysConfHandler
+	ComicRankCache  *storage.ComicRankCache
+	NovelRankCache  *storage.NovelRankCache
 }
 
 func (e *RecommendHandler) Recommend(wc *web.WebContext) interface{} {
@@ -134,11 +138,56 @@ func (e *RecommendHandler) GetRecommendItems(recommendId int64, recommendType in
 		if intValue == 0 {
 			intValue = 9
 		}
-		assets, err := e.AssetDb.GetAssetForHot(int64(intValue))
+		var now = time.Now()
+		dateTime := utils.GetStartOfWeek(now).Format(utils.NORM_DATE_PATTERN) + utils.COLON + utils.GetEndOfWeek(now).Format(utils.NORM_DATE_PATTERN)
+		comicRankMap, err := e.ComicRankCache.Rank(enums.RANK_TYPE_FOR_POPULAR, enums.TIME_TYPE_FOR_WEEK, dateTime, 0, 30)
 		if err != nil {
 			return nil, err
 		}
-		recommendItemResps = e.convertItem(assets, false)
+		var comicIds = make([]int64, 0)
+		for k := range comicRankMap {
+			comicIds = append(comicIds, k)
+		}
+		novelRankMap, err := e.NovelRankCache.Rank(enums.RANK_TYPE_FOR_POPULAR, enums.TIME_TYPE_FOR_WEEK, dateTime, 0, 30)
+		if err != nil {
+			return nil, err
+		}
+		var novelIds = make([]int64, 0)
+		for k := range novelRankMap {
+			novelIds = append(novelIds, k)
+		}
+		var assets = make([]model.Asset, 0)
+		comicAssets, err := e.AssetDb.GetAssetByObjId(comicIds, enums.ASSET_TYPE_FOR_COMIC)
+		if err != nil {
+			return nil, err
+		}
+		if len(comicAssets) != 0 {
+			assets = append(assets, comicAssets...)
+		}
+		novelAssets, err := e.AssetDb.GetAssetByObjId(novelIds, enums.ASSET_TYPE_FOR_NOVEL)
+		if err != nil {
+			return nil, err
+		}
+		if len(novelAssets) != 0 {
+			assets = append(assets, novelAssets...)
+		}
+		rand.New(rand.NewSource(now.UnixNano()))
+		var recommendAssets = make([]model.Asset, 0)
+		if len(assets) > intValue {
+			var index int
+			var set = make(map[int]bool)
+			for i := 0; i < int(intValue); i++ {
+				index = rand.Intn(len(assets))
+				for ok := set[index]; ok; {
+					index = rand.Intn(len(assets))
+				}
+				set[index] = true
+				recommendAssets = append(recommendAssets, assets[index])
+			}
+		} else {
+			recommendAssets = append(recommendAssets, assets...)
+		}
+		recommendItemResps = e.convertItem(recommendAssets, false)
 	} else if enums.RECOMMEND_TYPE_FOR_UPGRADE == recommendType {
 		intValue, err := e.SysConfHandler.GetIntValueByKey(constant.RECOMMEND_FOR_UPGRADE)
 		if err != nil {
