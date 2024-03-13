@@ -33,23 +33,19 @@ func (e *ClientInitListener) OnListen(event event.Event) {
 	if len(deviceId) == 0 {
 		return
 	}
-	app := device.App
-	appVersion := device.AppVersion
 	//是否更新设备
-	if ok, _ := e.deviceDb.IsUpgrade(deviceId, app, appVersion); ok {
-		err := e.deviceDb.SaveOrUpdateDevice(&model.Device{
-			DeviceId:   device.DeviceId,
-			Os:         device.Os,
-			OsVersion:  device.OsVersion,
-			App:        device.App,
-			AppVersion: device.AppVersion,
-			Model:      device.Model,
-			Imei:       device.Imei,
-			Channel:    device.Channel,
-		})
-		if err != nil {
-			logger.Panic(err.Error())
-		}
+	err := e.deviceDb.SaveOrUpdateDevice(&model.Device{
+		DeviceId:   device.DeviceId,
+		Os:         device.Os,
+		OsVersion:  device.OsVersion,
+		App:        device.App,
+		AppVersion: device.AppVersion,
+		Model:      device.Model,
+		Imei:       device.Imei,
+		Channel:    device.Channel,
+	})
+	if err != nil {
+		logger.Error(err.Error())
 	}
 	//APP初始化记录
 	e.clientInitRecordDb.InsertClientInitRecord(device)
