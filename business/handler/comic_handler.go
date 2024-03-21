@@ -368,6 +368,20 @@ func (e *ComicHandler) ComicCatalogue(wc *web.WebContext) interface{} {
 	if err != nil {
 		wc.AbortWithError(err)
 	}
+	if comicDetail == nil {
+		return response.Success()
+	}
+	userId := web.GetUserId(wc)
+	if userId != 0 {
+		browse, err := e.BrowseDb.GetBrowseByObjId(userId, enums.ASSET_TYPE_FOR_COMIC, comicDetail.ComicId)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		if browse != nil {
+			comicDetail.BrowseChapterId = browse.ChapterId
+			comicDetail.CurrentIndex = browse.StopIndex
+		}
+	}
 	volumes := comicDetail.Volumes
 	if len(volumes) == 0 {
 		return response.Success()
@@ -375,6 +389,12 @@ func (e *ComicHandler) ComicCatalogue(wc *web.WebContext) interface{} {
 	var chapters []resp.ComicChapterResp
 	for _, v := range volumes {
 		if v.ComicVolumeId == comicChapter.ComicVolumeId {
+			for _, chapter := range v.Chapters {
+				if chapter.ComicChapterId == comicDetail.BrowseChapterId {
+					chapter.CurrentIndex = comicDetail.CurrentIndex
+					break
+				}
+			}
 			chapters = v.Chapters
 			break
 		}

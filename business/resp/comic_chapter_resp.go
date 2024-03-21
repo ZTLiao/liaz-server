@@ -13,4 +13,5 @@ type ComicChapterResp struct {
 	Direction      int8       `json:"direction"`
 	UpdatedAt      types.Time `json:"updatedAt"`
 	Paths          []string   `json:"paths"`
+	CurrentIndex   int        `json:"currentIndex"`
 }
