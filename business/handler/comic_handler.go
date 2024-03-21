@@ -386,16 +386,15 @@ func (e *ComicHandler) ComicCatalogue(wc *web.WebContext) interface{} {
 	if len(volumes) == 0 {
 		return response.Success()
 	}
-	var chapters []resp.ComicChapterResp
+	var chapters []resp.ComicChapterResp = make([]resp.ComicChapterResp, 0)
 	for _, v := range volumes {
 		if v.ComicVolumeId == comicChapter.ComicVolumeId {
 			for _, chapter := range v.Chapters {
 				if chapter.ComicChapterId == comicDetail.BrowseChapterId {
 					chapter.CurrentIndex = comicDetail.CurrentIndex
-					break
 				}
+				chapters = append(chapters, chapter)
 			}
-			chapters = v.Chapters
 			break
 		}
 	}
