@@ -73,14 +73,18 @@ func (e *SearchHandler) Search(wc *web.WebContext) interface{} {
 			e.SearchCache.Incr(assetId)
 		}
 		result = strings.Join(assetIds, utils.COMMA)
-		if len(comicIds) == 0 {
-			e.AutoAddComicSearchJob(key)
-		}
-		if len(novelIds) == 0 {
-			e.AutoAddNovelSearchJob(key)
+		if pageNum == 1 {
+			if len(comicIds) == 0 {
+				e.AutoAddComicSearchJob(key)
+			}
+			if len(novelIds) == 0 {
+				e.AutoAddNovelSearchJob(key)
+			}
 		}
 	} else {
-		go e.AutoAddSearchJob(key)
+		if pageNum == 1 {
+			go e.AutoAddSearchJob(key)
+		}
 	}
 	deviceInfo := device.GetDeviceInfo(wc)
 	userId := web.GetUserId(wc)
