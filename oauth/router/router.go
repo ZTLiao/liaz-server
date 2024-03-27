@@ -47,7 +47,16 @@ func init() {
 		manager.MapClientStorage(clientStore)
 		manager.SetPasswordTokenCfg(&manage.Config{
 			AccessTokenExp:    time.Duration(constant.OAUTH_TOKEN_FOR_EXPIRE_TIME) * time.Second,
+			RefreshTokenExp:   time.Duration(constant.OAUTH_TOKEN_FOR_EXPIRE_TIME) * time.Second,
 			IsGenerateRefresh: true,
+		})
+		manager.SetRefreshTokenCfg(&manage.RefreshingConfig{
+			AccessTokenExp:     time.Duration(constant.OAUTH_TOKEN_FOR_EXPIRE_TIME) * time.Second,
+			RefreshTokenExp:    time.Duration(constant.OAUTH_TOKEN_FOR_EXPIRE_TIME) * time.Second,
+			IsGenerateRefresh:  true,
+			IsResetRefreshTime: true,
+			IsRemoveAccess:     true,
+			IsRemoveRefreshing: true,
 		})
 		srv := server.NewDefaultServer(manager)
 		srv.SetAllowGetAccessRequest(true)
