@@ -44,3 +44,16 @@ func (e *MessageBoardDb) InsertMessageBoard(content string, deviceInfo *device.D
 	}
 	return nil
 }
+
+func (e *MessageBoardDb) GetMessageBoardPage(startRow int, endRow int) ([]model.MessageBoard, int64, error) {
+	var messageBoards []model.MessageBoard
+	err := e.db.OrderBy("created_at asc").Limit(endRow, startRow).Find(&messageBoards)
+	if err != nil {
+		return nil, 0, err
+	}
+	total, err := e.db.Count(&model.MessageBoard{})
+	if err != nil {
+		return nil, 0, err
+	}
+	return messageBoards, total, nil
+}

@@ -44,6 +44,9 @@ func init() {
 			new(controller.AdminAppVersionController).Router(r)
 			new(controller.AdminNotificationController).Router(r)
 			new(controller.AdminCategoryGroupController).Router(r)
+			new(controller.AdminComicController).Router(r)
+			new(controller.AdminNovelController).Router(r)
+			new(controller.AdminMessageBoardController).Router(r)
 		}
 	})
 }
