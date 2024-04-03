@@ -135,3 +135,25 @@ func (e *NovelDb) GetNovelMapByIds(novelIds []int64) (map[int64]model.Novel, err
 	}
 	return novelMap, nil
 }
+
+func (e *NovelDb) GetNovelPage(searchKey string, startRow int, endRow int) ([]model.Novel, int64, error) {
+	var novels []model.Novel
+	session := e.db.OrderBy("updated_at desc")
+	if len(searchKey) != 0 {
+		session = session.And("(title = ? or categories = ? or authors = ?)", searchKey, searchKey, searchKey)
+	}
+	err := session.Limit(endRow, startRow).Find(&novels)
+	if err != nil {
+		return nil, 0, err
+	}
+	var total int64
+	if len(searchKey) != 0 {
+		total, err = e.db.Where("(title = ? or categories = ? or authors = ?)", searchKey, searchKey, searchKey).Count(&model.Novel{})
+	} else {
+		total, err = e.db.Count(&model.Novel{})
+	}
+	if err != nil {
+		return nil, 0, err
+	}
+	return novels, total, nil
+}

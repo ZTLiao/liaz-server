@@ -132,3 +132,25 @@ func (e *ComicDb) GetComicMapByIds(comicIds []int64) (map[int64]model.Comic, err
 	}
 	return comicMap, nil
 }
+
+func (e *ComicDb) GetComicPage(searchKey string, startRow int, endRow int) ([]model.Comic, int64, error) {
+	var comics []model.Comic
+	session := e.db.OrderBy("updated_at desc")
+	if len(searchKey) != 0 {
+		session = session.And("(title = ? or categories = ? or authors = ?)", searchKey, searchKey, searchKey)
+	}
+	err := session.Limit(endRow, startRow).Find(&comics)
+	if err != nil {
+		return nil, 0, err
+	}
+	var total int64
+	if len(searchKey) != 0 {
+		total, err = e.db.Where("(title = ? or categories = ? or authors = ?)", searchKey, searchKey, searchKey).Count(&model.Comic{})
+	} else {
+		total, err = e.db.Count(&model.Comic{})
+	}
+	if err != nil {
+		return nil, 0, err
+	}
+	return comics, total, nil
+}
