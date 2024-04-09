@@ -154,3 +154,22 @@ func (e *ComicDb) GetComicPage(searchKey string, startRow int, endRow int) ([]mo
 	}
 	return comics, total, nil
 }
+
+func (e *ComicDb) SaveOrUpdateComic(comic *model.Comic) error {
+	var now = types.Time(time.Now())
+	comicId := comic.ComicId
+	if comicId == 0 {
+		comic.CreatedAt = now
+		_, err := e.db.Insert(comic)
+		if err != nil {
+			return err
+		}
+	} else {
+		comic.UpdatedAt = now
+		_, err := e.db.ID(comicId).Update(comic)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

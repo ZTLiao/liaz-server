@@ -2,9 +2,11 @@ package handler
 
 import (
 	"admin/resp"
+	"business/model"
 	"business/storage"
 	"core/response"
 	"core/web"
+	"fmt"
 	"strconv"
 )
 
@@ -30,4 +32,87 @@ func (e *AdminComicHandler) GetComicPage(wc *web.WebContext) interface{} {
 	pagination.SetRecords(records)
 	pagination.SetTotal(total)
 	return response.ReturnOK(pagination)
+}
+
+func (e *AdminComicHandler) SaveComic(wc *web.WebContext) interface{} {
+	e.saveOrUpdateComic(wc)
+	return response.Success()
+}
+
+func (e *AdminComicHandler) UpdateComic(wc *web.WebContext) interface{} {
+	e.saveOrUpdateComic(wc)
+	return response.Success()
+}
+
+func (e *AdminComicHandler) saveOrUpdateComic(wc *web.WebContext) {
+	var params map[string]any
+	if err := wc.ShouldBindJSON(&params); err != nil {
+		wc.AbortWithError(err)
+	}
+	comicIdStr := fmt.Sprint(params["comicId"])
+	firstLetter := fmt.Sprint(params["firstLetter"])
+	title := fmt.Sprint(params["title"])
+	cover := fmt.Sprint(params["cover"])
+	authorIds := fmt.Sprint(params["authorIds"])
+	authors := fmt.Sprint(params["authors"])
+	categoryIds := fmt.Sprint(params["categoryIds"])
+	categories := fmt.Sprint(params["categories"])
+	regionIdStr := fmt.Sprint(params["regionId"])
+	region := fmt.Sprint(params["region"])
+	description := fmt.Sprint(params["description"])
+	directionStr := fmt.Sprint(params["direction"])
+	flagStr := fmt.Sprint(params["flag"])
+	startTimeStr := fmt.Sprint(params["startTime"])
+	endTimeStr := fmt.Sprint(params["endTime"])
+	statusStr := fmt.Sprint(params["status"])
+	var comic = new(model.Comic)
+	if len(comicIdStr) > 0 {
+		comicId, err := strconv.ParseInt(comicIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		comic.ComicId = comicId
+	}
+	if len(regionIdStr) > 0 {
+		regionId, err := strconv.ParseInt(regionIdStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		comic.RegionId = regionId
+	}
+	if len(directionStr) > 0 {
+		direction, err := strconv.ParseInt(directionStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		comic.Direction = int8(direction)
+	}
+	if len(flagStr) > 0 {
+		flag, err := strconv.ParseInt(flagStr, 10, 64)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		comic.Flag = int8(flag)
+	}
+	if len(startTimeStr) > 0 {
+
+	}
+	if len(endTimeStr) > 0 {
+
+	}
+	status, err := strconv.ParseInt(statusStr, 10, 8)
+	if err != nil {
+		wc.AbortWithError(err)
+	}
+	comic.FirstLetter = firstLetter
+	comic.Title = title
+	comic.Cover = cover
+	comic.AuthorIds = authorIds
+	comic.Authors = authors
+	comic.CategoryIds = categoryIds
+	comic.Categories = categories
+	comic.Region = region
+	comic.Description = description
+	comic.Status = int8(status)
+	e.ComicDb.SaveOrUpdateComic(comic)
 }
