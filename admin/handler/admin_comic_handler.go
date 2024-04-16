@@ -5,9 +5,12 @@ import (
 	"business/model"
 	"business/storage"
 	"core/response"
+	"core/types"
+	"core/utils"
 	"core/web"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 type AdminComicHandler struct {
@@ -95,10 +98,18 @@ func (e *AdminComicHandler) saveOrUpdateComic(wc *web.WebContext) {
 		comic.Flag = int8(flag)
 	}
 	if len(startTimeStr) > 0 {
-
+		startTime, err := time.Parse(utils.NORM_DATETIME_PATTERN, startTimeStr)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		comic.StartTime = types.Time(startTime)
 	}
 	if len(endTimeStr) > 0 {
-
+		endTime, err := time.Parse(utils.NORM_DATETIME_PATTERN, endTimeStr)
+		if err != nil {
+			wc.AbortWithError(err)
+		}
+		comic.EndTime = types.Time(endTime)
 	}
 	status, err := strconv.ParseInt(statusStr, 10, 8)
 	if err != nil {
