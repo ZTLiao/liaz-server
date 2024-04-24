@@ -157,3 +157,22 @@ func (e *NovelDb) GetNovelPage(searchKey string, startRow int, endRow int) ([]mo
 	}
 	return novels, total, nil
 }
+
+func (e *NovelDb) SaveOrUpdateNovel(novel *model.Novel) error {
+	var now = types.Time(time.Now())
+	novelId := novel.NovelId
+	if novelId == 0 {
+		novel.CreatedAt = now
+		_, err := e.db.Insert(novel)
+		if err != nil {
+			return err
+		}
+	} else {
+		novel.UpdatedAt = now
+		_, err := e.db.ID(novelId).Update(novel)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
