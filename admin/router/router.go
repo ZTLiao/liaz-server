@@ -47,6 +47,7 @@ func init() {
 			new(controller.AdminComicController).Router(r)
 			new(controller.AdminNovelController).Router(r)
 			new(controller.AdminMessageBoardController).Router(r)
+			new(controller.AdminRedisController).Router(r)
 		}
 	})
 }
